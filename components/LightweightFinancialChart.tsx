@@ -138,6 +138,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
 
     const [focusDate, setFocusDate] = useState<Date | null>(null);
     const [zoomPercentage, setZoomPercentage] = useState(0);
+    const [requestedZoomPercentage, setRequestedZoomPercentage] = useState(0); // User's intended zoom level
     const [crosshairPosition, setCrosshairPosition] = useState<{ date: string; value: number } | null>(null);
     // Removed state for sim lines to use direct DOM manipulation for performance
     const headerDateRange = useRef<{ from: string; to: string } | null>(null);
@@ -457,16 +458,17 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                 const rangeDays = getDaysDifference(start, end);
                 const percentage = calculateZoomPercentage(rangeDays, latestMaxRangeDays.current);
 
-                // Snap to nearest 5% if within 2.5% to avoid "weird" values like 8% or 18%
-                // BUT only for finer granularities where snapping makes sense.
-                // For Quarterly/Yearly, the data points are sparse, so strict snapping might fight the user.
-                const snapped = Math.round(percentage / 5) * 5;
-
-                // Disable snapping for Quarterly/Yearly to allow smoother zoom control
-                if ((frequency === Frequency.QUARTERLY || frequency === Frequency.YEARLY) || Math.abs(percentage - snapped) >= 2.5) {
+                // For Quarterly/Yearly views, use raw percentage (no snapping)
+                // For other views, snap to nearest 5% if within 2.5% tolerance
+                if (frequency === Frequency.QUARTERLY || frequency === Frequency.YEARLY) {
                     setZoomPercentage(percentage);
                 } else {
-                    setZoomPercentage(snapped);
+                    const snapped = Math.round(percentage / 5) * 5;
+                    if (Math.abs(percentage - snapped) < 2.5) {
+                        setZoomPercentage(snapped);
+                    } else {
+                        setZoomPercentage(percentage);
+                    }
                 }
             }
 
@@ -574,6 +576,9 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
     }, [isZoomed, visibleStartDate, visibleEndDate, focusDate]);
 
     const handleZoomChange = useCallback((newPercentage: number) => {
+        // Track the user's requested percentage separately
+        setRequestedZoomPercentage(newPercentage);
+
         const newRangeDays = calculateRangeFromPercentage(newPercentage, maxRangeDays);
 
         const currentStart = new Date(visibleStartDate);
@@ -596,6 +601,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
         if (chartRef.current) {
             chartRef.current.timeScale().fitContent();
             setFocusDate(null);
+            setRequestedZoomPercentage(0);
             // We don't need to manually call onVisibleDateRangeChange here
             // because fitContent() will trigger subscribeVisibleTimeRangeChange
             // which will update the state automatically.
@@ -648,7 +654,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
 
                 <div className="flex items-center space-x-4">
                     {/* Zoom Slider */}
-                    <ZoomSlider percentage={zoomPercentage} onChange={handleZoomChange} isZoomed={isZoomed} onReset={handleReset} />
+                    <ZoomSlider percentage={requestedZoomPercentage || zoomPercentage} onChange={handleZoomChange} isZoomed={isZoomed} onReset={handleReset} />
 
                     {/* Simulation Dates */}
                     <div className="flex items-center space-x-2 bg-gray-900 px-3 py-1.5 rounded border border-gray-700 h-8 justify-center mr-2">
