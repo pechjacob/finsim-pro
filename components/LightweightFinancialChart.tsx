@@ -301,10 +301,17 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                 textColor: '#9ca3af',
             },
             localization: {
-                timeFormatter: (timestamp: number) => {
-                    // Ensure we have a valid timestamp
-                    if (timestamp === undefined || timestamp === null || isNaN(timestamp)) return '';
-                    const date = new Date(timestamp * 1000);
+                timeFormatter: (time: number | string) => {
+                    let date: Date;
+                    // Handle timestamp (number) or date string
+                    if (typeof time === 'number') {
+                        date = new Date(time * 1000);
+                    } else {
+                        date = new Date(time);
+                    }
+
+                    if (isNaN(date.getTime())) return '';
+
                     const month = date.toLocaleString('en-US', { month: 'short' });
                     const day = date.getDate();
                     const year = date.getFullYear();
