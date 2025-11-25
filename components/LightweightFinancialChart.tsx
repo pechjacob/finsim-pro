@@ -99,7 +99,7 @@ const ZoomSlider = ({ percentage, onChange, isZoomed, onReset }: { percentage: n
 const ZoomInfoDisplay = ({ focusDate, rangeBefore, rangeAfter }: { focusDate: Date | null, rangeBefore: number, rangeAfter: number }) => {
     if (!focusDate) return null;
     return (
-        <div className="bg-gray-900/30 backdrop-blur-[2px] border border-gray-700/50 rounded p-2 shadow-lg">
+        <div className="bg-gray-900/30 backdrop-blur-[2px] border border-gray-700/50 rounded p-2 shadow-lg pointer-events-none">
             <div className="flex items-center space-x-3 text-xs">
                 <div className="flex items-center space-x-1">
                     <span className="text-orange-400 font-medium">Focus:</span>
@@ -109,7 +109,7 @@ const ZoomInfoDisplay = ({ focusDate, rangeBefore, rangeAfter }: { focusDate: Da
                 </div>
                 <div className="w-px h-3 bg-gray-700"></div>
                 <div className="flex items-center space-x-1">
-                    <span className="text-blue-400 font-medium">Range:</span>
+                    <span className="text-purple-400 font-medium">Range:</span>
                     <span className="text-white font-mono">
                         {rangeBefore} / +{rangeAfter} Day(s)
                     </span>
@@ -458,12 +458,15 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                 const percentage = calculateZoomPercentage(rangeDays, latestMaxRangeDays.current);
 
                 // Snap to nearest 5% if within 2.5% to avoid "weird" values like 8% or 18%
-                // This corrects for small deviations due to chart bar alignment (especially in Monthly view)
+                // BUT only for finer granularities where snapping makes sense.
+                // For Quarterly/Yearly, the data points are sparse, so strict snapping might fight the user.
                 const snapped = Math.round(percentage / 5) * 5;
-                if (Math.abs(percentage - snapped) < 2.5) {
-                    setZoomPercentage(snapped);
-                } else {
+
+                // Disable snapping for Quarterly/Yearly to allow smoother zoom control
+                if ((frequency === Frequency.QUARTERLY || frequency === Frequency.YEARLY) || Math.abs(percentage - snapped) >= 2.5) {
                     setZoomPercentage(percentage);
+                } else {
+                    setZoomPercentage(snapped);
                 }
             }
 
@@ -473,7 +476,20 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
             latestUpdateSimLines.current?.();
         });
 
-        window.addEventListener('resize', handleResize);
+        // Use ResizeObserver for robust resizing
+        const resizeObserver = new ResizeObserver(entries => {
+            if (entries.length === 0 || !entries[0].contentRect) return;
+            if (chartRef.current && chartContainerRef.current) {
+                const { width, height } = entries[0].contentRect;
+                chartRef.current.applyOptions({ width, height });
+                // Update sim lines on resize
+                latestUpdateSimLines.current?.();
+            }
+        });
+
+        if (chartContainerRef.current) {
+            resizeObserver.observe(chartContainerRef.current);
+        }
 
         // Initial update of Sim lines to ensure they appear on load
         // Use setTimeout to ensure the chart is fully ready and data might be available
@@ -482,7 +498,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
         }, 100);
 
         return () => {
-            window.removeEventListener('resize', handleResize);
+            resizeObserver.disconnect();
             chart.remove();
             chartRef.current = null;
             seriesRef.current = null;
@@ -614,7 +630,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
 
                     {/* Visible Range Display */}
                     <div className="flex items-center space-x-2 bg-gray-900 px-3 py-1.5 rounded border border-gray-700 h-8 justify-center w-[290px]">
-                        <span className={`text-xs font-medium ${isZoomed ? 'text-orange-400' : 'text-gray-400'}`}>Zoomed:</span>
+                        <span className={`text-xs font-medium ${isZoomed ? 'text-purple-400' : 'text-gray-400'}`}>Zoomed:</span>
                         <div className="grid grid-cols-[85px_20px_85px] items-center text-white font-mono text-xs">
                             <span className="text-center">
                                 {isZoomed && headerDateRange.current ? formatDateMMDDYYYY(new Date(headerDateRange.current.from)) : '-/-/-'}
