@@ -193,10 +193,9 @@ const SortableEventItem: React.FC<SortableEventItemProps> = ({
     const point = simulationPoints?.find(p => p.date === item.startDate);
     let beginningBalance = 0;
 
-    // Use item-specific start balance from itemStartBalances map if available
-    beginningBalance = point
-        ? (point.effectPrincipals?.[item.id] ?? point.balanceBeforeEffects ?? point.balance)
-        : 0;
+    // Use item-specific start balance from itemStartBalances map
+    // This shows the balance BEFORE this item applies
+    beginningBalance = point?.itemStartBalances?.[item.id] ?? 0;
 
     beginningBalanceFormatted = formatCurrency(beginningBalance);
 
@@ -262,7 +261,7 @@ const SortableEventItem: React.FC<SortableEventItemProps> = ({
                     ) : (
                         <>
                             <span>Starts {startDateFormatted}</span>
-                            {item.type === 'effect' && <span className="text-xs opacity-70 italic">On</span>}
+                            <span className="text-xs opacity-70 italic">On</span>
                             <span className="text-xs font-mono bg-black/30 px-2 py-0.5 rounded text-white shadow-sm">
                                 {beginningBalanceFormatted}
                             </span>
