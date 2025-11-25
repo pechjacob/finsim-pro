@@ -307,6 +307,7 @@ export const aggregateData = (data: { date: string; balance: number }[], frequen
   const aggregated: { date: string; balance: number }[] = [];
   let currentPeriodStart: Date | null = null;
   let lastPoint: { date: string; balance: number } | null = null;
+  let isFirstPoint = true;
 
   data.forEach((point) => {
     const date = parseDate(point.date);
@@ -340,16 +341,24 @@ export const aggregateData = (data: { date: string; balance: number }[], frequen
       }
     }
 
-    if (isNewPeriod && lastPoint) {
+    // Always include the very first point (sim start date)
+    if (isFirstPoint) {
+      aggregated.push(point);
+      isFirstPoint = false;
+    } else if (isNewPeriod && lastPoint) {
       aggregated.push(lastPoint);
       currentPeriodStart = date;
     }
     lastPoint = point;
   });
 
-  // Add the final point
-  if (lastPoint) {
-    aggregated.push(lastPoint);
+  // Add the final point (sim end date) if it's not already added
+  if (lastPoint && !isFirstPoint) {
+    // Check if the last point is already in aggregated
+    const lastAggregated = aggregated[aggregated.length - 1];
+    if (!lastAggregated || lastAggregated.date !== lastPoint.date) {
+      aggregated.push(lastPoint);
+    }
   }
 
   return aggregated;
