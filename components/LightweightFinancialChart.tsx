@@ -39,6 +39,11 @@ const formatDateMMDDYYYY = (date: Date): string => {
     return `${month}/${day}/${year}`;
 };
 
+// Format price to nearest whole dollar
+const priceFormatter = (price: number): string => {
+    return Math.round(price).toString();
+};
+
 const ZoomSlider = ({ percentage, onChange, isZoomed, onReset }: { percentage: number; onChange: (val: number) => void; isZoomed: boolean; onReset: () => void }) => {
     return (
         <div className="flex items-center space-x-0.5 bg-gray-800/50 rounded-lg p-1 border border-gray-700">
@@ -134,8 +139,13 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
     const [focusDate, setFocusDate] = useState<Date | null>(null);
     const [zoomPercentage, setZoomPercentage] = useState(0);
     const [crosshairPosition, setCrosshairPosition] = useState<{ date: string; value: number } | null>(null);
-    const [simLinePositions, setSimLinePositions] = useState<{ start: number | null; end: number | null }>({ start: null, end: null });
-    const [headerDateRange, setHeaderDateRange] = useState<{ from: string; to: string } | null>(null);
+    // Removed state for sim lines to use direct DOM manipulation for performance
+    const headerDateRange = useRef<{ from: string; to: string } | null>(null);
+    const [, forceUpdate] = useState({}); // Force update for header date range if needed
+
+    // Refs for Sim Lines
+    const simStartLineRef = useRef<HTMLDivElement>(null);
+    const simEndLineRef = useRef<HTMLDivElement>(null);
 
     // Convert balance data to lightweight-charts format
     const chartData = useMemo(() => {
@@ -261,7 +271,15 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
             endX = Math.min(endX, chartWidth - priceScaleWidth);
         }
 
-        setSimLinePositions({ start: startX, end: endX });
+        // Direct DOM manipulation for performance
+        if (simStartLineRef.current) {
+            simStartLineRef.current.style.display = startX !== null ? 'block' : 'none';
+            if (startX !== null) simStartLineRef.current.style.left = `${startX}px`;
+        }
+        if (simEndLineRef.current) {
+            simEndLineRef.current.style.display = endX !== null ? 'block' : 'none';
+            if (endX !== null) simEndLineRef.current.style.left = `${endX}px`;
+        }
     }, [simulationStartDate, simulationEndDate, getCoordinateForDate]);
 
     // Ref for updateSimLines to be used in subscriptions
@@ -316,7 +334,8 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                     const day = date.getDate();
                     const year = date.getFullYear();
                     return `${month} ${day} ${year}`;
-                }
+                },
+                priceFormatter: priceFormatter,
             },
             width: chartContainerRef.current.clientWidth,
             height: chartContainerRef.current.clientHeight,
@@ -414,7 +433,12 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                 if (fromIndex <= toIndex && latestChartData.current.length > 0) {
                     const fromStr = latestChartData.current[fromIndex].time as string;
                     const toStr = latestChartData.current[toIndex].time as string;
-                    setHeaderDateRange({ from: fromStr, to: toStr });
+                    if (fromIndex <= toIndex && latestChartData.current.length > 0) {
+                        const fromStr = latestChartData.current[fromIndex].time as string;
+                        const toStr = latestChartData.current[toIndex].time as string;
+                        headerDateRange.current = { from: fromStr, to: toStr };
+                        forceUpdate({}); // Trigger re-render for header update
+                    }
                 }
             }
 
@@ -445,7 +469,8 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
 
             // Update sim lines
             latestUpdateSimLines.current?.();
-            setSimLinePositions(prev => prev); // Force re-render if needed
+            // Update sim lines
+            latestUpdateSimLines.current?.();
         });
 
         window.addEventListener('resize', handleResize);
@@ -592,11 +617,11 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                         <span className={`text-xs font-medium ${isZoomed ? 'text-orange-400' : 'text-gray-400'}`}>Zoomed:</span>
                         <div className="grid grid-cols-[85px_20px_85px] items-center text-white font-mono text-xs">
                             <span className="text-center">
-                                {isZoomed && headerDateRange ? formatDateMMDDYYYY(new Date(headerDateRange.from)) : '-/-/-'}
+                                {isZoomed && headerDateRange.current ? formatDateMMDDYYYY(new Date(headerDateRange.current.from)) : '-/-/-'}
                             </span>
                             <span className="text-center">-</span>
                             <span className="text-center">
-                                {isZoomed && headerDateRange ? formatDateMMDDYYYY(new Date(headerDateRange.to)) : '-/-/-'}
+                                {isZoomed && headerDateRange.current ? formatDateMMDDYYYY(new Date(headerDateRange.current.to)) : '-/-/-'}
                             </span>
                         </div>
                     </div>
@@ -660,27 +685,16 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                 />
 
                 {/* Sim Start Line */}
-                {simLinePositions.start !== null && (
-                    <div
-                        className="absolute top-0 bottom-[30px] border-l border-lime-400 border-dashed w-px pointer-events-none z-50"
-                        style={{ left: `${simLinePositions.start}px` }}
-                    >
-                        <span className="absolute top-2 left-1/2 -translate-x-1/2 text-[10px] font-mono text-lime-400 bg-gray-900/80 px-1 rounded pointer-events-auto whitespace-nowrap">
-                            Start
-                        </span>
-                    </div>
-                )}
+                <div
+                    ref={simStartLineRef}
+                    className="absolute top-0 bottom-[30px] border-l border-lime-400 border-dashed w-px pointer-events-none z-50 hidden"
+                />
+
                 {/* Sim End Line */}
-                {simLinePositions.end !== null && (
-                    <div
-                        className="absolute top-0 bottom-[30px] border-l border-lime-400 border-dashed w-px pointer-events-none z-50"
-                        style={{ left: `${simLinePositions.end}px` }}
-                    >
-                        <span className="absolute top-2 left-1/2 -translate-x-1/2 text-[10px] font-mono text-lime-400 bg-gray-900/80 px-1 rounded pointer-events-auto whitespace-nowrap">
-                            End
-                        </span>
-                    </div>
-                )}
+                <div
+                    ref={simEndLineRef}
+                    className="absolute top-0 bottom-[30px] border-l border-lime-400 border-dashed w-px pointer-events-none z-50 hidden"
+                />
             </div>
         </div>
     );
