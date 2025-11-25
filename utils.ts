@@ -345,11 +345,17 @@ export const aggregateData = (data: { date: string; balance: number }[], frequen
     if (isFirstPoint) {
       aggregated.push(point);
       isFirstPoint = false;
+      lastPoint = point; // Track it as lastPoint but don't add it again later
     } else if (isNewPeriod && lastPoint) {
-      aggregated.push(lastPoint);
+      // Only add lastPoint if it's not the same as the first point we already added
+      if (aggregated[aggregated.length - 1].date !== lastPoint.date) {
+        aggregated.push(lastPoint);
+      }
       currentPeriodStart = date;
+      lastPoint = point;
+    } else {
+      lastPoint = point;
     }
-    lastPoint = point;
   });
 
   // Add the final point (sim end date) if it's not already added
