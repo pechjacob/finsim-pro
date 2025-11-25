@@ -144,9 +144,10 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
     const headerDateRange = useRef<{ from: string; to: string } | null>(null);
     const [, forceUpdate] = useState({}); // Force update for header date range if needed
 
-    // Refs for Sim Lines
+    // Refs for Sim Lines and Focus Line
     const simStartLineRef = useRef<HTMLDivElement>(null);
     const simEndLineRef = useRef<HTMLDivElement>(null);
+    const focusLineRef = useRef<HTMLDivElement>(null);
 
     // Convert balance data to lightweight-charts format
     const chartData = useMemo(() => {
@@ -275,6 +276,12 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
             endX = null;
         }
 
+        // Get focus line position if zoomed
+        let focusX: number | null = null;
+        if (focusDate && isZoomed) {
+            focusX = getCoordinateForDate(formatDate(focusDate));
+        }
+
         // Direct DOM manipulation for performance
         if (simStartLineRef.current) {
             simStartLineRef.current.style.display = startX !== null ? 'block' : 'none';
@@ -284,7 +291,11 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
             simEndLineRef.current.style.display = endX !== null ? 'block' : 'none';
             if (endX !== null) simEndLineRef.current.style.left = `${endX}px`;
         }
-    }, [simulationStartDate, simulationEndDate, getCoordinateForDate]);
+        if (focusLineRef.current) {
+            focusLineRef.current.style.display = focusX !== null ? 'block' : 'none';
+            if (focusX !== null) focusLineRef.current.style.left = `${focusX}px`;
+        }
+    }, [simulationStartDate, simulationEndDate, getCoordinateForDate, focusDate, isZoomed]);
 
     // Ref for updateSimLines to be used in subscriptions
     const latestUpdateSimLines = useRef(updateSimLines);
@@ -329,7 +340,17 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                     if (typeof time === 'number') {
                         date = new Date(time * 1000);
                     } else {
-                        date = new Date(time);
+                        // Parse date string as YYYY-MM-DD to avoid timezone issues
+                        // Creating Date from string interprets as UTC, causing off-by-one errors
+                        const parts = time.split('-');
+                        if (parts.length === 3) {
+                            const year = parseInt(parts[0], 10);
+                            const month = parseInt(parts[1], 10) - 1; // 0-indexed
+                            const day = parseInt(parts[2], 10);
+                            date = new Date(year, month, day);
+                        } else {
+                            date = new Date(time);
+                        }
                     }
 
                     if (isNaN(date.getTime())) return '';
@@ -460,6 +481,12 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                 const end = new Date(toStr);
                 const rangeDays = getDaysDifference(start, end);
                 const percentage = calculateZoomPercentage(rangeDays, latestMaxRangeDays.current);
+
+                // Update focus date to center of visible range when zoomed and panning
+                if (isZoomed) {
+                    const centerTime = start.getTime() + (end.getTime() - start.getTime()) / 2;
+                    setFocusDate(new Date(centerTime));
+                }
 
                 // For Quarterly/Yearly views, use raw percentage (no snapping)
                 // For other views, snap to nearest 5% if within 2.5% tolerance
@@ -729,6 +756,12 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                 <div
                     ref={simEndLineRef}
                     className="absolute top-0 bottom-[30px] border-l border-lime-400 border-dashed w-px pointer-events-none z-50 hidden"
+                />
+
+                {/* Focus Line (Orange) */}
+                <div
+                    ref={focusLineRef}
+                    className="absolute top-0 bottom-[30px] border-l border-orange-400 border-dotted w-px pointer-events-none z-40 hidden opacity-60"
                 />
             </div>
         </div>
