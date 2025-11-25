@@ -265,11 +265,14 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
         const startX = getCoordinateForDate(simulationStartDate);
         let endX = getCoordinateForDate(simulationEndDate);
 
-        // Clamp endX to avoid drawing over the price scale (approx 80px width)
-        if (endX !== null) {
-            const chartWidth = chartContainerRef.current.clientWidth;
-            const priceScaleWidth = 80; // Fixed width from config
-            endX = Math.min(endX, chartWidth - priceScaleWidth);
+        const chartWidth = chartContainerRef.current.clientWidth;
+        const priceScaleWidth = 80; // Fixed width from config
+        const maxX = chartWidth - priceScaleWidth;
+
+        // Hide the end line if it's beyond the visible viewport (to the right)
+        // Instead of clamping it to the edge
+        if (endX !== null && endX > maxX) {
+            endX = null;
         }
 
         // Direct DOM manipulation for performance
