@@ -288,7 +288,7 @@ export const runSimulation = (
       itemStartBalances
     });
 
-    loopDate.setDate(loopDate.getDate() + 1);
+    loopDate.setTime(addDays(loopDate, 1).getTime());
     safetyCounter++;
   }
 
