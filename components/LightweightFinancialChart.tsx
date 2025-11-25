@@ -493,6 +493,15 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
             resizeObserver.observe(chartContainerRef.current);
         }
 
+        // Continuous update loop for sim lines using requestAnimationFrame
+        // This ensures sim lines stay perfectly synced during panning
+        let animationFrameId: number;
+        const updateLoop = () => {
+            latestUpdateSimLines.current?.();
+            animationFrameId = requestAnimationFrame(updateLoop);
+        };
+        updateLoop();
+
         // Initial update of Sim lines to ensure they appear on load
         // Use setTimeout to ensure the chart is fully ready and data might be available
         setTimeout(() => {
@@ -500,6 +509,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
         }, 100);
 
         return () => {
+            cancelAnimationFrame(animationFrameId);
             resizeObserver.disconnect();
             chart.remove();
             chartRef.current = null;
