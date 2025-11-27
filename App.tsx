@@ -54,6 +54,7 @@ const App: React.FC = () => {
   const [visibleStartDate, setVisibleStartDate] = useState<string>(formatDate(today));
   const [visibleEndDate, setVisibleEndDate] = useState<string>(formatDate(addDays(today, 365 * 5)));
   const [granularity, setGranularity] = useState<Frequency>(Frequency.MONTHLY);
+  const [isFlipped, setIsFlipped] = useState(false);
 
   // Computed
   const activeAccount = accounts.find(a => a.id === activeAccountId) || accounts[0];
@@ -227,6 +228,7 @@ const App: React.FC = () => {
         }}
         viewStartDate={simulationStartDate}
         viewEndDate={simulationEndDate}
+        isFlipped={isFlipped}
       />
 
       {/* Main Content */}
@@ -295,6 +297,8 @@ const App: React.FC = () => {
             onToggleAllItems={handleToggleAllItems}
             hoverDate={hoverDate}
             frequency={granularity}
+            isFlipped={isFlipped}
+            onFlip={() => setIsFlipped(!isFlipped)}
           />
         </div>
 

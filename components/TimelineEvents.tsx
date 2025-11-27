@@ -2,12 +2,15 @@ import React, { useState, useMemo } from 'react';
 import { FinancialItem, FormulaType, SimulationPoint, Frequency } from '../types';
 import { formatCurrency } from '../utils';
 import { calculateTotalDelta } from '../services/simulation';
-import { ChevronUp, ChevronDown, GripVertical, Trash2, Eye, EyeOff, RotateCcw, Filter } from 'lucide-react';
+import { ChevronUp, ChevronDown, GripVertical, Trash2, Eye, EyeOff, RotateCcw, Filter, Braces } from 'lucide-react';
 import { DndContext, closestCenter, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { TimelineSyncChart } from './TimelineSyncChart';
+import { motion } from 'framer-motion';
+import { FormulaDisplay } from './FormulaDisplay';
+import { FlipIcon } from './FlipIcon';
 
 interface TimelineEventsProps {
     items: FinancialItem[];
@@ -291,7 +294,9 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
     hoverDate,
     isZoomed,
     onResetView,
-    frequency
+    frequency,
+    isFlipped,
+    onFlip
 }) => {
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -340,139 +345,297 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
     };
 
     return (
-        <div className="bg-gray-900 w-full border-t border-gray-800 flex flex-col h-full relative transition-all">
-            {/* Header Row mimicking spreadsheet/timeline header */}
-            <div
-                onClick={onToggleCollapse}
-                className={`sticky top-0 z-20 bg-gray-900 border-b border-gray-800 px-4 h-10 text-xs text-gray-500 flex ${isCollapsed ? 'justify-center' : 'justify-between'} items-center cursor-pointer hover:bg-gray-800 transition-colors shrink-0`}
+        <div className={`flex flex-col bg-gray-900 border-t border-gray-800 shadow-xl transition-all duration-300 ease-in-out ${isCollapsed ? 'h-10' : 'h-[450px]'}`} style={{ perspective: 1000 }}>
+            <motion.div
+                className="relative overflow-hidden"
+                initial={false}
+                animate={{
+                    opacity: isCollapsed ? 0 : 1,
+                    height: isCollapsed ? 0 : 440,
+                }}
+                transition={{ duration: 0.3, ease: 'easeInOut' }}
             >
-                <div className="flex items-center gap-2">
-                    {isCollapsed ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                    <span className="font-bold uppercase tracking-wider">Event Timeline</span>
-                    {!isCollapsed && !activeItemId && <span className="text-gray-600 font-normal normal-case ml-4">Select an event or effect to edit</span>}
-                </div>
-                {!isCollapsed && (
-                    <div className="flex items-center gap-2">
-                        {filterType && (
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setFilterType(null);
-                                }}
-                                className="text-gray-500 hover:text-white transition-colors p-1"
-                                title="Reset Filter"
-                            >
-                                <RotateCcw size={14} />
-                            </button>
-                        )}
-                        <div className="relative">
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setIsFilterOpen(!isFilterOpen);
-                                }}
-                                className={`flex items-center gap-1 bg-gray-800 text-gray-300 border ${filterType ? 'border-blue-500 text-blue-400' : 'border-gray-700'} rounded px-2 py-1 hover:bg-gray-700 transition-colors`}
-                                title="Filter Events"
-                            >
-                                <Filter size={14} />
-                                <span className="text-xs font-medium mx-1">
-                                    {filterType ? (filterType.charAt(0).toUpperCase() + filterType.slice(1)) : 'All Events'}
+                <motion.div
+                    className="absolute w-full h-full"
+                    initial={false}
+                    animate={{ rotateY: isFlipped ? 180 : 0 }}
+                    transition={{ duration: 0.6, ease: [0.4, 0.0, 0.2, 1] }}
+                    style={{ transformStyle: 'preserve-3d' }}
+                >
+                    {/* Front Face: Timeline */}
+                    <div
+                        className="absolute w-full h-full bg-gray-900 flex flex-col"
+                        style={{ backfaceVisibility: 'hidden', pointerEvents: isFlipped ? 'none' : 'auto' }}
+                    >
+                        {/* Timeline Header */}
+                        <div
+                            className="flex items-center justify-between px-4 h-10 bg-gray-900 hover:bg-gray-800 border-b border-gray-800 shrink-0 z-30 relative cursor-pointer group transition-colors"
+                            onClick={onToggleCollapse}
+                        >
+                            <div className="flex items-center space-x-2">
+                                <div className="text-gray-500 group-hover:text-white transition-colors">
+                                    <ChevronDown size={16} />
+                                </div>
+                                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                                    Event Timeline
                                 </span>
-                                <ChevronDown size={12} />
-                            </button>
+                                <span className="text-xs text-gray-500 ml-2">
+                                    Select an event or effect to edit
+                                </span>
+                            </div>
+                            <div className="flex items-center space-x-3">
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); onFlip(); }}
+                                    className={`p-1.5 rounded-md transition-colors ${isFlipped ? 'bg-blue-900/50 text-blue-400' : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800'}`}
+                                    title={isFlipped ? "Switch to Timeline" : "Switch to Formula View"}
+                                >
+                                    <FlipIcon size={16} />
+                                </button>
 
-                            {isFilterOpen && (
-                                <>
-                                    <div
-                                        className="fixed inset-0 z-30"
+                                <div className="relative group">
+                                    <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            setIsFilterOpen(false);
+                                            setIsFilterOpen(!isFilterOpen);
                                         }}
-                                    />
-                                    <div className="absolute right-0 top-full mt-1 w-32 bg-gray-800 border border-gray-700 rounded shadow-xl z-40 py-1 flex flex-col">
-                                        {[
-                                            { label: 'All Events', value: null },
-                                            { label: 'Income', value: 'income' },
-                                            { label: 'Expense', value: 'expense' },
-                                            { label: 'Effects', value: 'effect' }
-                                        ].map((option) => (
-                                            <button
-                                                key={option.label}
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setFilterType(option.value as any);
-                                                    setIsFilterOpen(false);
-                                                }}
-                                                className={`text-left px-3 py-1.5 text-xs hover:bg-gray-700 ${filterType === option.value ? 'text-blue-400 font-medium' : 'text-gray-300'}`}
-                                            >
-                                                {option.label}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleToggleVisibleItems();
-                            }}
-                            className="text-gray-500 hover:text-blue-400 transition-colors p-1"
-                            title="Enable/Disable All Events"
-                        >
-                            <Eye size={14} />
-                        </button>
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                if (confirm('Are you sure you want to delete all events?')) {
-                                    onDeleteAllItems();
-                                }
-                            }}
-                            className="text-gray-500 hover:text-red-500 transition-colors p-1"
-                            title="Delete All Events"
-                        >
-                            <Trash2 size={14} />
-                        </button>
-                        <span>Delta in View</span>
-                    </div>
-                )}
-            </div>
+                                        onMouseDown={(e) => e.stopPropagation()}
+                                        className="flex items-center space-x-1 text-gray-400 hover:text-white text-xs bg-gray-800 px-2 py-1 rounded border border-gray-700"
+                                    >
+                                        <Filter size={12} />
+                                        <span>{filterType ? (filterType.charAt(0).toUpperCase() + filterType.slice(1)) : 'All Events'}</span>
+                                    </button>
 
-            {!isCollapsed && (
-                <div className="flex-1 relative overflow-hidden flex flex-col h-full">
-                    {/* Background Sync Chart */}
-                    <TimelineSyncChart
-                        visibleStartDate={viewStartDate}
-                        visibleEndDate={viewEndDate}
-                        hoverDate={hoverDate || null}
-                        simulationPoints={simulationPoints}
-                        frequency={frequency}
-                    />
+                                    {isFilterOpen && (
+                                        <>
+                                            <div className="fixed inset-0 z-30" onClick={(e) => {
+                                                e.stopPropagation();
+                                                setIsFilterOpen(false);
+                                            }} />
+                                            <div className="absolute right-0 top-full mt-1 w-32 bg-gray-900 border border-gray-700 rounded shadow-xl z-40 py-1 flex flex-col">
+                                                {[
+                                                    { label: 'All Events', value: null },
+                                                    { label: 'Income', value: 'income' },
+                                                    { label: 'Expense', value: 'expense' },
+                                                    { label: 'Effects', value: 'effect' }
+                                                ].map((option) => (
+                                                    <button
+                                                        key={option.label}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setFilterType(option.value as any);
+                                                            setIsFilterOpen(false);
+                                                        }}
+                                                        className={`text-left px-3 py-1.5 text-xs hover:bg-gray-700 ${filterType === option.value ? 'text-blue-400 font-medium' : 'text-gray-300'}`}
+                                                    >
+                                                        {option.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
 
-                    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd} modifiers={[restrictToVerticalAxis]}>
-                        <SortableContext items={filteredItems.map(i => i.id)} strategy={verticalListSortingStrategy}>
-                            <div className="py-2 space-y-1 overflow-y-auto flex-1 relative z-10">
-                                {filteredItems.map(item => (
-                                    <SortableEventItem
-                                        key={item.id}
-                                        item={item}
-                                        isActive={item.id === activeItemId}
-                                        onItemClick={onItemClick}
-                                        viewStartDate={viewStartDate}
-                                        viewEndDate={viewEndDate}
-                                        itemTotals={itemTotals}
-                                        simulationPoints={simulationPoints}
-                                    />
-                                ))}
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onToggleAllItems();
+                                    }}
+                                    onMouseDown={(e) => e.stopPropagation()}
+                                    className="text-gray-400 hover:text-white focus:outline-none"
+                                    title="Toggle All Visibility"
+                                >
+                                    <Eye size={16} />
+                                </button>
+
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onDeleteAllItems();
+                                    }}
+                                    onMouseDown={(e) => e.stopPropagation()}
+                                    className="text-gray-400 hover:text-red-400 focus:outline-none"
+                                    title="Delete All Events"
+                                >
+                                    <Trash2 size={16} />
+                                </button>
+
+                                <div className="text-xs text-gray-500 font-mono">
+                                    Delta in View
+                                </div>
                             </div>
-                        </SortableContext>
-                    </DndContext>
+                        </div>
+
+                        {/* Timeline Content */}
+                        <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar relative">
+                            <div className="absolute inset-0 pointer-events-none z-0">
+                                <TimelineSyncChart
+                                    items={items}
+                                    viewStartDate={viewStartDate}
+                                    viewEndDate={viewEndDate}
+                                    simulationPoints={simulationPoints}
+                                    hoverDate={hoverDate}
+                                    isZoomed={isZoomed}
+                                    frequency={frequency}
+                                />
+                            </div>
+                            <div className="relative z-10">
+                                <DndContext
+                                    sensors={sensors}
+                                    collisionDetection={closestCenter}
+                                    onDragEnd={handleDragEnd}
+                                    modifiers={[restrictToVerticalAxis]}
+                                >
+                                    <SortableContext
+                                        items={filteredItems.map(item => item.id)}
+                                        strategy={verticalListSortingStrategy}
+                                    >
+                                        <div className="pb-4">
+                                            {filteredItems.map((item) => (
+                                                <SortableEventItem
+                                                    key={item.id}
+                                                    item={item}
+                                                    isActive={activeItemId === item.id}
+                                                    onItemClick={onItemClick}
+                                                    viewStartDate={viewStartDate}
+                                                    viewEndDate={viewEndDate}
+                                                    itemTotals={itemTotals}
+                                                    simulationPoints={simulationPoints}
+                                                />
+                                            ))}
+                                        </div>
+                                    </SortableContext>
+                                </DndContext>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Back Face: Formula View */}
+                    <div
+                        className="absolute w-full h-full bg-gray-900 flex flex-col"
+                        style={{
+                            backfaceVisibility: 'hidden',
+                            transform: 'rotateY(180deg)',
+                            pointerEvents: isFlipped ? 'auto' : 'none'
+                        }}
+                    >
+                        {/* Formula View Header */}
+                        <div
+                            className="flex items-center justify-between px-4 h-10 bg-gray-900 hover:bg-gray-800 border-b border-gray-800 shrink-0 z-30 relative cursor-pointer group transition-colors"
+                            onClick={onToggleCollapse}
+                        >
+                            <div className="flex items-center space-x-2">
+                                <div className="text-gray-500 group-hover:text-white transition-colors">
+                                    <ChevronDown size={16} />
+                                </div>
+                                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                                    Event Timeline
+                                </span>
+                                <span className="text-xs text-gray-500 ml-2">
+                                    Select an event or effect to edit
+                                </span>
+                            </div>
+                            <div className="flex items-center space-x-3">
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); onFlip(); }}
+                                    className={`p-1.5 rounded-md transition-colors ${isFlipped ? 'bg-blue-900/50 text-blue-400' : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800'}`}
+                                    title={isFlipped ? "Switch to Timeline" : "Switch to Formula View"}
+                                >
+                                    <FlipIcon size={16} />
+                                </button>
+
+                                <div className="relative group">
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setIsFilterOpen(!isFilterOpen); }}
+                                        className="flex items-center space-x-1 text-gray-400 hover:text-white text-xs bg-gray-800 px-2 py-1 rounded border border-gray-700"
+                                    >
+                                        <Filter size={12} />
+                                        <span>{filterType ? (filterType.charAt(0).toUpperCase() + filterType.slice(1)) : 'All Events'}</span>
+                                    </button>
+
+                                    {isFilterOpen && (
+                                        <>
+                                            <div className="fixed inset-0 z-30" onClick={() => setIsFilterOpen(false)} />
+                                            <div className="absolute right-0 top-full mt-1 w-32 bg-gray-900 border border-gray-700 rounded shadow-xl z-40 py-1 flex flex-col">
+                                                {[
+                                                    { label: 'All Events', value: null },
+                                                    { label: 'Income', value: 'income' },
+                                                    { label: 'Expense', value: 'expense' },
+                                                    { label: 'Effects', value: 'effect' }
+                                                ].map((option) => (
+                                                    <button
+                                                        key={option.label}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setFilterType(option.value as any);
+                                                            setIsFilterOpen(false);
+                                                        }}
+                                                        className={`text-left px-3 py-1.5 text-xs hover:bg-gray-700 ${filterType === option.value ? 'text-blue-400 font-medium' : 'text-gray-300'}`}
+                                                    >
+                                                        {option.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onToggleAllItems();
+                                    }}
+                                    onMouseDown={(e) => e.stopPropagation()}
+                                    className="text-gray-400 hover:text-white focus:outline-none"
+                                    title="Toggle All Visibility"
+                                >
+                                    <Eye size={16} />
+                                </button>
+
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onDeleteAllItems();
+                                    }}
+                                    onMouseDown={(e) => e.stopPropagation()}
+                                    className="text-gray-400 hover:text-red-400 focus:outline-none"
+                                    title="Delete All Events"
+                                >
+                                    <Trash2 size={16} />
+                                </button>
+
+                                <div className="text-xs text-gray-500 font-mono">
+                                    Delta in View
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Formula Content */}
+                        <div className="flex-1 overflow-y-auto custom-scrollbar">
+                            <FormulaDisplay items={items} />
+                        </div>
+                    </div>
+                </motion.div>
+            </motion.div>
+
+            {/* Collapsed Header */}
+            {isCollapsed && (
+                <div
+                    className="flex items-center justify-between px-4 h-10 bg-gray-900 hover:bg-gray-800 border-b border-gray-800 shrink-0 z-30 relative cursor-pointer group transition-colors"
+                    onClick={onToggleCollapse}
+                >
+                    <div className="flex items-center space-x-2">
+                        <div className="text-gray-500 group-hover:text-white transition-colors">
+                            <ChevronUp size={16} />
+                        </div>
+                        <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                            Event Timeline
+                        </span>
+                    </div>
+                    <div className="text-xs text-gray-500 font-mono">
+                        Delta in View
+                    </div>
                 </div>
             )}
-
-
         </div>
     );
 };

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Account, FinancialItem, FormulaType, CompoundingPeriod } from '../types';
 import { formatDate } from '../utils';
 import { Trash2, Plus, X, Save, HelpCircle, Download, Upload, ChevronLeft, ChevronRight, Eye, EyeOff } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface SidebarProps {
     account: Account;
@@ -19,6 +20,7 @@ interface SidebarProps {
     onUpdateDraft?: (item: FinancialItem | null) => void;
     viewStartDate: string;
     viewEndDate: string;
+    isFlipped?: boolean;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -36,7 +38,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     draftItem,
     onUpdateDraft,
     viewStartDate,
-    viewEndDate
+    viewEndDate,
+    isFlipped = false
 }) => {
     const [localName, setLocalName] = useState(account.name);
     const [isCollapsed, setIsCollapsed] = useState(false);
@@ -420,136 +423,210 @@ export const Sidebar: React.FC<SidebarProps> = ({
         );
     };
 
-    if (isCollapsed) {
-        return (
-            <div
-                className="w-12 bg-gray-900 border-r border-gray-800 h-full flex flex-col items-center justify-center py-4 shrink-0 transition-all duration-300 cursor-pointer hover:bg-gray-800 group"
-                onClick={() => setIsCollapsed(false)}
-                title="Expand Sidebar"
-            >
-                <div className="flex flex-col items-center gap-2">
-                    <div className="text-gray-400 group-hover:text-white transition-colors">
-                        <ChevronRight size={20} />
-                    </div>
-                    <div className="whitespace-nowrap text-gray-500 font-bold text-xs tracking-widest [writing-mode:vertical-rl] rotate-180 select-none">
-                        ACCOUNT MANAGER
-                    </div>
+    // Formula View Content (Back Face)
+    const renderFormulaView = () => (
+        <div className="flex flex-col h-full p-4 text-gray-200">
+            <h2 className="text-lg font-bold mb-6 text-gray-100">Account Value Formula</h2>
+
+            <div className="mb-8">
+                <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700 mb-4 font-mono text-sm">
+                    V(t) = Vo + <span className="text-green-400">I_j</span> · t + <span className="text-red-400">E_r</span> · t + <span className="text-blue-400">L_s</span>
+                </div>
+                <div className="space-y-2 text-sm text-gray-400 pl-2">
+                    <p><span className="font-mono text-gray-300">Vo</span> = Initial balance</p>
+                    <p><span className="font-mono text-gray-300">t</span> = time in months</p>
                 </div>
             </div>
-        );
-    }
+
+            <h2 className="text-lg font-bold mb-4 text-gray-100">Expanded Calculation</h2>
+
+            <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700 font-mono text-sm mb-6">
+                V(t) = Vo + (<span className="text-green-400">I_j</span>) · t - (<span className="text-red-400">1500</span>) · t + <span className="text-blue-400">L_s</span>
+            </div>
+
+            <div className="mt-auto border-t border-gray-800 pt-6">
+                <p className="text-xs text-blue-400 mb-2">Final Value at t = 60 months</p>
+                <p className="text-3xl font-bold text-blue-500">$35,000</p>
+            </div>
+        </div>
+    );
 
     return (
-        <div className="w-80 bg-gray-900 border-r border-gray-800 h-full flex shrink-0 transition-all duration-300 relative">
-            <div className="flex-1 flex flex-col text-gray-200 overflow-y-auto scrollbar-hide p-4">
-                <div className="mb-2">
-                    <div className="flex justify-between items-center mb-2">
-                        <h2 className="text-xs font-bold text-gray-500 tracking-wider">ACCOUNT: <span className="text-gray-300">{account.name}</span></h2>
-                        <div className="flex items-center space-x-3">
-                            {accounts.length > 1 && (
-                                <button
-                                    onClick={() => onDeleteAccount(account.id)}
-                                    className="flex items-center text-xs text-red-400 hover:text-red-300 transition-colors"
-                                    title="Delete Account"
-                                >
-                                    <Trash2 size={14} />
-                                </button>
-                            )}
-                            <button onClick={onExport} className="flex items-center text-xs text-gray-400 hover:text-white transition-colors" title="Export Data">
-                                <Download size={14} />
-                            </button>
-                            <label className="flex items-center text-xs text-gray-400 hover:text-white transition-colors cursor-pointer" title="Import Data">
-                                <Upload size={14} />
-                                <input type="file" className="hidden" onChange={onImport} accept=".json" />
-                            </label>
+        <div className={`relative h-full shrink-0 perspective-1000 transition-all duration-300 ease-in-out ${isCollapsed ? 'w-12' : 'w-80'}`}>
+            <motion.div
+                className="relative h-full overflow-hidden"
+                initial={false}
+                animate={{
+                    opacity: isCollapsed ? 0 : 1,
+                    width: isCollapsed ? 0 : 320
+                }}
+                transition={{ duration: 0.3, ease: 'easeInOut' }}
+            >
+                <motion.div
+                    className="w-full h-full relative preserve-3d"
+                    animate={{ rotateY: isFlipped ? 180 : 0 }}
+                    transition={{ duration: 0.6 }}
+                    style={{ transformStyle: 'preserve-3d' }}
+                >
+                    {/* Front Face (Standard Sidebar) */}
+                    <div
+                        className="absolute w-full h-full bg-gray-900 border-r border-gray-800 backface-hidden"
+                        style={{ backfaceVisibility: 'hidden', pointerEvents: isFlipped ? 'none' : 'auto' }}
+                    >
+                        <div className="flex h-full relative">
+                            <div className="flex-1 flex flex-col text-gray-200 overflow-y-auto scrollbar-hide p-4">
+                                <div className="mb-2">
+                                    <div className="flex justify-between items-center mb-2">
+                                        <h2 className="text-xs font-bold text-gray-500 tracking-wider">ACCOUNT: <span className="text-gray-300">{account.name}</span></h2>
+                                        <div className="flex items-center space-x-3">
+                                            {accounts.length > 1 && (
+                                                <button
+                                                    onClick={() => onDeleteAccount(account.id)}
+                                                    className="flex items-center text-xs text-red-400 hover:text-red-300 transition-colors"
+                                                    title="Delete Account"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            )}
+                                            <button onClick={onExport} className="flex items-center text-xs text-gray-400 hover:text-white transition-colors" title="Export Data">
+                                                <Download size={14} />
+                                            </button>
+                                            <label className="flex items-center text-xs text-gray-400 hover:text-white transition-colors cursor-pointer" title="Import Data">
+                                                <Upload size={14} />
+                                                <input type="file" className="hidden" onChange={onImport} accept=".json" />
+                                            </label>
 
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="border-t border-gray-800 my-2"></div>
+
+                                <div className="flex flex-col space-y-2">
+                                    <button
+                                        onClick={() => {
+                                            if (onUpdateDraft) {
+                                                onUpdateDraft({
+                                                    id: crypto.randomUUID(),
+                                                    accountId: account.id,
+                                                    name: 'New Income',
+                                                    type: 'income',
+                                                    startDate: getDefaultStartDate(),
+                                                    formula: FormulaType.MONTHLY_SUM,
+                                                    amount: 1000
+                                                });
+                                            }
+                                        }}
+                                        className="text-left flex items-center text-green-400 hover:text-green-300 text-xs font-medium transition-colors"
+                                    >
+                                        <Plus size={14} className="mr-1" /> Add Income
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            if (onUpdateDraft) {
+                                                onUpdateDraft({
+                                                    id: crypto.randomUUID(),
+                                                    accountId: account.id,
+                                                    name: 'New Expense',
+                                                    type: 'expense',
+                                                    startDate: getDefaultStartDate(),
+                                                    formula: FormulaType.MONTHLY_SUM,
+                                                    amount: 500
+                                                });
+                                            }
+                                        }}
+                                        className="text-left flex items-center text-red-400 hover:text-red-300 text-xs font-medium transition-colors"
+                                    >
+                                        <Plus size={14} className="mr-1" /> Add Expense
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            if (onUpdateDraft) {
+                                                onUpdateDraft({
+                                                    id: crypto.randomUUID(),
+                                                    accountId: account.id,
+                                                    name: 'New Effect',
+                                                    type: 'effect',
+                                                    startDate: getDefaultStartDate(),
+                                                    formula: FormulaType.COMPOUNDING,
+                                                    interestRate: 5,
+                                                    compoundingPeriod: CompoundingPeriod.MONTHLY,
+                                                    compoundingFrequency: 1
+                                                });
+                                            }
+                                        }}
+                                        className="text-left flex items-center text-purple-400 hover:text-purple-300 text-xs font-medium transition-colors"
+                                    >
+                                        <Plus size={14} className="mr-1" /> Add Interest Effect
+                                    </button>
+                                </div>
+
+                                {renderItemForm()}
+
+                                <div className="mt-auto pt-10 text-xs text-gray-600 flex flex-col gap-1">
+                                    <p>FinSim Pro v1.0.0</p>
+                                    <a href="#" className="hover:text-blue-400">Documentation</a>
+                                    <a href="#" className="hover:text-blue-400">Support</a>
+                                    <a href="#" className="hover:text-blue-400 flex items-center gap-1">
+                                        Github
+                                    </a>
+                                </div>
+                            </div>
+                            <div
+                                onClick={() => setIsCollapsed(true)}
+                                className="w-3 h-full cursor-pointer bg-gray-900 hover:bg-gray-800 transition-colors flex items-center justify-center z-20 group border-l border-gray-800"
+                                title="Collapse Sidebar"
+                            >
+                                <div className="text-gray-700 group-hover:text-white transition-colors">
+                                    <ChevronLeft size={16} />
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-
-                </div>
-
-                <div className="border-t border-gray-800 my-2"></div>
-
-                <div className="flex flex-col space-y-2">
-                    <button
-                        onClick={() => {
-                            if (onUpdateDraft) {
-                                onUpdateDraft({
-                                    id: crypto.randomUUID(),
-                                    accountId: account.id,
-                                    name: 'New Income',
-                                    type: 'income',
-                                    startDate: getDefaultStartDate(),
-                                    formula: FormulaType.MONTHLY_SUM,
-                                    amount: 1000
-                                });
-                            }
+                    {/* Back Face (Formula View) */}
+                    <div
+                        className="absolute w-full h-full bg-gray-900 border-r border-gray-800 backface-hidden"
+                        style={{
+                            backfaceVisibility: 'hidden',
+                            transform: 'rotateY(180deg)',
+                            pointerEvents: isFlipped ? 'auto' : 'none'
                         }}
-                        className="text-left flex items-center text-green-400 hover:text-green-300 text-xs font-medium transition-colors"
                     >
-                        <Plus size={14} className="mr-1" /> Add Income
-                    </button>
-                    <button
-                        onClick={() => {
-                            if (onUpdateDraft) {
-                                onUpdateDraft({
-                                    id: crypto.randomUUID(),
-                                    accountId: account.id,
-                                    name: 'New Expense',
-                                    type: 'expense',
-                                    startDate: getDefaultStartDate(),
-                                    formula: FormulaType.MONTHLY_SUM,
-                                    amount: 500
-                                });
-                            }
-                        }}
-                        className="text-left flex items-center text-red-400 hover:text-red-300 text-xs font-medium transition-colors"
-                    >
-                        <Plus size={14} className="mr-1" /> Add Expense
-                    </button>
-                    <button
-                        onClick={() => {
-                            if (onUpdateDraft) {
-                                onUpdateDraft({
-                                    id: crypto.randomUUID(),
-                                    accountId: account.id,
-                                    name: 'New Effect',
-                                    type: 'effect',
-                                    startDate: getDefaultStartDate(),
-                                    formula: FormulaType.COMPOUNDING,
-                                    interestRate: 5,
-                                    compoundingPeriod: CompoundingPeriod.MONTHLY,
-                                    compoundingFrequency: 1
-                                });
-                            }
-                        }}
-                        className="text-left flex items-center text-purple-400 hover:text-purple-300 text-xs font-medium transition-colors"
-                    >
-                        <Plus size={14} className="mr-1" /> Add Interest Effect
-                    </button>
-                </div>
+                        <div className="flex h-full relative">
+                            <div className="flex-1 overflow-y-auto scrollbar-hide">
+                                {renderFormulaView()}
+                            </div>
+                            <div
+                                onClick={() => setIsCollapsed(true)}
+                                className="w-3 h-full cursor-pointer bg-gray-900 hover:bg-gray-800 transition-colors flex items-center justify-center z-20 group border-l border-gray-800"
+                                title="Collapse Sidebar"
+                            >
+                                <div className="text-gray-700 group-hover:text-white transition-colors">
+                                    <ChevronLeft size={16} />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </motion.div>
+            </motion.div>
 
-                {renderItemForm()}
-
-                <div className="mt-auto pt-10 text-xs text-gray-600 flex flex-col gap-1">
-                    <p>FinSim Pro v1.0.0</p>
-                    <a href="#" className="hover:text-blue-400">Documentation</a>
-                    <a href="#" className="hover:text-blue-400">Support</a>
-                    <a href="#" className="hover:text-blue-400 flex items-center gap-1">
-                        Github
-                    </a>
+            {isCollapsed && (
+                <div
+                    className="absolute top-0 left-0 w-12 bg-gray-900 border-r border-gray-800 h-full flex flex-col items-center justify-center py-4 shrink-0 transition-all duration-300 cursor-pointer hover:bg-gray-800 group"
+                    onClick={() => setIsCollapsed(false)}
+                    title="Expand Sidebar"
+                >
+                    <div className="flex flex-col items-center gap-2">
+                        <div className="text-gray-400 group-hover:text-white transition-colors">
+                            <ChevronRight size={20} />
+                        </div>
+                        <div className="whitespace-nowrap text-gray-500 font-bold text-xs tracking-widest [writing-mode:vertical-rl] rotate-180 select-none">
+                            ACCOUNT MANAGER
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div
-                onClick={() => setIsCollapsed(true)}
-                className="w-3 h-full cursor-pointer bg-gray-900 hover:bg-gray-800 transition-colors flex items-center justify-center z-20 group border-l border-gray-800"
-                title="Collapse Sidebar"
-            >
-                <div className="text-gray-700 group-hover:text-white transition-colors">
-                    <ChevronLeft size={16} />
-                </div>
-            </div>
+            )}
         </div>
     );
 };
