@@ -97,7 +97,11 @@ export const TimelineSyncChart: React.FC<TimelineSyncChartProps> = ({
     useEffect(() => {
         if (!seriesRef.current || !simulationPoints) return;
         const aggregated = aggregateData(simulationPoints, frequency);
-        const data = aggregated.map(p => ({ time: p.date, value: 0 }));
+        // Convert dates to Unix timestamps (seconds) for consistency
+        const data = aggregated.map(p => ({
+            time: new Date(p.date).getTime() / 1000,
+            value: 0
+        }));
         seriesRef.current.setData(data);
     }, [simulationPoints, frequency]);
 
@@ -120,9 +124,9 @@ export const TimelineSyncChart: React.FC<TimelineSyncChartProps> = ({
         if (!chartRef.current || !seriesRef.current) return;
 
         if (hoverDate) {
-            // setCrosshairPosition(price, time, series)
-            // We pass 0 as price, and the series.
-            chartRef.current.setCrosshairPosition(0, hoverDate, seriesRef.current);
+            // Convert hoverDate to Unix timestamp (seconds) for consistency
+            const hoverTime = new Date(hoverDate).getTime() / 1000;
+            chartRef.current.setCrosshairPosition(0, hoverTime, seriesRef.current);
         } else {
             chartRef.current.clearCrosshairPosition();
         }

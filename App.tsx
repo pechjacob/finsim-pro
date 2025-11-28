@@ -229,6 +229,7 @@ const App: React.FC = () => {
         viewStartDate={simulationStartDate}
         viewEndDate={simulationEndDate}
         isFlipped={isFlipped}
+        finalBalance={simulationData.length > 0 ? simulationData[simulationData.length - 1].balance : 0}
       />
 
       {/* Main Content */}
@@ -275,7 +276,7 @@ const App: React.FC = () => {
         </div>
 
         {/* Timeline/Events Area (Lower Split) */}
-        <div className={`w-full flex flex-col bg-gray-900 transition-all duration-300 ease-in-out ${isTimelineCollapsed ? 'h-10 shrink-0' : 'h-[40%] shrink-0'}`}>
+        <div className={`w-full flex flex-col transition-all duration-300 ease-in-out ${isTimelineCollapsed ? 'h-10 shrink-0' : 'h-[40%] shrink-0'}`}>
           <TimelineEvents
             items={displayedItems.filter(i => i.accountId === activeAccountId || i.toAccountId === activeAccountId)}
             activeItemId={activeItemId}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Account, FinancialItem, FormulaType, CompoundingPeriod } from '../types';
-import { formatDate } from '../utils';
+import { formatDate, formatCurrency } from '../utils';
 import { Trash2, Plus, X, Save, HelpCircle, Download, Upload, ChevronLeft, ChevronRight, Eye, EyeOff } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -21,6 +21,7 @@ interface SidebarProps {
     viewStartDate: string;
     viewEndDate: string;
     isFlipped?: boolean;
+    finalBalance?: number;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -39,7 +40,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     onUpdateDraft,
     viewStartDate,
     viewEndDate,
-    isFlipped = false
+    isFlipped = false,
+    finalBalance = 0
 }) => {
     const [localName, setLocalName] = useState(account.name);
     const [isCollapsed, setIsCollapsed] = useState(false);
@@ -54,6 +56,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
     const activeItem = items.find(i => i.id === activeItemId);
     const [editingItem, setEditingItem] = useState<FinancialItem | null>(null);
+    const [originalItem, setOriginalItem] = useState<FinancialItem | null>(null);
 
     useEffect(() => {
         setLocalName(account.name);
@@ -65,12 +68,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
             // We don't set editingItem here because we use draftItem directly.
             setIsCollapsed(false);
             setEditingItem(null);
+            setOriginalItem(null);
         } else if (activeItem) {
-            setEditingItem({ ...activeItem });
-            // Automatically expand if an item is selected for editing
-            setIsCollapsed(false);
+            // Only update if we switched to a DIFFERENT item, or if we weren't editing anything before
+            if (!editingItem || editingItem.id !== activeItem.id) {
+                setEditingItem({ ...activeItem });
+                setOriginalItem({ ...activeItem }); // Store original for revert
+                // Automatically expand if an item is selected for editing
+                setIsCollapsed(false);
+            }
         } else {
             setEditingItem(null);
+            setOriginalItem(null);
         }
     }, [activeItem, draftItem]);
 
@@ -80,10 +89,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
     const handleSaveItem = () => {
         if (draftItem) {
-            onUpsertItem(draftItem);
+            // Treat undefined as 0 when saving
+            const itemToSave = {
+                ...draftItem,
+                amount: draftItem.amount ?? 0,
+                interestRate: draftItem.interestRate ?? 0
+            };
+            onUpsertItem(itemToSave);
             if (onUpdateDraft) onUpdateDraft(null);
         } else if (editingItem) {
-            onUpsertItem(editingItem);
+            // Treat undefined as 0 when saving
+            const itemToSave = {
+                ...editingItem,
+                amount: editingItem.amount ?? 0,
+                interestRate: editingItem.interestRate ?? 0
+            };
+            onUpsertItem(itemToSave);
+            setOriginalItem(null); // Clear original since we saved
         }
         onClose();
     };
@@ -99,8 +121,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
             if (draftItem && onUpdateDraft) {
                 onUpdateDraft(newItem);
             } else {
-                setEditingItem(newItem);
-                onUpsertItem(newItem); // Propagate changes immediately
+                // Treat undefined amounts as 0 for preview
+                const previewItem = {
+                    ...newItem,
+                    amount: newItem.amount ?? 0,
+                    interestRate: newItem.interestRate ?? 0
+                };
+                setEditingItem(newItem); // Keep undefined for input handle
+                onUpsertItem(previewItem); // Update immediately for preview
             }
         };
 
@@ -131,9 +159,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             onClick={() => {
                                 if (draftItem && onUpdateDraft) {
                                     onUpdateDraft(null);
-                                } else {
-                                    onClose();
+                                } else if (originalItem) {
+                                    // Revert to original values if closing without saving
+                                    onUpsertItem(originalItem);
                                 }
+                                onClose();
                             }}
                             className="text-gray-400 hover:text-gray-200"
                             title="Close"
@@ -206,6 +236,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                 min={item.startDate || viewStartDate}
                                 max={viewEndDate}
                                 onChange={(e) => updateItem({ ...item, endDate: e.target.value })}
+                                onFocus={() => {
+                                    if (!item.endDate) {
+                                        updateItem({ ...item, endDate: viewEndDate });
+                                    }
+                                }}
                                 className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 text-sm text-white focus:border-blue-500 outline-none"
                             />
                         </div>
@@ -397,9 +432,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <input
                         type="number"
                         step={isEffect ? "0.1" : "1"}
-                        value={isEffect ? (item.interestRate || 0) : (item.amount || 0)}
+                        value={isEffect ? (item.interestRate ?? '') : (item.amount ?? '')}
                         onChange={(e) => {
-                            const val = parseFloat(e.target.value);
+                            const val = e.target.value === '' ? undefined : parseFloat(e.target.value);
                             if (isEffect) {
                                 updateItem({ ...item, interestRate: val });
                             } else {
@@ -424,32 +459,99 @@ export const Sidebar: React.FC<SidebarProps> = ({
     };
 
     // Formula View Content (Back Face)
-    const renderFormulaView = () => (
-        <div className="flex flex-col h-full p-4 text-gray-200">
-            <h2 className="text-lg font-bold mb-6 text-gray-100">Account Value Formula</h2>
+    const renderFormulaView = () => {
+        // Filter enabled items and sort them to match TimelineEvents order
+        const activeItems = items.filter(i => i.isEnabled !== false);
+        const sortedItems = [...activeItems].sort((a, b) => {
+            const orderA = a.order ?? 999999;
+            const orderB = b.order ?? 999999;
+            if (orderA !== orderB) return orderA - orderB;
+            if (a.type === 'income' && b.type !== 'income') return -1;
+            if (a.type === 'expense' && b.type !== 'expense') return 1;
+            return a.name.localeCompare(b.name);
+        });
 
-            <div className="mb-8">
-                <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700 mb-4 font-mono text-sm">
-                    V(t) = Vo + <span className="text-green-400">I_j</span> · t + <span className="text-red-400">E_r</span> · t + <span className="text-blue-400">L_s</span>
+        // Calculate time duration in months
+        const startDate = new Date(viewStartDate);
+        const endDate = new Date(viewEndDate);
+        const months = Math.round((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24 * 30.44));
+
+        // Get initial balance
+        const initialBalance = account.initialBalance || 0;
+
+        // Helper to get variable name and color
+        const getItemMeta = (item: FinancialItem) => {
+            const firstChar = item.name.charAt(0).toLowerCase();
+            if (item.type === 'income') return { var: `I_${firstChar}`, color: 'text-green-400', valColor: 'text-green-400' };
+            if (item.type === 'expense') return { var: `E_${firstChar}`, color: 'text-red-400', valColor: 'text-red-400' };
+            return { var: `L_${firstChar}`, color: 'text-blue-400', valColor: 'text-blue-400' };
+        };
+
+        return (
+            <div className="flex flex-col h-full p-4 text-gray-200">
+                <h2 className="text-lg font-bold mb-6 text-gray-100">Account Value Formula</h2>
+
+                <div className="mb-8">
+                    <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700 mb-4 font-mono text-sm leading-relaxed">
+                        V(t) = Vo
+                        {sortedItems.map((item, index) => {
+                            const { var: varName, color } = getItemMeta(item);
+                            const isLumpSum = item.formula === FormulaType.LUMP_SUM;
+                            const isActive = activeItemId === item.id;
+                            return (
+                                <span key={item.id}>
+                                    {' + '}
+                                    <span className={`${color} ${isActive ? 'bg-white/20 px-1 rounded' : ''}`}>{varName}</span>
+                                    {!isLumpSum && ' · t'}
+                                </span>
+                            );
+                        })}
+                    </div>
+                    <div className="space-y-2 text-sm text-gray-400 pl-2">
+                        <p><span className="font-mono text-gray-300">Vo</span> = Initial balance</p>
+                        <p><span className="font-mono text-gray-300">t</span> = time in months</p>
+                        {sortedItems.map(item => {
+                            const { var: varName, color } = getItemMeta(item);
+                            const isActive = activeItemId === item.id;
+                            return (
+                                <p key={item.id} className={isActive ? 'bg-white/10 px-2 py-0.5 rounded' : ''}>
+                                    <span className={`font-mono ${color}`}>{varName}</span> = {item.name}
+                                </p>
+                            );
+                        })}
+                    </div>
                 </div>
-                <div className="space-y-2 text-sm text-gray-400 pl-2">
-                    <p><span className="font-mono text-gray-300">Vo</span> = Initial balance</p>
-                    <p><span className="font-mono text-gray-300">t</span> = time in months</p>
+
+                <h2 className="text-lg font-bold mb-4 text-gray-100">Expanded Calculation</h2>
+
+                <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700 font-mono text-sm mb-6 leading-relaxed">
+                    V({months}) = {initialBalance}
+                    {sortedItems.map((item) => {
+                        const { var: varName, color } = getItemMeta(item);
+                        const isLumpSum = item.formula === FormulaType.LUMP_SUM;
+                        const isExpense = item.type === 'expense';
+                        const amount = item.amount || 0;
+                        const isActive = activeItemId === item.id;
+
+                        return (
+                            <span key={item.id}>
+                                {isExpense ? ' - ' : ' + '}
+                                <span className={isActive ? 'bg-white/20 px-1 rounded' : ''}>
+                                    ({<span className={color}>{amount}</span>})
+                                </span>
+                                {!isLumpSum && ` · ${months}`}
+                            </span>
+                        );
+                    })}
+                </div>
+
+                <div className="mt-auto border-t border-gray-800 pt-6">
+                    <p className="text-xs text-blue-400 mb-2">Final Value at t = {months} months</p>
+                    <p className="text-3xl font-bold text-blue-500">{formatCurrency(finalBalance)}</p>
                 </div>
             </div>
-
-            <h2 className="text-lg font-bold mb-4 text-gray-100">Expanded Calculation</h2>
-
-            <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700 font-mono text-sm mb-6">
-                V(t) = Vo + (<span className="text-green-400">I_j</span>) · t - (<span className="text-red-400">1500</span>) · t + <span className="text-blue-400">L_s</span>
-            </div>
-
-            <div className="mt-auto border-t border-gray-800 pt-6">
-                <p className="text-xs text-blue-400 mb-2">Final Value at t = 60 months</p>
-                <p className="text-3xl font-bold text-blue-500">$35,000</p>
-            </div>
-        </div>
-    );
+        );
+    };
 
     return (
         <div className={`relative h-full shrink-0 perspective-1000 transition-all duration-300 ease-in-out ${isCollapsed ? 'w-12' : 'w-80'}`}>

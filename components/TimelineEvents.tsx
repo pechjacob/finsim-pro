@@ -212,7 +212,7 @@ const SortableEventItem: React.FC<SortableEventItemProps> = ({
             style={style}
             {...attributes}
             {...listeners}
-            className={`relative h-10 w-full border-b ${borderClass} group transition-colors ${isActive ? 'bg-gray-800' : 'hover:bg-gray-800/50'} ${item.isEnabled === false ? 'opacity-50 grayscale' : ''}`}
+            className={`relative h-10 mx-2 mb-1 rounded-md border ${borderClass} overflow-hidden group transition-colors ${isActive ? 'bg-gray-800' : 'hover:bg-gray-800/50'} ${item.isEnabled === false ? 'opacity-50 grayscale' : ''}`}
             onClick={() => onItemClick(item.id)}
         >
             {/* Full Width Track */}
@@ -227,7 +227,7 @@ const SortableEventItem: React.FC<SortableEventItemProps> = ({
 
             {/* Content Layer */}
             <div className="relative z-10 flex items-center h-full px-4 w-full">
-                <div className="mr-2 cursor-grab active:cursor-grabbing text-gray-600 hover:text-gray-400">
+                <div className="mr-2 cursor-grab active:cursor-grabbing text-gray-600 group-hover:text-gray-400 transition-colors">
                     <GripVertical size={14} />
                 </div>
 
@@ -252,7 +252,7 @@ const SortableEventItem: React.FC<SortableEventItemProps> = ({
                 </div>
 
                 {/* Right side: start date, beginning balance, end date */}
-                <div className="flex items-center space-x-2 text-xs opacity-80 text-white z-10 ml-auto">
+                <div className={`flex items-center space-x-2 text-xs font-mono opacity-80 ${textColor} z-10 ml-auto`}>
                     {isLumpSum ? (
                         <>
                             <span>On {startDateFormatted}</span>
@@ -269,7 +269,9 @@ const SortableEventItem: React.FC<SortableEventItemProps> = ({
                                 {beginningBalanceFormatted}
                             </span>
                             {/* End date */}
-                            <span>{item.endDate ? `Ends ${item.endDate.split('-')[1]}-${item.endDate.split('-')[2]}-${item.endDate.split('-')[0]}` : 'Ongoing'}</span>
+                            <span className="px-1.5 py-0.5 bg-black/20 rounded uppercase text-[10px] tracking-wider">
+                                {item.endDate ? `Ends ${item.endDate.split('-')[1]}-${item.endDate.split('-')[2]}-${item.endDate.split('-')[0]}` : 'Ongoing'}
+                            </span>
                         </>
                     )}
                 </div>
@@ -345,13 +347,12 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
     };
 
     return (
-        <div className={`flex flex-col bg-gray-900 border-t border-gray-800 shadow-xl transition-all duration-300 ease-in-out ${isCollapsed ? 'h-10' : 'h-[450px]'}`} style={{ perspective: 1000 }}>
+        <div className={`flex flex-col transition-all duration-300 ease-in-out ${isCollapsed ? 'h-10' : 'h-full'}`} style={{ perspective: 1000 }}>
             <motion.div
-                className="relative overflow-hidden"
+                className="flex-1 relative overflow-hidden"
                 initial={false}
                 animate={{
                     opacity: isCollapsed ? 0 : 1,
-                    height: isCollapsed ? 0 : 440,
                 }}
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
             >
@@ -364,7 +365,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                 >
                     {/* Front Face: Timeline */}
                     <div
-                        className="absolute w-full h-full bg-gray-900 flex flex-col"
+                        className="absolute w-full h-full bg-gray-900 border-t border-gray-800 shadow-xl flex flex-col"
                         style={{ backfaceVisibility: 'hidden', pointerEvents: isFlipped ? 'none' : 'auto' }}
                     >
                         {/* Timeline Header */}
@@ -489,7 +490,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                         items={filteredItems.map(item => item.id)}
                                         strategy={verticalListSortingStrategy}
                                     >
-                                        <div className="pb-4">
+                                        <div className="pb-4 pt-1">
                                             {filteredItems.map((item) => (
                                                 <SortableEventItem
                                                     key={item.id}
@@ -511,7 +512,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
 
                     {/* Back Face: Formula View */}
                     <div
-                        className="absolute w-full h-full bg-gray-900 flex flex-col"
+                        className="absolute w-full h-full bg-gray-900 border-t border-gray-800 shadow-xl flex flex-col"
                         style={{
                             backfaceVisibility: 'hidden',
                             transform: 'rotateY(180deg)',
@@ -537,7 +538,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                             <div className="flex items-center space-x-3">
                                 <button
                                     onClick={(e) => { e.stopPropagation(); onFlip(); }}
-                                    className={`p-1.5 rounded-md transition-colors ${isFlipped ? 'bg-blue-900/50 text-blue-400' : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800'}`}
+                                    className={`p-1.5 rounded-md transition-colors ${isFlipped ? 'bg-blue-900/50 text-blue-400 hover:bg-blue-900/80 hover:text-blue-300' : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800'}`}
                                     title={isFlipped ? "Switch to Timeline" : "Switch to Formula View"}
                                 >
                                     <FlipIcon size={16} />
@@ -554,7 +555,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
 
                                     {isFilterOpen && (
                                         <>
-                                            <div className="fixed inset-0 z-30" onClick={() => setIsFilterOpen(false)} />
+                                            <div className="fixed inset-0 z-30" onClick={(e) => { e.stopPropagation(); setIsFilterOpen(false); }} />
                                             <div className="absolute right-0 top-full mt-1 w-32 bg-gray-900 border border-gray-700 rounded shadow-xl z-40 py-1 flex flex-col">
                                                 {[
                                                     { label: 'All Events', value: null },
@@ -610,8 +611,28 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                         </div>
 
                         {/* Formula Content */}
-                        <div className="flex-1 overflow-y-auto custom-scrollbar">
-                            <FormulaDisplay items={items} />
+                        <div className="flex-1 overflow-y-auto custom-scrollbar relative">
+                            {/* Crosshair overlay */}
+                            <div className="absolute inset-0 pointer-events-none z-0">
+                                <TimelineSyncChart
+                                    items={items}
+                                    viewStartDate={viewStartDate}
+                                    viewEndDate={viewEndDate}
+                                    hoverDate={hoverDate}
+                                    simulationPoints={simulationPoints}
+                                    frequency={frequency}
+                                />
+                            </div>
+
+                            <FormulaDisplay
+                                items={filteredItems}
+                                activeItemId={activeItemId}
+                                onItemClick={onItemClick}
+                                viewStartDate={viewStartDate}
+                                viewEndDate={viewEndDate}
+                                simulationPoints={simulationPoints}
+                                itemTotals={itemTotals}
+                            />
                         </div>
                     </div>
                 </motion.div>
@@ -620,7 +641,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
             {/* Collapsed Header */}
             {isCollapsed && (
                 <div
-                    className="flex items-center justify-between px-4 h-10 bg-gray-900 hover:bg-gray-800 border-b border-gray-800 shrink-0 z-30 relative cursor-pointer group transition-colors"
+                    className="flex items-center justify-between px-4 h-10 bg-gray-900 border-t border-gray-800 shadow-xl hover:bg-gray-800 border-b border-gray-800 shrink-0 z-30 relative cursor-pointer group transition-colors"
                     onClick={onToggleCollapse}
                 >
                     <div className="flex items-center space-x-2">
