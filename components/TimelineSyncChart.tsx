@@ -4,16 +4,16 @@ import { Frequency } from '../types';
 import { aggregateData } from '../utils';
 
 interface TimelineSyncChartProps {
-    visibleStartDate: string;
-    visibleEndDate: string;
+    viewStartDate: string;
+    viewEndDate: string;
     hoverDate: string | null;
     simulationPoints: { date: string; balance: number }[];
     frequency: Frequency;
 }
 
 export const TimelineSyncChart: React.FC<TimelineSyncChartProps> = ({
-    visibleStartDate,
-    visibleEndDate,
+    viewStartDate,
+    viewEndDate,
     hoverDate,
     simulationPoints,
     frequency
@@ -109,15 +109,15 @@ export const TimelineSyncChart: React.FC<TimelineSyncChartProps> = ({
     useLayoutEffect(() => {
         if (!chartRef.current) return;
 
-        const startTime = new Date(visibleStartDate).getTime() / 1000;
-        const endTime = new Date(visibleEndDate).getTime() / 1000;
+        const startTime = new Date(viewStartDate).getTime() / 1000;
+        const endTime = new Date(viewEndDate).getTime() / 1000;
 
         try {
             chartRef.current.timeScale().setVisibleRange({ from: startTime, to: endTime });
         } catch (e) {
             // Ignore invalid range
         }
-    }, [visibleStartDate, visibleEndDate]);
+    }, [viewStartDate, viewEndDate]);
 
     // Sync Crosshair
     useEffect(() => {

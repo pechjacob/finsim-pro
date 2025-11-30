@@ -298,6 +298,8 @@ const App: React.FC = () => {
             onToggleAllItems={handleToggleAllItems}
             hoverDate={hoverDate}
             frequency={granularity}
+            simulationStartDate={simulationStartDate}
+            simulationEndDate={simulationEndDate}
             isFlipped={isFlipped}
             onFlip={() => setIsFlipped(!isFlipped)}
           />

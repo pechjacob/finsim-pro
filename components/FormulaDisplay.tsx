@@ -27,9 +27,9 @@ export const FormulaDisplay: React.FC<FormulaDisplayProps> = ({
 }) => {
     // Helper to get variable name
     const getVarName = (item: FinancialItem) => {
-        if (item.type === 'income') return `I_{${item.name.charAt(0).toLowerCase()} } `;
-        if (item.type === 'expense') return `E_{${item.name.charAt(0).toLowerCase()} } `;
-        return `L_{${item.name.charAt(0).toLowerCase()} } `; // Default/Savings
+        if (item.type === 'income') return `I_{${item.name.charAt(0).toLowerCase()}}`;
+        if (item.type === 'expense') return `E_{${item.name.charAt(0).toLowerCase()}}`;
+        return `L_{${item.name.charAt(0).toLowerCase()}}`; // Default/Savings
     };
 
     // Helper to get account balance at event start date (matches SortableEventItem logic)
@@ -191,7 +191,9 @@ export const FormulaDisplay: React.FC<FormulaDisplayProps> = ({
                                     <GripVertical size={14} />
                                 </div>
                                 <span className="text-sm font-bold">
-                                    <InlineMath math={leftEq} />
+                                    <InlineMath math={varName} />
+                                    {' = '}
+                                    {item.name}
                                 </span>
                                 <span className="text-xs opacity-70 italic">
                                     {frequencyText}

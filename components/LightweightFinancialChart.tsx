@@ -144,10 +144,12 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
     const headerDateRange = useRef<{ from: string; to: string } | null>(null);
     const [, forceUpdate] = useState({}); // Force update for header date range if needed
 
-    // Refs for Sim Lines and Focus Line
+    // Refs for Sim Lines, Focus Line, and Zoom Boundary Lines
     const simStartLineRef = useRef<HTMLDivElement>(null);
     const simEndLineRef = useRef<HTMLDivElement>(null);
     const focusLineRef = useRef<HTMLDivElement>(null);
+    const zoomStartLineRef = useRef<HTMLDivElement>(null);
+    const zoomEndLineRef = useRef<HTMLDivElement>(null);
 
     // Convert balance data to lightweight-charts format
     const chartData = useMemo(() => {
@@ -203,6 +205,12 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
     useEffect(() => {
         latestChartData.current = chartData;
     }, [chartData]);
+
+    // Ref for isZoomed to avoid stale closures in ResizeObserver
+    const latestIsZoomed = useRef(isZoomed);
+    useEffect(() => {
+        latestIsZoomed.current = isZoomed;
+    }, [isZoomed]);
 
     // Helper to get coordinate for any date
     const getCoordinateForDate = useCallback((targetDateStr: string): number | null => {
@@ -276,10 +284,22 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
             endX = null;
         }
 
-        // Get focus line position if zoomed
+        // Get focus line position if zoomed - fixed at center of viewport
         let focusX: number | null = null;
         if (focusDate && isZoomed) {
-            focusX = getCoordinateForDate(formatDate(focusDate));
+            // Position at the center of the plotting area
+            const plotAreaWidth = chartWidth - priceScaleWidth;
+            focusX = plotAreaWidth / 2;
+        }
+
+        // Get zoom boundary line positions if zoomed
+        let zoomStartX: number | null = null;
+        let zoomEndX: number | null = null;
+        if (isZoomed) {
+            // Left edge of viewport (first visible pixel of chart area)
+            zoomStartX = 0;
+            // Right edge of viewport (last visible pixel before price scale)
+            zoomEndX = maxX;
         }
 
         // Direct DOM manipulation for performance
@@ -294,6 +314,14 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
         if (focusLineRef.current) {
             focusLineRef.current.style.display = focusX !== null ? 'block' : 'none';
             if (focusX !== null) focusLineRef.current.style.left = `${focusX}px`;
+        }
+        if (zoomStartLineRef.current) {
+            zoomStartLineRef.current.style.display = zoomStartX !== null ? 'block' : 'none';
+            if (zoomStartX !== null) zoomStartLineRef.current.style.left = `${zoomStartX}px`;
+        }
+        if (zoomEndLineRef.current) {
+            zoomEndLineRef.current.style.display = zoomEndX !== null ? 'block' : 'none';
+            if (zoomEndX !== null) zoomEndLineRef.current.style.left = `${zoomEndX}px`;
         }
     }, [simulationStartDate, simulationEndDate, getCoordinateForDate, focusDate, isZoomed]);
 
@@ -482,24 +510,35 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                 const rangeDays = getDaysDifference(start, end);
                 const percentage = calculateZoomPercentage(rangeDays, latestMaxRangeDays.current);
 
-                // Update focus date to center of visible range when zoomed and panning
-                if (isZoomed) {
+                // Calculate if we're zoomed based on current range (not prop-based isZoomed which lags)
+                const currentlyZoomed = (latestMaxRangeDays.current - rangeDays) > 2.5;
+
+                // Update focus date to center of visible range when zoomed
+                if (currentlyZoomed) {
                     const centerTime = start.getTime() + (end.getTime() - start.getTime()) / 2;
                     setFocusDate(new Date(centerTime));
+                } else {
+                    setFocusDate(null);
                 }
 
                 // For Quarterly/Yearly views, use raw percentage (no snapping)
                 // For other views, snap to nearest 5% if within 2.5% tolerance
+                let newPercentage = percentage;
                 if (frequency === Frequency.QUARTERLY || frequency === Frequency.YEARLY) {
                     setZoomPercentage(percentage);
                 } else {
                     const snapped = Math.round(percentage / 5) * 5;
                     if (Math.abs(percentage - snapped) < 2.5) {
+                        newPercentage = snapped;
                         setZoomPercentage(snapped);
                     } else {
                         setZoomPercentage(percentage);
                     }
                 }
+
+                // Clear requestedZoomPercentage when user manually zooms (not via buttons)
+                // This ensures the display updates correctly when switching between button and manual zoom
+                setRequestedZoomPercentage(0);
             }
 
             // Update sim lines
@@ -514,6 +553,12 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
             if (chartRef.current && chartContainerRef.current) {
                 const { width, height } = entries[0].contentRect;
                 chartRef.current.applyOptions({ width, height });
+
+                // If not zoomed, force fit content to prevent drift
+                if (!latestIsZoomed.current) {
+                    chartRef.current.timeScale().fitContent();
+                }
+
                 // Update sim lines on resize
                 latestUpdateSimLines.current?.();
             }
@@ -562,12 +607,20 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
         }
     }, [chartData]);
 
-    // Update visible range from props
+    // Track previous chart data to detect changes
+    const prevChartDataRef = useRef(chartData);
+
+    // Sync visible range from props
     useEffect(() => {
         if (!chartRef.current) return;
 
+        const chartDataChanged = prevChartDataRef.current !== chartData;
+        prevChartDataRef.current = chartData;
+
         const currentRange = chartRef.current.timeScale().getVisibleRange();
-        if (currentRange) {
+
+        // Only check for skipping if chart data hasn't changed
+        if (!chartDataChanged && currentRange) {
             const currentFrom = new Date(currentRange.from as string).getTime();
             const currentTo = new Date(currentRange.to as string).getTime();
 
@@ -579,7 +632,6 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
             const diffTo = Math.abs(currentTo - propTo) / (1000 * 60 * 60 * 24);
 
             // If both are within 1 day of precision, don't force update
-            // This prevents "snapping" when the chart is at a sub-day position but state is daily
             if (diffFrom < 1 && diffTo < 1) {
                 return;
             }
@@ -588,21 +640,29 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
         const startTime = new Date(visibleStartDate).getTime() / 1000;
         const endTime = new Date(visibleEndDate).getTime() / 1000;
 
-        try {
-            chartRef.current.timeScale().setVisibleRange({ from: startTime, to: endTime });
-            // Mark as initialized after first successful set
-            if (!isInitialized.current) {
-                // Small timeout to allow chart to settle? 
-                // Actually, setVisibleRange is synchronous in applying to state, but rendering is async.
-                // Let's set it immediately so subsequent callbacks are honored.
-                setTimeout(() => {
-                    isInitialized.current = true;
-                }, 100);
+        const applyRange = () => {
+            try {
+                chartRef.current?.timeScale().setVisibleRange({ from: startTime, to: endTime });
+                // Mark as initialized after first successful set
+                if (!isInitialized.current) {
+                    setTimeout(() => {
+                        isInitialized.current = true;
+                    }, 100);
+                }
+            } catch (e) {
+                // Ignore if range is invalid
             }
-        } catch (e) {
-            // Ignore if range is invalid
+        };
+
+        if (chartDataChanged) {
+            // If data changed, wait a tick to let the chart process the new data and potentially reset view
+            // before we enforce our desired range
+            setTimeout(applyRange, 0);
+        } else {
+            applyRange();
         }
-    }, [visibleStartDate, visibleEndDate]);
+        // Re-apply visible range when chart data changes (e.g. frequency change) to maintain zoom
+    }, [visibleStartDate, visibleEndDate, chartData]);
 
     // Initialize focus date
     useEffect(() => {
@@ -736,7 +796,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
             <div className="relative flex-1 overflow-hidden">
                 {/* Focus/Range Overlay */}
                 {isZoomed && focusDate && (
-                    <div className="absolute top-2 left-2 z-10">
+                    <div className="absolute top-2 left-2 z-[60]">
                         <ZoomInfoDisplay focusDate={focusDate} rangeBefore={rangeBefore} rangeAfter={rangeAfter} />
                     </div>
                 )}
@@ -762,6 +822,18 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                 <div
                     ref={focusLineRef}
                     className="absolute top-0 bottom-[30px] border-l border-orange-400 border-dotted w-px pointer-events-none z-40 hidden opacity-60"
+                />
+
+                {/* Zoom Start Boundary Line (Purple) */}
+                <div
+                    ref={zoomStartLineRef}
+                    className="absolute top-0 bottom-[30px] border-l border-purple-400 border-dotted w-px pointer-events-none z-30 hidden opacity-60"
+                />
+
+                {/* Zoom End Boundary Line (Purple) */}
+                <div
+                    ref={zoomEndLineRef}
+                    className="absolute top-0 bottom-[30px] border-l border-purple-400 border-dotted w-px pointer-events-none z-30 hidden opacity-60"
                 />
             </div>
         </div>

@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { FinancialItem, FormulaType, SimulationPoint, Frequency } from '../types';
 import { formatCurrency } from '../utils';
 import { calculateTotalDelta } from '../services/simulation';
-import { ChevronUp, ChevronDown, GripVertical, Trash2, Eye, EyeOff, RotateCcw, Filter, Braces } from 'lucide-react';
+import { ChevronUp, ChevronDown, GripVertical, Trash2, Eye, EyeOff, RotateCcw, Filter, Braces, Search } from 'lucide-react';
 import { DndContext, closestCenter, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -29,6 +29,8 @@ interface TimelineEventsProps {
     isZoomed?: boolean;
     onResetView?: () => void;
     frequency: Frequency;
+    simulationStartDate: string;
+    simulationEndDate: string;
 }
 
 interface SortableEventItemProps {
@@ -298,7 +300,9 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
     onResetView,
     frequency,
     isFlipped,
-    onFlip
+    onFlip,
+    simulationStartDate,
+    simulationEndDate
 }) => {
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -310,6 +314,13 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
 
     const [filterType, setFilterType] = useState<'income' | 'expense' | 'effect' | null>(null);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [isZoomTrackingEnabled, setIsZoomTrackingEnabled] = useState(true);
+
+    // Calculate effective view range based on zoom tracking state
+    const isChartZoomed = isZoomed || (viewStartDate !== simulationStartDate || viewEndDate !== simulationEndDate);
+
+    const effectiveStartDate = (isZoomTrackingEnabled && isChartZoomed) ? viewStartDate : simulationStartDate;
+    const effectiveEndDate = (isZoomTrackingEnabled && isChartZoomed) ? viewEndDate : simulationEndDate;
 
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
@@ -341,6 +352,31 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
         if (!filterType) return sortedItems;
         return sortedItems.filter(item => item.type === filterType);
     }, [sortedItems, filterType]);
+
+    const zoomToggle = (
+        <div
+            className={`relative w-12 h-6 rounded-full cursor-pointer transition-colors duration-200 ease-in-out flex items-center ${!isChartZoomed
+                ? 'bg-gray-700 opacity-50 cursor-not-allowed'
+                : isZoomTrackingEnabled
+                    ? 'bg-purple-600 hover:bg-purple-500'
+                    : 'bg-lime-600 hover:bg-lime-500'
+                }`}
+            onClick={(e) => {
+                e.stopPropagation();
+                if (isChartZoomed) {
+                    setIsZoomTrackingEnabled(!isZoomTrackingEnabled);
+                }
+            }}
+            title={!isChartZoomed ? "Zoom to use" : isZoomTrackingEnabled ? "Zoom Tracking Enabled" : "Zoom Tracking Disabled"}
+        >
+            <div
+                className={`absolute w-5 h-5 bg-white rounded-full shadow-sm transform transition-transform duration-200 flex items-center justify-center ${isZoomTrackingEnabled ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+            >
+                <Search size={10} className={isZoomTrackingEnabled ? "text-purple-600" : "text-lime-600"} />
+            </div>
+        </div>
+    );
 
     const handleToggleVisibleItems = () => {
         onToggleAllItems(filteredItems.map(i => i.id));
@@ -385,6 +421,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                 </span>
                             </div>
                             <div className="flex items-center space-x-3">
+                                {zoomToggle}
                                 <button
                                     onClick={(e) => { e.stopPropagation(); onFlip(); }}
                                     className={`p-1.5 rounded-md transition-colors ${isFlipped ? 'bg-blue-900/50 text-blue-400' : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800'}`}
@@ -408,11 +445,11 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
 
                                     {isFilterOpen && (
                                         <>
-                                            <div className="fixed inset-0 z-30" onClick={(e) => {
+                                            <div className="fixed inset-0 z-50" onClick={(e) => {
                                                 e.stopPropagation();
                                                 setIsFilterOpen(false);
                                             }} />
-                                            <div className="absolute right-0 top-full mt-1 w-32 bg-gray-900 border border-gray-700 rounded shadow-xl z-40 py-1 flex flex-col">
+                                            <div className="absolute right-0 top-full mt-1 w-32 bg-gray-900 border border-gray-700 rounded shadow-xl z-[60] py-1 flex flex-col">
                                                 {[
                                                     { label: 'All Events', value: null },
                                                     { label: 'Income', value: 'income' },
@@ -471,8 +508,8 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                             <div className="absolute inset-0 pointer-events-none z-0">
                                 <TimelineSyncChart
                                     items={items}
-                                    viewStartDate={viewStartDate}
-                                    viewEndDate={viewEndDate}
+                                    viewStartDate={effectiveStartDate}
+                                    viewEndDate={effectiveEndDate}
                                     simulationPoints={simulationPoints}
                                     hoverDate={hoverDate}
                                     isZoomed={isZoomed}
@@ -497,8 +534,8 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                                     item={item}
                                                     isActive={activeItemId === item.id}
                                                     onItemClick={onItemClick}
-                                                    viewStartDate={viewStartDate}
-                                                    viewEndDate={viewEndDate}
+                                                    viewStartDate={effectiveStartDate}
+                                                    viewEndDate={effectiveEndDate}
                                                     itemTotals={itemTotals}
                                                     simulationPoints={simulationPoints}
                                                 />
@@ -536,6 +573,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                 </span>
                             </div>
                             <div className="flex items-center space-x-3">
+                                {zoomToggle}
                                 <button
                                     onClick={(e) => { e.stopPropagation(); onFlip(); }}
                                     className={`p-1.5 rounded-md transition-colors ${isFlipped ? 'bg-blue-900/50 text-blue-400 hover:bg-blue-900/80 hover:text-blue-300' : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800'}`}
@@ -555,8 +593,8 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
 
                                     {isFilterOpen && (
                                         <>
-                                            <div className="fixed inset-0 z-30" onClick={(e) => { e.stopPropagation(); setIsFilterOpen(false); }} />
-                                            <div className="absolute right-0 top-full mt-1 w-32 bg-gray-900 border border-gray-700 rounded shadow-xl z-40 py-1 flex flex-col">
+                                            <div className="fixed inset-0 z-50" onClick={(e) => { e.stopPropagation(); setIsFilterOpen(false); }} />
+                                            <div className="absolute right-0 top-full mt-1 w-32 bg-gray-900 border border-gray-700 rounded shadow-xl z-[60] py-1 flex flex-col">
                                                 {[
                                                     { label: 'All Events', value: null },
                                                     { label: 'Income', value: 'income' },
@@ -616,8 +654,8 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                             <div className="absolute inset-0 pointer-events-none z-0">
                                 <TimelineSyncChart
                                     items={items}
-                                    viewStartDate={viewStartDate}
-                                    viewEndDate={viewEndDate}
+                                    viewStartDate={effectiveStartDate}
+                                    viewEndDate={effectiveEndDate}
                                     hoverDate={hoverDate}
                                     simulationPoints={simulationPoints}
                                     frequency={frequency}
@@ -628,8 +666,8 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                 items={filteredItems}
                                 activeItemId={activeItemId}
                                 onItemClick={onItemClick}
-                                viewStartDate={viewStartDate}
-                                viewEndDate={viewEndDate}
+                                viewStartDate={effectiveStartDate}
+                                viewEndDate={effectiveEndDate}
                                 simulationPoints={simulationPoints}
                                 itemTotals={itemTotals}
                             />
@@ -639,24 +677,26 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
             </motion.div>
 
             {/* Collapsed Header */}
-            {isCollapsed && (
-                <div
-                    className="flex items-center justify-between px-4 h-10 bg-gray-900 border-t border-gray-800 shadow-xl hover:bg-gray-800 border-b border-gray-800 shrink-0 z-30 relative cursor-pointer group transition-colors"
-                    onClick={onToggleCollapse}
-                >
-                    <div className="flex items-center space-x-2">
-                        <div className="text-gray-500 group-hover:text-white transition-colors">
-                            <ChevronUp size={16} />
+            {
+                isCollapsed && (
+                    <div
+                        className="flex items-center justify-between px-4 h-10 bg-gray-900 border-t border-gray-800 shadow-xl hover:bg-gray-800 border-b border-gray-800 shrink-0 z-30 relative cursor-pointer group transition-colors"
+                        onClick={onToggleCollapse}
+                    >
+                        <div className="flex items-center space-x-2">
+                            <div className="text-gray-500 group-hover:text-white transition-colors">
+                                <ChevronUp size={16} />
+                            </div>
+                            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                                Event Timeline
+                            </span>
                         </div>
-                        <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                            Event Timeline
-                        </span>
+                        <div className="text-xs text-gray-500 font-mono">
+                            Delta in View
+                        </div>
                     </div>
-                    <div className="text-xs text-gray-500 font-mono">
-                        Delta in View
-                    </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 };

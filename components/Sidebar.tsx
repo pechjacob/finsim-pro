@@ -3,6 +3,8 @@ import { Account, FinancialItem, FormulaType, CompoundingPeriod } from '../types
 import { formatDate, formatCurrency } from '../utils';
 import { Trash2, Plus, X, Save, HelpCircle, Download, Upload, ChevronLeft, ChevronRight, Eye, EyeOff } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { InlineMath } from 'react-katex';
+import 'katex/dist/katex.min.css';
 
 interface SidebarProps {
     account: Account;
@@ -482,9 +484,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         // Helper to get variable name and color
         const getItemMeta = (item: FinancialItem) => {
             const firstChar = item.name.charAt(0).toLowerCase();
-            if (item.type === 'income') return { var: `I_${firstChar}`, color: 'text-green-400', valColor: 'text-green-400' };
-            if (item.type === 'expense') return { var: `E_${firstChar}`, color: 'text-red-400', valColor: 'text-red-400' };
-            return { var: `L_${firstChar}`, color: 'text-blue-400', valColor: 'text-blue-400' };
+            if (item.type === 'income') return { var: `I_{${firstChar}}`, color: 'text-green-400', valColor: 'text-green-400' };
+            if (item.type === 'expense') return { var: `E_{${firstChar}}`, color: 'text-red-400', valColor: 'text-red-400' };
+            return { var: `L_{${firstChar}}`, color: 'text-blue-400', valColor: 'text-blue-400' };
         };
 
         return (
@@ -501,7 +503,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             return (
                                 <span key={item.id}>
                                     {' + '}
-                                    <span className={`${color} ${isActive ? 'bg-white/20 px-1 rounded' : ''}`}>{varName}</span>
+                                    <span className={`${color} ${isActive ? 'bg-white/20 px-1 rounded' : ''}`}>
+                                        <InlineMath math={varName} />
+                                    </span>
                                     {!isLumpSum && ' · t'}
                                 </span>
                             );
@@ -515,7 +519,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             const isActive = activeItemId === item.id;
                             return (
                                 <p key={item.id} className={isActive ? 'bg-white/10 px-2 py-0.5 rounded' : ''}>
-                                    <span className={`font-mono ${color}`}>{varName}</span> = {item.name}
+                                    <span className={`inline-block ${color}`}>
+                                        <InlineMath math={varName} />
+                                    </span>
+                                    {' = '}{item.name}
                                 </p>
                             );
                         })}
@@ -537,7 +544,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             <span key={item.id}>
                                 {isExpense ? ' - ' : ' + '}
                                 <span className={isActive ? 'bg-white/20 px-1 rounded' : ''}>
-                                    ({<span className={color}>{amount}</span>})
+                                    <span className={color}>{amount}</span>
                                 </span>
                                 {!isLumpSum && ` · ${months}`}
                             </span>
