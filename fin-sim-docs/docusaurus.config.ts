@@ -138,11 +138,11 @@ const config: Config = {
           items: [
             {
               label: 'Getting Started',
-              to: '/docs/intro',
+              to: '/',
             },
             {
               label: 'Tutorials',
-              to: '/docs/tutorials',
+              to: 'tutorials/first-simulation',
             },
           ],
         },
