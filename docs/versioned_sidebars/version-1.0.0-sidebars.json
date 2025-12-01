@@ -1,0 +1,52 @@
+{
+    "homeSidebar": [
+        {
+            "type": "doc",
+            "id": "intro",
+            "label": "Getting Started"
+        },
+        {
+            "type": "category",
+            "label": "Features",
+            "items": [
+                "features/chart",
+                "features/timeline",
+                "features/accounts",
+                "features/formulas"
+            ]
+        }
+    ],
+    "tutorialsSidebar": [
+        {
+            "type": "doc",
+            "id": "tutorials/index",
+            "label": "Overview"
+        },
+        "tutorials/first-simulation",
+        "tutorials/creating-events",
+        "tutorials/interest-effects",
+        "tutorials/analyzing-results"
+    ],
+    "apiSidebar": [
+        {
+            "type": "doc",
+            "id": "api",
+            "label": "API Reference"
+        }
+    ],
+    "architectureSidebar": [
+        {
+            "type": "doc",
+            "id": "architecture",
+            "label": "Overview"
+        },
+        "architecture/data-models"
+    ],
+    "releasesSidebar": [
+        {
+            "type": "doc",
+            "id": "releases",
+            "label": "Release Notes"
+        }
+    ]
+}
