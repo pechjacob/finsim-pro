@@ -6,10 +6,19 @@ import rehypeKatex from 'rehype-katex';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
+// Determine the app URL based on the environment
+// In dev, we want to point to the Vite dev server
+// In prod, we want to point to the root of the domain
+const isDev = process.env.NODE_ENV === 'development';
+const appUrl = isDev ? 'http://localhost:3000/finsim-pro/' : 'pathname:///finsim-pro/';
+
 const config: Config = {
   title: 'FinSim Docs',
   tagline: 'Financial Simulation & Planning',
   favicon: 'img/FinSim-Logo.png',
+
+  // Suppress the warning about baseUrl not being /
+  baseUrlIssueBanner: false,
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
@@ -93,7 +102,7 @@ const config: Config = {
       logo: {
         alt: 'FinSim Pro Logo',
         src: 'img/FinSim-Logo.png',
-        href: 'pathname:///finsim-pro/',
+        href: appUrl,
       },
       items: [
         {
