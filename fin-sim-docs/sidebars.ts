@@ -13,37 +13,12 @@ import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
  Create as many sidebars as you want.
  */
 const sidebars: SidebarsConfig = {
-  // By default, Docusaurus generates a sidebar from the docs folder structure
-  tutorialSidebar: [
+  // Home page (Getting Started) sidebar
+  homeSidebar: [
     {
       type: 'doc',
       id: 'intro',
       label: 'Getting Started',
-    },
-    {
-      type: 'category',
-      label: 'Tutorials',
-      items: [
-        'tutorials/first-simulation',
-        'tutorials/creating-events',
-        'tutorials/interest-effects',
-        'tutorials/analyzing-results',
-      ],
-    },
-    {
-      type: 'doc',
-      id: 'api',
-      label: 'API Reference',
-    },
-    {
-      type: 'doc',
-      id: 'architecture',
-      label: 'Architecture',
-    },
-    {
-      type: 'doc',
-      id: 'releases',
-      label: 'Release Notes',
     },
     {
       type: 'category',
@@ -64,29 +39,8 @@ const sidebars: SidebarsConfig = {
     },
   ],
 
-  // But you can create a sidebar manually
-  /*
-  tutorialSidebar: [
-    {
-      type: 'doc',
-      id: 'intro',
-      label: 'Welcome',
-    },
-    {
-      type: 'doc',
-      id: 'getting-started',
-      label: 'Getting Started',
-    },
-    {
-      type: 'category',
-      label: 'Features',
-      items: [
-        'features/chart',
-        'features/timeline',
-        'features/accounts',
-        'features/formulas',
-      ],
-    },
+  // Tutorials sidebar
+  tutorialsSidebar: [
     {
       type: 'category',
       label: 'Tutorials',
@@ -97,16 +51,39 @@ const sidebars: SidebarsConfig = {
         'tutorials/analyzing-results',
       ],
     },
+  ],
+
+  // API Reference sidebar
+  apiSidebar: [
     {
-      type: 'category',
-      label: 'Advanced',
-      items: [
-        'advanced/architecture',
-        'advanced/data-models',
-      ],
+      type: 'doc',
+      id: 'api',
+      label: 'API Reference',
     },
   ],
-   */
+
+  // Architecture sidebar
+  architectureSidebar: [
+    {
+      type: 'doc',
+      id: 'architecture',
+      label: 'Architecture',
+    },
+    {
+      type: 'doc',
+      id: 'advanced/data-models',
+      label: 'Data Models',
+    },
+  ],
+
+  // Releases sidebar
+  releasesSidebar: [
+    {
+      type: 'doc',
+      id: 'releases',
+      label: 'Release Notes',
+    },
+  ],
 };
 
 export default sidebars;
