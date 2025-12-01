@@ -7,9 +7,9 @@ import rehypeKatex from 'rehype-katex';
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
-  title: 'FinSim Pro Docs',
+  title: 'FinSim Docs',
   tagline: 'Financial Simulation & Planning',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/FinSim-Logo.png',
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
@@ -19,7 +19,7 @@ const config: Config = {
   // Set the production url of your site here
   url: 'https://pechjacob.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
-  baseUrl: '/FinSim-Pro/',
+  baseUrl: '/finsim-pro/docs/',
 
   // GitHub pages deployment config.
   organizationName: 'pechjacob',
@@ -36,13 +36,28 @@ const config: Config = {
   markdown: {
     mermaid: true,
   },
-  themes: ['@docusaurus/theme-mermaid'],
+  themes: [
+    '@docusaurus/theme-mermaid',
+    [
+      require.resolve("@easyops-cn/docusaurus-search-local"),
+      /** @type {import("@easyops-cn/docusaurus-search-local").PluginOptions} */
+      ({
+        hashed: true,
+        language: ["en"],
+        indexDocs: true,
+        indexBlog: false,
+        indexPages: true,
+        docsRouteBasePath: "/",
+      }),
+    ],
+  ],
 
   presets: [
     [
       'classic',
       {
         docs: {
+          routeBasePath: '/',
           sidebarPath: './sidebars.ts',
           remarkPlugins: [remarkMath],
           rehypePlugins: [rehypeKatex],
@@ -77,14 +92,36 @@ const config: Config = {
       title: 'FinSim Pro',
       logo: {
         alt: 'FinSim Pro Logo',
-        src: 'img/logo.svg',
+        src: 'img/FinSim-Logo.png',
+        href: 'pathname:///finsim-pro/',
+        target: '_self',
       },
       items: [
         {
-          type: 'docSidebar',
-          sidebarId: 'tutorialSidebar',
+          type: 'doc',
+          docId: 'intro',
           position: 'left',
-          label: 'Documentation',
+          label: 'Getting Started',
+        },
+        {
+          to: 'tutorials/first-simulation',
+          label: 'Tutorials',
+          position: 'left',
+        },
+        {
+          to: 'api',
+          label: 'API Reference',
+          position: 'left',
+        },
+        {
+          to: 'architecture',
+          label: 'Architecture',
+          position: 'left',
+        },
+        {
+          to: 'releases',
+          label: 'Releases',
+          position: 'left',
         },
         {
           href: 'https://github.com/pechjacob/FinSim-Pro',
@@ -104,8 +141,8 @@ const config: Config = {
               to: '/docs/intro',
             },
             {
-              label: 'Architecture',
-              to: '/docs/architecture',
+              label: 'Tutorials',
+              to: '/docs/tutorials',
             },
           ],
         },

@@ -5,8 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:all": "concurrently \"npm run dev\" \"npm run docs:dev\" --names \"app,docs\" --prefix-colors \"cyan,magenta\"",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "docs:dev": "cd fin-sim-docs && npm start -- --port 3001",
+    "docs:build": "cd fin-sim-docs && npm run build",
+    "docs:serve": "cd fin-sim-docs && npm run serve"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

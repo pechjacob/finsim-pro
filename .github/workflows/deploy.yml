@@ -20,14 +20,31 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
+      # Build Main App
+      - name: Install main dependencies
         run: npm ci
 
-      - name: Build
+      - name: Build main app
         run: npm run build
 
+      # Build Docusaurus
+      - name: Install docs dependencies
+        run: cd fin-sim-docs && npm ci
+
+      - name: Build docs
+        run: npm run docs:build
+
+      # Combine both builds
+      - name: Combine builds
+        run: |
+          mkdir -p deployment
+          cp -r dist/* deployment/
+          mkdir -p deployment/docs
+          cp -r fin-sim-docs/build/* deployment/docs/
+
+      # Deploy combined folder
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: dist
+          folder: deployment
           branch: gh-pages

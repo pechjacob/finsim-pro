@@ -17,7 +17,7 @@ FinSim Pro allows you to model your financial future by adding **Events** (Incom
     *   **Dates:** Set the Start and End dates.
 4.  **Save:** Click the checkmark icon to save.
 
-![Adding an Event](/img/add_event_screenshot.png)
+<!-- TODO: Add screenshot showing the event creation process -->
 
 ## Event Types
 

@@ -1,45 +1,61 @@
 ---
 sidebar_position: 1
+slug: /
 ---
 
-# Getting Started
+# Welcome to FinSim Docs
 
-Welcome to **FinSim Pro**! This guide will help you get the application running locally.
+**FinSim Pro** is a powerful financial simulation tool designed to help you visualize and forecast your financial future with precision and ease.
 
-## Prerequisites
+## What is FinSim Pro?
 
-- **Node.js** (v18 or higher recommended)
-- **npm** (comes with Node.js)
+FinSim Pro allows you to model complex financial scenarios by defining accounts, income sources, expenses, and compounding effects. With its interactive timeline and real-time charting, you can instantly see how today's decisions impact your financial trajectory over the next 5 years.
 
-## Installation
+## Key Features
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/pechjacob/FinSim-Pro.git
-    cd FinSim-Pro
-    ```
+<div className="container">
+  <div className="row">
+    <div className="col col--4">
+      <div className="card margin-bottom--lg">
+        <div className="card__header">
+          <h3>Interactive Chart</h3>
+        </div>
+        <div className="card__body">
+          <p>
+            Visualize your balance history and future projections with a responsive, zoomable area chart.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div className="col col--4">
+      <div className="card margin-bottom--lg">
+        <div className="card__header">
+          <h3>Event Timeline</h3>
+        </div>
+        <div className="card__body">
+          <p>
+            Drag-and-drop interface to manage income, expenses, and transfers. Toggle events to test scenarios.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div className="col col--4">
+      <div className="card margin-bottom--lg">
+        <div className="card__header">
+          <h3>Smart Formulas</h3>
+        </div>
+        <div className="card__body">
+          <p>
+            Apply complex interest effects and recurring adjustments with built-in formula support.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-2.  **Install dependencies:**
-    ```bash
-    npm install
-    ```
+## Quick Start
 
-## Running the Application
+Ready to start planning?
 
-Start the development server:
-
-```bash
-npm run dev
-```
-
-The application will be available at `http://localhost:3000`.
-
-## Building for Production
-
-To build the application for production:
-
-```bash
-npm run build
-```
-
-The output will be in the `dist` directory.
+[Start the Tutorials →](./tutorials/first-simulation)

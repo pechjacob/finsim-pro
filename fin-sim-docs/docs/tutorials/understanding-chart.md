@@ -18,9 +18,9 @@ Switch between **Daily**, **Weekly**, **Monthly**, **Quarterly**, and **Yearly**
 ### Simulation Range
 The green dashed lines indicate the **Simulation Start** and **End** dates. Events outside this range are not calculated.
 
-![Chart Overview](/img/chart_overview.png)
+<!-- TODO: Add chart overview screenshot -->
 
 ### Crosshair
 Hover over the chart to see the exact balance and date at any point.
 
-![Crosshair Example](/img/crosshair_example.png)
+<!-- TODO: Add crosshair example screenshot -->

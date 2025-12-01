@@ -1,59 +1,45 @@
-# FinSim Pro - Architecture
+---
+sidebar_position: 1
+---
 
-## High-Level Overview
-FinSim Pro is a client-side React application built with Vite. It follows a unidirectional data flow where the `App` component holds the state, passes it to the `Simulation Engine` for calculation, and distributes the results to the `Chart` and `Timeline` components.
+# Architecture
 
-## Component Diagram
+FinSim Pro is built as a modern React application, leveraging client-side calculation for instant feedback.
+
+## Technology Stack
+
+*   **Frontend Framework:** React 18+ (Vite)
+*   **Language:** TypeScript
+*   **State Management:** React Context + Hooks
+*   **Styling:** Tailwind CSS
+*   **Charting:** Lightweight Charts (TradingView)
+*   **Icons:** Lucide React
+*   **Drag & Drop:** @dnd-kit
+
+## Component Hierarchy
 
 ```mermaid
 graph TD
-    App[App.tsx] -->|State: Items, Accounts| Simulation[Simulation Engine]
-    App -->|Props: Data, Settings| Chart[FinancialChart.tsx]
-    App -->|Props: Items, Handlers| Sidebar[Sidebar.tsx]
-    App -->|Props: Items, SimulationData| Timeline[TimelineEvents.tsx]
-
-    subgraph "Simulation Engine"
-        Simulation -->|Input| Calculate[calculateDailyBalances]
-        Calculate -->|Output| Points[SimulationPoints[]]
-    end
-
-    subgraph "UI Components"
-        Sidebar -->|User Action| UpdateState[Update App State]
-        Timeline -->|Drag & Drop| Reorder[Reorder Items]
-        Chart -->|Hover| Crosshair[Sync Crosshair]
-    end
-
-    Timeline -.->|Sync| Chart
+    App --> Layout
+    Layout --> Sidebar
+    Layout --> MainContent
+    MainContent --> ChartContainer
+    MainContent --> TimelineContainer
+    ChartContainer --> LightweightFinancialChart
+    TimelineContainer --> TimelineEvents
+    TimelineEvents --> EventList
+    TimelineEvents --> TimelineSyncChart
 ```
 
-## Key Modules
+## Core Modules
 
-### 1. App Container (`App.tsx`)
-- **Role**: Root orchestrator.
-- **Responsibilities**:
-  - Manages global state (`items`, `accounts`, `viewSettings`).
-  - Triggers the simulation recalculation via `useMemo` whenever inputs change.
-  - Handles global actions like Export/Import and Delete Account.
+### 1. Simulation Engine
+The core logic resides in `useSimulation.ts`. It:
+1.  Takes the initial state (Accounts, Events).
+2.  Iterates through each day of the simulation range.
+3.  Applies recurring events (Income/Expenses).
+4.  Calculates interest and formula effects.
+5.  Generates a `SimulationPoint` array for the chart.
 
-### 2. Simulation Service (`services/simulation.ts`)
-- **Role**: The "Brain" of the application.
-- **Logic**:
-  - Iterates through every day from `viewStartDate` to `viewEndDate`.
-  - For each day, applies active `FinancialItems` in their specified `order`.
-  - Calculates interest/effects based on the running balance.
-  - Returns an array of `SimulationPoint` objects.
-
-### 3. Timeline (`TimelineEvents.tsx`)
-- **Role**: Interactive list of events.
-- **Features**:
-  - **Drag-and-Drop**: Uses `@dnd-kit` to reorder items, which directly affects the calculation order in the simulation.
-  - **Visual Sync**: Renders event bars that align perfectly with the Chart's X-Axis.
-  - **Inline Controls**: Toggle visibility, delete, and view delta summaries.
-
-### 4. Chart (`FinancialChart.tsx`)
-- **Role**: Visualization.
-- **Tech**: `recharts`.
-- **Features**:
-  - Responsive Area Chart.
-  - Dynamic Granularity (Daily, Weekly, Monthly, etc.).
-  - Custom Tooltips and Crosshair synchronization with the Timeline.
+### 2. Timeline Sync
+The `TimelineSyncChart` component ensures that the visual timeline of events aligns perfectly with the main financial chart. It shares the same X-axis (Time) scale, allowing for synchronized zooming and panning.

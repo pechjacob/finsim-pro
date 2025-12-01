@@ -674,7 +674,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
                                 <div className="mt-auto pt-10 text-xs text-gray-600 flex flex-col gap-1">
                                     <p>FinSim Pro v1.0.0</p>
-                                    <a href="#" className="hover:text-blue-400">Documentation</a>
+                                    <a
+                                        href={
+                                            import.meta.env.DEV
+                                                ? "http://localhost:3000/finsim-pro/docs"
+                                                : "/finsim-pro/docs"
+                                        }
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="hover:text-blue-400"
+                                    >
+                                        Documentation
+                                    </a>
                                     <a href="#" className="hover:text-blue-400">Support</a>
                                     <a href="#" className="hover:text-blue-400 flex items-center gap-1">
                                         Github
