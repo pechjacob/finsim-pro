@@ -47,11 +47,6 @@ const App: React.FC = () => {
   const [hoverDate, setHoverDate] = useState<string | null>(null);
   const [draftItem, setDraftItem] = useState<FinancialItem | null>(null);
 
-  // Set window name for smart tab switching
-  useEffect(() => {
-    window.name = 'finsim-app';
-  }, []);
-
   // View Settings
   const today = new Date();
   const [simulationStartDate, setSimulationStartDate] = useState<string>(formatDate(today));

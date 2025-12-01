@@ -680,7 +680,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                                 ? "http://localhost:3000/finsim-pro/docs"
                                                 : "/finsim-pro/docs"
                                         }
-                                        target="finsim-docs"
+                                        target="_blank"
                                         rel="noopener noreferrer"
                                         className="hover:text-blue-400"
                                     >

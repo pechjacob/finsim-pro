@@ -10,7 +10,7 @@ import rehypeKatex from 'rehype-katex';
 // In dev, we want to point to the Vite dev server
 // In prod, we want to point to the root of the domain
 const isDev = process.env.NODE_ENV === 'development';
-const appUrl = isDev ? 'http://localhost:3000/finsim-pro/' : 'pathname:///finsim-pro/';
+const appUrl = isDev ? 'http://localhost:3000/finsim-pro/' : 'https://pechjacob.github.io/finsim-pro/';
 
 const config: Config = {
   title: 'FinSim Docs',
