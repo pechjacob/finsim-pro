@@ -1,3 +1,6 @@
+# Antigravity artifacts
+.gemini/
+
 # Logs
 logs
 *.log
@@ -7,10 +10,22 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies
 node_modules
+apps/*/node_modules/
+docs/node_modules/
+
+# Build outputs
 dist
 dist-ssr
+build
+apps/*/dist/
+docs/build/
+
+# Environment
 *.local
+.env
+.env.local
 
 # Editor directories and files
 .vscode/*
@@ -22,4 +37,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-.env
