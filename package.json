@@ -1,41 +1,33 @@
 {
   "name": "finsim-pro",
+  "version": "1.0.0",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "description": "Financial simulation and planning application",
+  "author": "Jacob Pech",
+  "license": "MIT",
+  "workspaces": [
+    "apps/*",
+    "docs"
+  ],
   "scripts": {
-    "dev": "vite",
+    "dev": "npm run dev --workspace=apps/finsim",
+    "docs:dev": "npm start --workspace=docs -- --port 3001",
     "dev:all": "concurrently \"npm run dev\" \"npm run docs:dev\" --names \"app,docs\" --prefix-colors \"cyan,magenta\"",
-    "build": "vite build",
-    "preview": "vite preview",
-    "docs:dev": "cd fin-sim-docs && npm start -- --port 3001",
-    "docs:build": "cd fin-sim-docs && npm run build",
-    "docs:serve": "cd fin-sim-docs && npm run serve"
-  },
-  "dependencies": {
-    "@dnd-kit/core": "^6.3.1",
-    "@dnd-kit/modifiers": "^9.0.0",
-    "@dnd-kit/sortable": "^10.0.0",
-    "@dnd-kit/utilities": "^3.2.2",
-    "expr-eval": "^2.0.2",
-    "framer-motion": "^12.23.24",
-    "katex": "^0.16.25",
-    "lightweight-charts": "^5.0.9",
-    "lightweight-charts-react-wrapper": "^2.1.1",
-    "lucide-react": "^0.554.0",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "react-katex": "^3.1.0",
-    "recharts": "^3.4.1"
+    "build": "npm run build --workspace=apps/finsim",
+    "docs:build": "npm run build --workspace=docs",
+    "build:all": "npm run build && npm run docs:build",
+    "release": "standard-version",
+    "release:minor": "standard-version --release-as minor",
+    "release:major": "standard-version --release-as major",
+    "release:patch": "standard-version --release-as patch",
+    "docs:version": "npm run docusaurus docs:version --workspace=docs",
+    "prepare": "husky install"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.17",
-    "@types/node": "^22.14.0",
-    "@vitejs/plugin-react": "^5.0.0",
-    "autoprefixer": "^10.4.22",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.17",
-    "typescript": "~5.8.2",
-    "vite": "^6.2.0"
+    "concurrently": "^8.2.2",
+    "standard-version": "^9.5.0",
+    "@commitlint/cli": "^18.4.3",
+    "@commitlint/config-conventional": "^18.4.3",
+    "husky": "^8.0.3"
   }
 }

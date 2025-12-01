@@ -1,6 +1,6 @@
 {
-  "name": "fin-sim-docs",
-  "version": "0.0.0",
+  "name": "@finsim/docs",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",

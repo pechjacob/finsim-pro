@@ -1,11 +1,11 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Account, FinancialItem, Frequency, SimulationPoint, FormulaType } from './types';
-import { Sidebar } from './components/Sidebar';
-import { FinancialChart } from './components/FinancialChart';
-import { LightweightFinancialChart } from './components/LightweightFinancialChart';
-import { TimelineEvents } from './components/TimelineEvents';
-import { runSimulation } from './services/simulation';
-import { addDays, formatDate, generateUUID } from './utils';
+import { Account, FinancialItem, Frequency, SimulationPoint, FormulaType } from './src/types';
+import { Sidebar } from './src/components/Sidebar';
+import { FinancialChart } from './src/components/FinancialChart';
+import { LightweightFinancialChart } from './src/components/LightweightFinancialChart';
+import { TimelineEvents } from './src/components/TimelineEvents';
+import { runSimulation } from './src/services/simulation';
+import { addDays, formatDate, generateUUID } from './src/utils';
 import { Layout } from 'lucide-react';
 
 // Feature flag: Set to true to use lightweight-charts, false for Recharts
