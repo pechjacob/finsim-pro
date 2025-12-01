@@ -17,8 +17,13 @@ export default function LogoWrapper(props: Props): JSX.Element {
         e.preventDefault();
         e.stopPropagation();
 
-        // Get the href from the logo config (which we set to the correct absolute URL)
-        const href = props.href || '/finsim-pro/';
+        // Get the href from the logo config
+        let href = props.href || '/finsim-pro/';
+
+        // Strip pathname:// protocol if present (used in Docusaurus config for absolute paths)
+        if (href.startsWith('pathname://')) {
+            href = href.replace('pathname://', '');
+        }
 
         // Open in the named window 'finsim-app'
         // If a window with this name exists, it will switch to it
