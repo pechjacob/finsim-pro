@@ -93,13 +93,18 @@ const config: Config = {
       logo: {
         alt: 'FinSim Pro Logo',
         src: 'img/FinSim-Logo.png',
-        href: '../',
-        target: '_self',
+        href: 'pathname:///finsim-pro/',
       },
       items: [
         {
-          type: 'docSidebar',
-          sidebarId: 'tutorialsSidebar',
+          type: 'doc',
+          docId: 'intro',
+          position: 'left',
+          label: 'Getting Started',
+        },
+        {
+          type: 'doc',
+          docId: 'tutorials/index',
           position: 'left',
           label: 'Tutorials',
         },

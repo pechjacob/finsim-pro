@@ -30,27 +30,19 @@ const sidebars: SidebarsConfig = {
         'features/formulas',
       ],
     },
-    {
-      type: 'category',
-      label: 'Advanced',
-      items: [
-        'advanced/data-models',
-      ],
-    },
   ],
 
   // Tutorials sidebar
   tutorialsSidebar: [
     {
-      type: 'category',
-      label: 'Tutorials',
-      items: [
-        'tutorials/first-simulation',
-        'tutorials/creating-events',
-        'tutorials/interest-effects',
-        'tutorials/analyzing-results',
-      ],
+      type: 'doc',
+      id: 'tutorials/index',
+      label: 'Overview',
     },
+    'tutorials/first-simulation',
+    'tutorials/creating-events',
+    'tutorials/interest-effects',
+    'tutorials/analyzing-results',
   ],
 
   // API Reference sidebar
@@ -67,13 +59,9 @@ const sidebars: SidebarsConfig = {
     {
       type: 'doc',
       id: 'architecture',
-      label: 'Architecture',
+      label: 'Overview',
     },
-    {
-      type: 'doc',
-      id: 'advanced/data-models',
-      label: 'Data Models',
-    },
+    'architecture/data-models',
   ],
 
   // Releases sidebar
