@@ -1,0 +1,21 @@
+{
+  "types": [
+    {"type": "feat", "section": "✨ Features"},
+    {"type": "fix", "section": "🐛 Bug Fixes"},
+    {"type": "docs", "section": "📚 Documentation"},
+    {"type": "style", "section": "💄 Styling"},
+    {"type": "refactor", "section": "♻️ Code Refactoring"},
+    {"type": "perf", "section": "⚡ Performance"},
+    {"type": "test", "section": "✅ Tests"},
+    {"type": "chore", "hidden": true},
+    {"type": "revert", "section": "⏪ Reverts"}
+  ],
+  "commitUrlFormat": "https://github.com/pechjacob/finsim-pro/commit/{{hash}}",
+  "compareUrlFormat": "https://github.com/pechjacob/finsim-pro/compare/{{previousTag}}...{{currentTag}}",
+  "issueUrlFormat": "https://github.com/pechjacob/finsim-pro/issues/{{id}}",
+  "userUrlFormat": "https://github.com/{{user}}",
+  "releaseCommitMessageFormat": "chore(release): {{currentTag}}",
+  "skip": {
+    "changelog": false
+  }
+}
