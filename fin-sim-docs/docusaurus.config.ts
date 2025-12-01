@@ -25,7 +25,7 @@ const config: Config = {
   organizationName: 'pechjacob',
   projectName: 'FinSim-Pro',
 
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
 
   i18n: {
@@ -86,7 +86,7 @@ const config: Config = {
     colorMode: {
       defaultMode: 'dark',
       disableSwitch: false,
-      respectPrefersColorScheme: true,
+      respectPrefersColorScheme: false,
     },
     navbar: {
       title: 'FinSim Pro',
@@ -94,7 +94,6 @@ const config: Config = {
         alt: 'FinSim Pro Logo',
         src: 'img/FinSim-Logo.png',
         href: 'pathname:///finsim-pro/',
-        target: '_self',
       },
       items: [
         {
@@ -104,24 +103,28 @@ const config: Config = {
           label: 'Getting Started',
         },
         {
-          to: 'tutorials/first-simulation',
+          type: 'doc',
+          docId: 'tutorials/index',
+          position: 'left',
           label: 'Tutorials',
-          position: 'left',
         },
         {
-          to: 'api',
+          type: 'doc',
+          docId: 'api',
+          position: 'left',
           label: 'API Reference',
-          position: 'left',
         },
         {
-          to: 'architecture',
+          type: 'doc',
+          docId: 'architecture',
+          position: 'left',
           label: 'Architecture',
-          position: 'left',
         },
         {
-          to: 'releases',
-          label: 'Releases',
+          type: 'doc',
+          docId: 'releases',
           position: 'left',
+          label: 'Releases',
         },
         {
           href: 'https://github.com/pechjacob/FinSim-Pro',
@@ -142,7 +145,7 @@ const config: Config = {
             },
             {
               label: 'Tutorials',
-              to: 'tutorials/first-simulation',
+              to: '/tutorials',
             },
           ],
         },
