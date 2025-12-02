@@ -150,6 +150,10 @@ const config: Config = {
           label: 'Releases',
         },
         {
+          type: 'docsVersionDropdown',
+          position: 'right',
+        },
+        {
           href: 'https://github.com/pechjacob/FinSim-Pro',
           label: 'GitHub',
           position: 'right',
