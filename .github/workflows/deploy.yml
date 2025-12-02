@@ -41,10 +41,10 @@ jobs:
       
       - name: Prepare deployment directory
         run: |
-          mkdir -p deploy/finsim-pro
-          cp -r apps/finsim/dist/* deploy/finsim-pro/
-          mkdir -p deploy/finsim-pro/docs
-          cp -r docs/build/* deploy/finsim-pro/docs/
+          mkdir -p deploy
+          cp -r apps/finsim/dist/* deploy/
+          mkdir -p deploy/docs
+          cp -r docs/build/* deploy/docs/
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
