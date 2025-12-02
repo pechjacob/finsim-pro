@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useLayoutEffect } from 'react';
-import { createChart, ColorType, LineStyle, CrosshairMode, IChartApi, ISeriesApi, LineSeries } from 'lightweight-charts';
+import { createChart, ColorType, LineStyle, CrosshairMode, IChartApi, ISeriesApi } from 'lightweight-charts';
 import { Frequency } from '../types';
 import { aggregateData } from '../utils';
 
@@ -68,7 +68,7 @@ export const TimelineSyncChart: React.FC<TimelineSyncChartProps> = ({
         });
 
         // Dummy series to allow crosshair positioning
-        const series = chart.addSeries(LineSeries, {
+        const series = chart.addLineSeries({
             visible: false,
             lastValueVisible: false,
             priceLineVisible: false,

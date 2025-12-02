@@ -1,5 +1,5 @@
 import React, { useRef, useState, useCallback, useMemo, useEffect } from 'react';
-import { createChart, ColorType, LineStyle, CrosshairMode, IChartApi, ISeriesApi, AreaSeries } from 'lightweight-charts';
+import { createChart, ColorType, LineStyle, CrosshairMode, IChartApi, ISeriesApi } from 'lightweight-charts';
 import { RotateCcw, Minus, Plus } from 'lucide-react';
 import { Frequency } from '../types';
 import {
@@ -440,7 +440,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
             },
         });
 
-        const areaSeries = chart.addSeries(AreaSeries, {
+        const areaSeries = chart.addAreaSeries({
             lineColor: '#60a5fa',
             topColor: 'rgba(59, 130, 246, 0.3)',
             bottomColor: 'rgba(59, 130, 246, 0)',
