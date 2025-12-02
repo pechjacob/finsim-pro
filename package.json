@@ -1,7 +1,7 @@
 {
   "name": "finsim-pro",
   "version": "1.0.0",
-  "private": false,
+  "private": true,
   "description": "Financial simulation and planning application",
   "author": "Jacob Pech",
   "license": "MIT",
