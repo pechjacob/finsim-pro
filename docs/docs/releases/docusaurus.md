@@ -1,4 +1,4 @@
-# Docusaurus Versioning
+# Documentation Versioning
 
 ## Creating New Version
 

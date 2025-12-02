@@ -1,4 +1,4 @@
-# Git Workflow
+# Conventional Commits
 
 ## Conventional Commits
 

@@ -68,52 +68,16 @@ const sidebars: SidebarsConfig = {
   releasesSidebar: [
     {
       type: 'doc',
-      id: 'releases',
+      id: 'releases/index',
       label: 'Release Notes',
     },
-    {
-      type: 'category',
-      label: 'Development Workflows',
-      items: [
-        'releases/workflows',
-        'releases/git-workflow',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Versioning Semantics',
-      items: [
-        'releases/versioning',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'CI/CD Pipeline',
-      items: [
-        'releases/cicd',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Docusaurus Versioning',
-      items: [
-        'releases/docusaurus-versioning',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Monorepo Structure',
-      items: [
-        'releases/monorepo',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Contributing',
-      items: [
-        'releases/contributing',
-      ],
-    },
+    'releases/workflows',
+    'releases/git-workflow',
+    'releases/versioning',
+    'releases/cicd',
+    'releases/docusaurus',
+    'releases/monorepo',
+    'releases/contributing',
   ],
 };
 

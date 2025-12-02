@@ -1,4 +1,4 @@
-# Versioning Semantics
+# Semantic Versioning
 
 FinSim Pro follows [Semantic Versioning 2.0.0](https://semver.org/) (`MAJOR.MINOR.PATCH`):
 
