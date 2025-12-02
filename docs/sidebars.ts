@@ -62,22 +62,40 @@ const sidebars: SidebarsConfig = {
       label: 'Overview',
     },
     'architecture/data-models',
+    'architecture/repo-structure',
   ],
 
-  // Releases sidebar
-  releasesSidebar: [
+  // SDLC sidebar
+  sdlcSidebar: [
     {
       type: 'doc',
-      id: 'releases/index',
+      id: 'sdlc/index',
       label: 'Release Notes',
     },
-    'releases/workflows',
-    'releases/git-workflow',
-    'releases/versioning',
-    'releases/cicd',
-    'releases/docusaurus',
-    'releases/monorepo',
-    'releases/contributing',
+    {
+      type: 'category',
+      label: 'Workflows',
+      items: [
+        'sdlc/workflows/git-workflow',
+        'sdlc/workflows/dev-workflow',
+        'sdlc/workflows/gh-workflow',
+        'sdlc/workflows/docs-workflow',
+        'sdlc/workflows/npm-workflow',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Versioning',
+      items: [
+        'sdlc/versioning/semantics',
+        'sdlc/versioning/version-bump-rules',
+        'sdlc/versioning/automated-versioning',
+        'sdlc/versioning/release-process',
+        'sdlc/versioning/changelog-structure',
+        'sdlc/versioning/docs-versioning',
+      ],
+    },
+    'sdlc/contributing',
   ],
 };
 

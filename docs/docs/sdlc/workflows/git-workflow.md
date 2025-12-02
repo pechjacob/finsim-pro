@@ -1,4 +1,4 @@
-# Conventional Commits
+# Git Workflow
 
 ## Conventional Commits
 
@@ -61,3 +61,27 @@ feat(Chart): Add Feature   # Capitalized (should be lowercase)
 
 > [!IMPORTANT]
 > **Commitlint** is enforced via Husky git hooks. Invalid commits will be **rejected**.
+
+## Branch Strategy
+
+### Main Branch
+
+- `main` - Production-ready code
+- Direct commits only for hotfixes
+- All features merged via pull requests
+
+### Feature Branches
+
+```bash
+# Naming convention
+feat/feature-name
+fix/bug-description
+docs/documentation-update
+```
+
+### Workflow
+
+1. Create branch from `main`
+2. Make changes with conventional commits
+3. Push and create PR
+4. After merge, delete branch

@@ -1,6 +1,6 @@
-# Quick Commands
+# NPM Workflow
 
-## Quick Commands Reference
+## Quick Commands
 
 ```bash
 # Development
@@ -26,4 +26,28 @@ npm run release:patch    # Force patch bump
 # Maintenance
 npm run clean            # Remove all node_modules
 npm run fresh            # Clean + reinstall
+```
+
+## Workspace Commands
+
+### Installing Dependencies
+
+```bash
+# Install in specific workspace
+npm install <package> --workspace=apps/finsim
+npm install <package> --workspace=docs
+
+# Install dev dependency
+npm install -D <package> --workspace=apps/finsim
+```
+
+### Running Scripts
+
+```bash
+# Run in specific workspace
+npm run dev --workspace=apps/finsim
+npm run build --workspace=docs
+
+# Run in all workspaces
+npm run lint --workspaces --if-present
 ```

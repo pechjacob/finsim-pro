@@ -145,9 +145,9 @@ const config: Config = {
         },
         {
           type: 'doc',
-          docId: 'releases',
+          docId: 'sdlc/index',
           position: 'left',
-          label: 'Releases',
+          label: 'SDLC',
         },
         {
           type: 'docsVersionDropdown',
