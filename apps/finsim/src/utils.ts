@@ -359,14 +359,15 @@ export const aggregateData = (data: { date: string; balance: number }[], frequen
   });
 
   // Add the final point (sim end date) if it's not already added
-  if (lastPoint && !isFirstPoint) {
-    // Check if the last point is already in aggregated
+  // Use explicit type guard pattern to help TypeScript
+  if (lastPoint !== null && !isFirstPoint) {
+    const finalPoint: { date: string; balance: number } = lastPoint;
     if (aggregated.length === 0) {
-      aggregated.push(lastPoint);
+      aggregated.push(finalPoint);
     } else {
       const lastAggregated = aggregated[aggregated.length - 1];
-      if (lastAggregated.date !== lastPoint!.date) {
-        aggregated.push(lastPoint);
+      if (lastAggregated.date !== finalPoint.date) {
+        aggregated.push(finalPoint);
       }
     }
   }
