@@ -219,7 +219,6 @@ const App: React.FC = () => {
         accounts={accounts}
         onExport={handleExport}
         onImport={handleImport}
-        hoverDate={hoverDate}
         draftItem={draftItem}
         onUpdateDraft={(item) => {
           setDraftItem(item);

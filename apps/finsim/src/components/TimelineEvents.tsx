@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { FinancialItem, FormulaType, SimulationPoint, Frequency } from '../types';
 import { formatCurrency } from '../utils';
 import { calculateTotalDelta } from '../services/simulation';
-import { ChevronUp, ChevronDown, GripVertical, Trash2, Eye, EyeOff, RotateCcw, Filter, Braces, Search } from 'lucide-react';
+import { ChevronUp, ChevronDown, GripVertical, Trash2, Eye, Filter, Search } from 'lucide-react';
 import { DndContext, closestCenter, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -31,6 +31,8 @@ interface TimelineEventsProps {
     frequency: Frequency;
     simulationStartDate: string;
     simulationEndDate: string;
+    isFlipped: boolean;
+    onFlip: () => void;
 }
 
 interface SortableEventItemProps {
@@ -297,7 +299,6 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
     onToggleAllItems,
     hoverDate,
     isZoomed,
-    onResetView,
     frequency,
     isFlipped,
     onFlip,
@@ -378,9 +379,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
         </div>
     );
 
-    const handleToggleVisibleItems = () => {
-        onToggleAllItems(filteredItems.map(i => i.id));
-    };
+
 
     return (
         <div className={`flex flex-col transition-all duration-300 ease-in-out ${isCollapsed ? 'h-10' : 'h-full'}`} style={{ perspective: 1000 }}>
@@ -507,12 +506,10 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                         <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar relative">
                             <div className="absolute inset-0 pointer-events-none z-0">
                                 <TimelineSyncChart
-                                    items={items}
                                     viewStartDate={effectiveStartDate}
                                     viewEndDate={effectiveEndDate}
                                     simulationPoints={simulationPoints}
                                     hoverDate={hoverDate}
-                                    isZoomed={isZoomed}
                                     frequency={frequency}
                                 />
                             </div>
@@ -653,7 +650,6 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                             {/* Crosshair overlay */}
                             <div className="absolute inset-0 pointer-events-none z-0">
                                 <TimelineSyncChart
-                                    items={items}
                                     viewStartDate={effectiveStartDate}
                                     viewEndDate={effectiveEndDate}
                                     hoverDate={hoverDate}

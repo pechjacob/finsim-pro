@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Account, FinancialItem, FormulaType, CompoundingPeriod } from '../types';
 import { formatDate, formatCurrency } from '../utils';
-import { Trash2, Plus, X, Save, HelpCircle, Download, Upload, ChevronLeft, ChevronRight, Eye, EyeOff } from 'lucide-react';
+import { Trash2, Plus, X, Save, Download, Upload, ChevronLeft, ChevronRight, Eye, EyeOff } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
@@ -85,9 +85,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         }
     }, [activeItem, draftItem]);
 
-    const handleSaveAccount = () => {
-        onUpdateAccount({ ...account, name: localName });
-    };
+
 
     const handleSaveItem = () => {
         if (draftItem) {
@@ -496,7 +494,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <div className="mb-8">
                     <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700 mb-4 font-mono text-sm leading-relaxed">
                         V(t) = Vo
-                        {sortedItems.map((item, index) => {
+                        {sortedItems.map((item) => {
                             const { var: varName, color } = getItemMeta(item);
                             const isLumpSum = item.formula === FormulaType.LUMP_SUM;
                             const isActive = activeItemId === item.id;
@@ -534,7 +532,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700 font-mono text-sm mb-6 leading-relaxed">
                     V({months}) = {initialBalance}
                     {sortedItems.map((item) => {
-                        const { var: varName, color } = getItemMeta(item);
+                        const { color } = getItemMeta(item);
                         const isLumpSum = item.formula === FormulaType.LUMP_SUM;
                         const isExpense = item.type === 'expense';
                         const amount = item.amount || 0;

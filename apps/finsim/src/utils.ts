@@ -361,7 +361,7 @@ export const aggregateData = (data: { date: string; balance: number }[], frequen
   // Add the final point (sim end date) if it's not already added
   if (lastPoint && !isFirstPoint) {
     // Check if the last point is already in aggregated
-    const lastAggregated = aggregated[aggregated.length - 1];
+    const lastAggregated = aggregated.length > 0 ? aggregated[aggregated.length - 1] : null;
     if (!lastAggregated || lastAggregated.date !== lastPoint.date) {
       aggregated.push(lastPoint);
     }

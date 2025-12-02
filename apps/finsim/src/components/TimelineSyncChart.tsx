@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useLayoutEffect } from 'react';
-import { createChart, ColorType, LineStyle, CrosshairMode, IChartApi, ISeriesApi } from 'lightweight-charts';
+import { createChart, ColorType, LineStyle, CrosshairMode, IChartApi, ISeriesApi, UTCTimestamp } from 'lightweight-charts';
 import { Frequency } from '../types';
 import { aggregateData } from '../utils';
 
 interface TimelineSyncChartProps {
     viewStartDate: string;
     viewEndDate: string;
-    hoverDate: string | null;
+    hoverDate: string | null | undefined;
     simulationPoints: { date: string; balance: number }[];
     frequency: Frequency;
 }
@@ -99,7 +99,7 @@ export const TimelineSyncChart: React.FC<TimelineSyncChartProps> = ({
         const aggregated = aggregateData(simulationPoints, frequency);
         // Convert dates to Unix timestamps (seconds) for consistency
         const data = aggregated.map(p => ({
-            time: new Date(p.date).getTime() / 1000,
+            time: (new Date(p.date).getTime() / 1000) as UTCTimestamp,
             value: 0
         }));
         seriesRef.current.setData(data);
@@ -109,8 +109,8 @@ export const TimelineSyncChart: React.FC<TimelineSyncChartProps> = ({
     useLayoutEffect(() => {
         if (!chartRef.current) return;
 
-        const startTime = new Date(viewStartDate).getTime() / 1000;
-        const endTime = new Date(viewEndDate).getTime() / 1000;
+        const startTime = (new Date(viewStartDate).getTime() / 1000) as UTCTimestamp;
+        const endTime = (new Date(viewEndDate).getTime() / 1000) as UTCTimestamp;
 
         try {
             chartRef.current.timeScale().setVisibleRange({ from: startTime, to: endTime });
@@ -125,7 +125,7 @@ export const TimelineSyncChart: React.FC<TimelineSyncChartProps> = ({
 
         if (hoverDate) {
             // Convert hoverDate to Unix timestamp (seconds) for consistency
-            const hoverTime = new Date(hoverDate).getTime() / 1000;
+            const hoverTime = (new Date(hoverDate).getTime() / 1000) as UTCTimestamp;
             chartRef.current.setCrosshairPosition(0, hoverTime, seriesRef.current);
         } else {
             chartRef.current.clearCrosshairPosition();

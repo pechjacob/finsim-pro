@@ -12,7 +12,7 @@ interface FormulaDisplayProps {
     onItemClick?: (id: string) => void;
     viewStartDate?: string;
     viewEndDate?: string;
-    simulationPoints?: { date: string; balance: number; }[];
+    simulationPoints?: { date: string; balance: number; itemStartBalances?: Record<string, number>; }[];
     itemTotals?: Record<string, number>;
 }
 

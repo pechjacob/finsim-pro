@@ -1,10 +1,9 @@
 import React, { useRef, useState, useCallback, useMemo, useEffect } from 'react';
-import { createChart, ColorType, LineStyle, CrosshairMode, IChartApi, ISeriesApi } from 'lightweight-charts';
+import { createChart, ColorType, LineStyle, CrosshairMode, IChartApi, ISeriesApi, UTCTimestamp } from 'lightweight-charts';
 import { RotateCcw, Minus, Plus } from 'lucide-react';
 import { Frequency } from '../types';
 import {
     formatDate,
-    formatCurrency,
     getDaysDifference,
     calculateZoomPercentage,
     calculateRangeFromPercentage,
@@ -139,7 +138,6 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
     const [focusDate, setFocusDate] = useState<Date | null>(null);
     const [zoomPercentage, setZoomPercentage] = useState(0);
     const [requestedZoomPercentage, setRequestedZoomPercentage] = useState(0); // User's intended zoom level
-    const [crosshairPosition, setCrosshairPosition] = useState<{ date: string; value: number } | null>(null);
     // Removed state for sim lines to use direct DOM manipulation for performance
     const headerDateRange = useRef<{ from: string; to: string } | null>(null);
     const [, forceUpdate] = useState({}); // Force update for header date range if needed
@@ -339,17 +337,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
     useEffect(() => {
         if (!chartContainerRef.current) return;
 
-        const handleResize = () => {
-            if (chartRef.current && chartContainerRef.current) {
-                chartRef.current.applyOptions({
-                    width: chartContainerRef.current.clientWidth,
-                    height: chartContainerRef.current.clientHeight
-                });
 
-                // Update sim lines on resize
-                latestUpdateSimLines.current?.();
-            }
-        };
 
         // Helper to get coordinate for any date, handling missing points in aggregated data
         // REMOVED: Moved to component scope to access latestChartData ref
@@ -458,13 +446,11 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                 const data = param.seriesData.get(areaSeries);
                 if (data) {
                     const dateStr = param.time as string;
-                    setCrosshairPosition({ date: dateStr, value: (data as any).value });
                     if (latestOnHover.current) {
                         latestOnHover.current(dateStr);
                     }
                 }
             } else {
-                setCrosshairPosition(null);
                 if (latestOnHover.current) {
                     latestOnHover.current(null);
                 }
@@ -486,12 +472,8 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                 if (fromIndex <= toIndex && latestChartData.current.length > 0) {
                     const fromStr = latestChartData.current[fromIndex].time as string;
                     const toStr = latestChartData.current[toIndex].time as string;
-                    if (fromIndex <= toIndex && latestChartData.current.length > 0) {
-                        const fromStr = latestChartData.current[fromIndex].time as string;
-                        const toStr = latestChartData.current[toIndex].time as string;
-                        headerDateRange.current = { from: fromStr, to: toStr };
-                        forceUpdate({}); // Trigger re-render for header update
-                    }
+                    headerDateRange.current = { from: fromStr, to: toStr };
+                    forceUpdate({}); // Trigger re-render for header update
                 }
             }
 
@@ -523,13 +505,11 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
 
                 // For Quarterly/Yearly views, use raw percentage (no snapping)
                 // For other views, snap to nearest 5% if within 2.5% tolerance
-                let newPercentage = percentage;
                 if (frequency === Frequency.QUARTERLY || frequency === Frequency.YEARLY) {
                     setZoomPercentage(percentage);
                 } else {
                     const snapped = Math.round(percentage / 5) * 5;
                     if (Math.abs(percentage - snapped) < 2.5) {
-                        newPercentage = snapped;
                         setZoomPercentage(snapped);
                     } else {
                         setZoomPercentage(percentage);
@@ -642,7 +622,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
 
         const applyRange = () => {
             try {
-                chartRef.current?.timeScale().setVisibleRange({ from: startTime, to: endTime });
+                chartRef.current?.timeScale().setVisibleRange({ from: startTime as UTCTimestamp, to: endTime as UTCTimestamp });
                 // Mark as initialized after first successful set
                 if (!isInitialized.current) {
                     setTimeout(() => {
@@ -759,7 +739,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                     {/* Simulation Dates */}
                     <div className="flex items-center space-x-2 bg-gray-900 px-3 py-1.5 rounded border border-gray-700 h-8 justify-center mr-2">
                         <span className="text-xs text-lime-400">Sim:</span>
-                        <div className="bg-white/10 rounded px-1 flex items-center justify-center h-5 hover:bg-lime-400/20 transition-colors cursor-pointer" onClick={() => document.getElementById('sim-start-date')?.showPicker()}>
+                        <div className="bg-white/10 rounded px-1 flex items-center justify-center h-5 hover:bg-lime-400/20 transition-colors cursor-pointer" onClick={() => (document.getElementById('sim-start-date') as HTMLInputElement)?.showPicker()}>
                             <input
                                 id="sim-start-date"
                                 type="date"
@@ -774,7 +754,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                             />
                         </div>
                         <span className="text-gray-400 text-xs">-</span>
-                        <div className="bg-white/10 rounded px-1 flex items-center justify-center h-5 hover:bg-lime-400/20 transition-colors cursor-pointer" onClick={() => document.getElementById('sim-end-date')?.showPicker()}>
+                        <div className="bg-white/10 rounded px-1 flex items-center justify-center h-5 hover:bg-lime-400/20 transition-colors cursor-pointer" onClick={() => (document.getElementById('sim-end-date') as HTMLInputElement)?.showPicker()}>
                             <input
                                 id="sim-end-date"
                                 type="date"
