@@ -1,26 +1,37 @@
 {
   "name": "finsim-pro",
   "version": "1.0.0",
-  "private": true,
+  "private": false,
   "description": "Financial simulation and planning application",
   "author": "Jacob Pech",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pechjacob/finsim-pro.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pechjacob/finsim-pro/issues"
+  },
+  "homepage": "https://pechjacob.github.io/finsim-pro",
   "workspaces": [
     "apps/*",
     "docs"
   ],
   "scripts": {
-    "dev": "npm run dev --workspace=apps/finsim",
+    "app:dev": "npm run dev --workspace=apps/finsim",
     "docs:dev": "npm start --workspace=docs -- --port 3001",
-    "dev:all": "concurrently \"npm run dev\" \"npm run docs:dev\" --names \"app,docs\" --prefix-colors \"cyan,magenta\"",
-    "build": "npm run build --workspace=apps/finsim",
+    "dev:all": "concurrently \"npm run app:dev\" \"npm run docs:dev\" --names \"app,docs\" --prefix-colors \"cyan,magenta\"",
+    "app:build": "npm run build --workspace=apps/finsim",
     "docs:build": "npm run build --workspace=docs",
-    "build:all": "npm run build && npm run docs:build",
+    "build:all": "npm run app:build && npm run docs:build",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
     "release": "standard-version",
     "release:minor": "standard-version --release-as minor",
     "release:major": "standard-version --release-as major",
     "release:patch": "standard-version --release-as patch",
-    "docs:version": "npm run docusaurus docs:version --workspace=docs",
+    "clean": "rm -rf node_modules apps/*/node_modules docs/node_modules",
+    "fresh": "npm run clean && npm install",
     "prepare": "husky install"
   },
   "devDependencies": {
