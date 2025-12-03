@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/pechjacob/finsim-pro/compare/v1.0.0...v1.1.0) (2025-12-03)
+
+
+### 🐛 Bug Fixes
+
+* **app:** disable strict unused checks temporarily for ci build to pass ([e436979](https://github.com/pechjacob/finsim-pro/commit/e43697993e81a7a915dd864081fc4bc36e158a53))
+* **app:** resolve type narrowing issue in aggregate data function ([5c5d898](https://github.com/pechjacob/finsim-pro/commit/5c5d8986f32a0d591c177362d9154cbe6ec257e6))
+* **app:** resolve typescript build errors for ci deployment ([54c4f30](https://github.com/pechjacob/finsim-pro/commit/54c4f30497c461caee68e3e37319df3d91474c74))
+* **ci:** correct deployment artifact path to resolve 404 ([48b7e03](https://github.com/pechjacob/finsim-pro/commit/48b7e03e4d3866d98a896e8ded60350679471ac2))
+
+
+### ✨ Features
+
+* **app:** add landing page, routing, and glass navbar ([6bdc545](https://github.com/pechjacob/finsim-pro/commit/6bdc54517442bfae559728c2136d87942f36b794))
+
 ## 1.0.0 (2025-12-02)
 
 
