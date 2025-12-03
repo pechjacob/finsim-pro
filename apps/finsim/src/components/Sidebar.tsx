@@ -30,7 +30,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     account,
     items,
     activeItemId,
-    onUpdateAccount,
+    // onUpdateAccount, // Unused
     onUpsertItem,
     onDeleteItem,
     onDeleteAccount,
@@ -45,7 +45,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     isFlipped = false,
     finalBalance = 0
 }) => {
-    const [localName, setLocalName] = useState(account.name);
+    // const [localName, setLocalName] = useState(account.name); // Unused
     const [isCollapsed, setIsCollapsed] = useState(false);
 
     const getDefaultStartDate = () => {
@@ -60,9 +60,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
     const [editingItem, setEditingItem] = useState<FinancialItem | null>(null);
     const [originalItem, setOriginalItem] = useState<FinancialItem | null>(null);
 
-    useEffect(() => {
-        setLocalName(account.name);
-    }, [account]);
+    // useEffect(() => {
+    //     setLocalName(account.name);
+    // }, [account]);
 
     useEffect(() => {
         if (draftItem) {
@@ -684,7 +684,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                     >
                                         Documentation
                                     </a>
-                                    <a href="#" className="hover:text-blue-400">Support</a>
+
                                     <a href="#" className="hover:text-blue-400 flex items-center gap-1">
                                         Github
                                     </a>
