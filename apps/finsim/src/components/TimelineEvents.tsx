@@ -356,11 +356,11 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
 
     const zoomToggle = (
         <div
-            className={`relative w-12 h-6 rounded-full cursor-pointer transition-colors duration-200 ease-in-out flex items-center ${!isChartZoomed
+            className={`relative w-12 h-6 rounded-full transition-colors duration-200 ease-in-out flex items-center ${!isChartZoomed
                 ? 'bg-gray-700 opacity-50 cursor-not-allowed'
-                : isZoomTrackingEnabled
+                : (isZoomTrackingEnabled
                     ? 'bg-purple-600 hover:bg-purple-500'
-                    : 'bg-lime-600 hover:bg-lime-500'
+                    : 'bg-lime-600 hover:bg-lime-500') + ' cursor-pointer'
                 }`}
             onClick={(e) => {
                 e.stopPropagation();

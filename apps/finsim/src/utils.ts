@@ -180,7 +180,7 @@ export const generateSmartYTicks = (min: number, max: number, height: number): {
 
   // 1. Calculate visible range with padding
   const range = max - min;
-  const padding = range * 0.1; // 10% padding total (5% top, 5% bottom)
+  // const padding = range * 0.1; // Unused
   // Or user said 5-10% above/below. Let's do 5% each side.
   const niceMin = Math.floor(min - range * 0.05);
   const niceMax = Math.ceil(max + range * 0.05);
@@ -234,7 +234,7 @@ export const generateSmartYTicks = (min: number, max: number, height: number): {
   return { ticks, domain: [niceMin, niceMax] };
 };
 
-export const getSmartYTickFormatter = (maxVal: number): (val: number) => string => {
+export const getSmartYTickFormatter = (_maxVal: number): (val: number) => string => {
   return (val: number) => {
     if (val === 0) return '$0';
 

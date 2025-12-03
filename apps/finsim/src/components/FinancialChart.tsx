@@ -21,8 +21,7 @@ import {
     calculateZoomPercentage,
     calculateRangeFromPercentage,
     calculateRangeOffsets,
-    constrainToBounds,
-    addDays
+    constrainToBounds
 } from '../utils';
 import { RotateCcw, Minus, Plus } from 'lucide-react';
 
@@ -34,7 +33,6 @@ interface FinancialChartProps {
     simulationEndDate: string;
     visibleStartDate: string;
     visibleEndDate: string;
-    onSimulationDateRangeChange: (start: string, end: string) => void;
     onVisibleDateRangeChange: (start: string, end: string) => void;
     onHover?: (date: string | null) => void;
 }
@@ -160,7 +158,6 @@ export const FinancialChart: React.FC<FinancialChartProps> = ({
     simulationEndDate,
     visibleStartDate,
     visibleEndDate,
-    onSimulationDateRangeChange,
     onVisibleDateRangeChange,
     onHover
 }) => {
@@ -454,15 +451,11 @@ export const FinancialChart: React.FC<FinancialChartProps> = ({
         const width = rect.width;
         const cursorRatio = Math.max(0, Math.min(1, cursorX / width));
 
-        const ZOOM_SENSITIVITY = 0.001;
-        const delta = -e.deltaY * ZOOM_SENSITIVITY;
-        const zoomFactor = Math.exp(delta);
-
         const currentStart = new Date(visibleStartDate).getTime();
         const currentEnd = new Date(visibleEndDate).getTime();
         const currentDuration = currentEnd - currentStart;
 
-        let newDuration = currentDuration / zoomFactor;
+        let newDuration = currentDuration / Math.exp(-e.deltaY * 0.001);
 
         // Calculate new bounds anchored to cursor
         const anchorTime = currentStart + currentDuration * cursorRatio;
@@ -472,7 +465,6 @@ export const FinancialChart: React.FC<FinancialChartProps> = ({
         // Constrain to data bounds
         const simStart = new Date(simulationStartDate);
         const simEnd = new Date(simulationEndDate);
-        const minDuration = 1000 * 60 * 60 * 24 * 7; // Min 7 days
 
         let [constrainedNewStart, constrainedNewEnd] = constrainToBounds(
             new Date(newStart),

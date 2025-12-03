@@ -90,6 +90,8 @@ export const TimelineSyncChart: React.FC<TimelineSyncChartProps> = ({
         return () => {
             resizeObserver.disconnect();
             chart.remove();
+            chartRef.current = null;
+            seriesRef.current = null;
         };
     }, []);
 
@@ -126,9 +128,19 @@ export const TimelineSyncChart: React.FC<TimelineSyncChartProps> = ({
         if (hoverDate) {
             // Convert hoverDate to Unix timestamp (seconds) for consistency
             const hoverTime = (new Date(hoverDate).getTime() / 1000) as UTCTimestamp;
-            chartRef.current.setCrosshairPosition(0, hoverTime, seriesRef.current);
+            if (isNaN(hoverTime)) return;
+
+            try {
+                chartRef.current.setCrosshairPosition(0, hoverTime, seriesRef.current);
+            } catch (e) {
+                console.warn('Failed to set crosshair position', e);
+            }
         } else {
-            chartRef.current.clearCrosshairPosition();
+            try {
+                chartRef.current.clearCrosshairPosition();
+            } catch (e) {
+                // Ignore
+            }
         }
     }, [hoverDate]);
 

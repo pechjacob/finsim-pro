@@ -50,7 +50,7 @@ export const runSimulation = (
       if (itemEnd && loopDate > itemEnd) return;
 
       // Apply formulas
-      let applyAmount = 0;
+      // let applyAmount = 0; // Unused
 
       // Determine direction
       const isOutgoing = item.accountId === account.id && item.type !== 'income'; // If I own it and it's expense or transfer out

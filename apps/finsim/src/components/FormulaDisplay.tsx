@@ -66,15 +66,15 @@ export const FormulaDisplay: React.FC<FormulaDisplayProps> = ({
                     }
 
                     const varName = getVarName(item);
-                    const amount = item.amount || 0;
-                    const amountStr = isExpense ? `-\\$${amount} ` : `\\$${amount} `;
-                    const nameStr = `\\text{${item.name} } `;
+                    // const amount = item.amount || 0; // Unused
+                    // const amountStr = isExpense ? `-\\$${amount} ` : `\\$${amount} `; // Unused
+                    // const nameStr = `\\text{${item.name} } `; // Unused
 
                     // Left side equation: I_j = Job
-                    const leftEq = `${varName} = ${nameStr} `;
+                    // const leftEq = `${varName} = ${nameStr} `; // Unused
 
                     // Center equation: I_j = $2000
-                    const centerEq = `${varName} = ${amountStr} `;
+                    // const centerEq = `${varName} = ${amountStr} `; // Unused
 
                     const isEnabled = item.isEnabled !== false;
 
