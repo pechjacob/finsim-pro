@@ -35,7 +35,6 @@ const config: Config = {
   projectName: 'FinSim-Pro',
 
   onBrokenLinks: 'warn',
-  onBrokenMarkdownLinks: 'warn',
 
   i18n: {
     defaultLocale: 'en',
@@ -44,6 +43,9 @@ const config: Config = {
 
   markdown: {
     mermaid: true,
+    hooks: {
+      onBrokenMarkdownLinks: 'warn',
+    },
   },
   themes: [
     '@docusaurus/theme-mermaid',
@@ -72,16 +74,11 @@ const config: Config = {
           rehypePlugins: [rehypeKatex],
 
           // Versioning configuration
-          lastVersion: 'current',
           versions: {
             current: {
               label: 'Next 🚧',
-              path: '/',
+              path: 'next',
               banner: 'unreleased',
-            },
-            '1.0.0': {
-              label: '1.0.0',
-              path: '/1.0.0',
             },
           },
         },
