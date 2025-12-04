@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Auto-sync unreleased changes to docs after every commit
+node scripts/preview-changelog.js --sync

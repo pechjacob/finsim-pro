@@ -72,6 +72,8 @@ const sidebars: SidebarsConfig = {
       id: 'sdlc/index',
       label: 'Release Notes',
     },
+    'sdlc/complete-workflow',
+    'sdlc/changelog-automation',
     {
       type: 'category',
       label: 'Workflows',
