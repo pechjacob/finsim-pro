@@ -10,7 +10,7 @@ import { getVersionString } from '../version';
 interface SidebarProps {
     account: Account;
     items: FinancialItem[];
-    activeItemId: string | null;
+    selectedItemIds: Set<string>;
     onUpdateAccount: (account: Account) => void;
     onUpsertItem: (item: FinancialItem) => void;
     onDeleteItem: (id: string) => void;
@@ -30,7 +30,7 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({
     account,
     items,
-    activeItemId,
+    selectedItemIds,
     // onUpdateAccount, // Unused
     onUpsertItem,
     onDeleteItem,
@@ -57,7 +57,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
         return viewStartDate;
     };
 
-    const activeItem = items.find(i => i.id === activeItemId);
+    // Only show active item if exactly ONE item is selected
+    const activeItem = selectedItemIds.size === 1
+        ? items.find(i => i.id === Array.from(selectedItemIds)[0])
+        : null;
     const [editingItem, setEditingItem] = useState<FinancialItem | null>(null);
     const [originalItem, setOriginalItem] = useState<FinancialItem | null>(null);
 
@@ -498,7 +501,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         {sortedItems.map((item) => {
                             const { var: varName, color } = getItemMeta(item);
                             const isLumpSum = item.formula === FormulaType.LUMP_SUM;
-                            const isActive = activeItemId === item.id;
+                            const isActive = selectedItemIds.has(item.id);
                             return (
                                 <span key={item.id}>
                                     {' + '}
@@ -515,7 +518,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         <p><span className="font-mono text-gray-300">t</span> = time in months</p>
                         {sortedItems.map(item => {
                             const { var: varName, color } = getItemMeta(item);
-                            const isActive = activeItemId === item.id;
+                            const isActive = selectedItemIds.has(item.id);
                             return (
                                 <p key={item.id} className={isActive ? 'bg-white/10 px-2 py-0.5 rounded' : ''}>
                                     <span className={`inline-block ${color}`}>
@@ -537,7 +540,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         const isLumpSum = item.formula === FormulaType.LUMP_SUM;
                         const isExpense = item.type === 'expense';
                         const amount = item.amount || 0;
-                        const isActive = activeItemId === item.id;
+                        const isActive = selectedItemIds.has(item.id);
 
                         return (
                             <span key={item.id}>

@@ -14,7 +14,7 @@ import { FlipIcon } from './FlipIcon';
 
 interface TimelineEventsProps {
     items: FinancialItem[];
-    activeItemId: string | null;
+    selectedItemIds: Set<string>;
     onItemClick: (id: string) => void;
     viewStartDate: string;
     viewEndDate: string;
@@ -286,7 +286,7 @@ const SortableEventItem: React.FC<SortableEventItemProps> = ({
 
 export const TimelineEvents: React.FC<TimelineEventsProps> = ({
     items,
-    activeItemId,
+    selectedItemIds,
     onItemClick,
     viewStartDate,
     viewEndDate,
@@ -599,7 +599,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                                 <SortableEventItem
                                                     key={item.id}
                                                     item={item}
-                                                    isActive={activeItemId === item.id}
+                                                    isActive={selectedItemIds.has(item.id)}
                                                     onItemClick={onItemClick}
                                                     viewStartDate={effectiveStartDate}
                                                     viewEndDate={effectiveEndDate}
@@ -791,7 +791,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
 
                             <FormulaDisplay
                                 items={filteredItems}
-                                activeItemId={activeItemId}
+                                selectedItemIds={selectedItemIds}
                                 onItemClick={onItemClick}
                                 viewStartDate={effectiveStartDate}
                                 viewEndDate={effectiveEndDate}

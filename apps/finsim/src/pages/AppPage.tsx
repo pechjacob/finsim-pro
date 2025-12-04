@@ -44,7 +44,7 @@ const AppPage: React.FC = () => {
     }
   ]);
 
-  const [activeItemId, setActiveItemId] = useState<string | null>(null);
+  const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(new Set());
   const [isTimelineCollapsed, setIsTimelineCollapsed] = useState(false);
   const [hoverDate, setHoverDate] = useState<string | null>(null);
   const [draftItem, setDraftItem] = useState<FinancialItem | null>(null);
@@ -82,12 +82,16 @@ const AppPage: React.FC = () => {
       }
       return [...prev, item];
     });
-    setActiveItemId(item.id); // Focus the new/edited item
+    setSelectedItemIds(new Set([item.id])); // Focus the new/edited item
   };
 
   const handleDeleteItem = (id: string) => {
     setItems(prev => prev.filter(i => i.id !== id));
-    if (activeItemId === id) setActiveItemId(null);
+    setSelectedItemIds(prev => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
     setDraftItem(null); // Clear draft when deleting
   };
 
@@ -184,7 +188,7 @@ const AppPage: React.FC = () => {
 
   const handleDeleteAllItems = () => {
     setItems(prev => prev.filter(i => !(i.accountId === activeAccountId || i.toAccountId === activeAccountId)));
-    setActiveItemId(null);
+    setSelectedItemIds(new Set());
   };
 
   const handleToggleAllItems = (itemIds?: string[]) => {
@@ -204,13 +208,13 @@ const AppPage: React.FC = () => {
       <Sidebar
         account={activeAccount}
         items={items.filter(i => i.accountId === activeAccountId || i.toAccountId === activeAccountId)}
-        activeItemId={activeItemId}
+        selectedItemIds={selectedItemIds}
         onUpdateAccount={(acc) => setAccounts(prev => prev.map(a => a.id === acc.id ? acc : a))}
         onUpsertItem={handleUpsertItem}
         onDeleteItem={handleDeleteItem}
         onDeleteAccount={handleDeleteAccount}
         onClose={() => {
-          setActiveItemId(null);
+          setSelectedItemIds(new Set());
           setDraftItem(null);
         }}
         accounts={accounts}
@@ -219,8 +223,8 @@ const AppPage: React.FC = () => {
         draftItem={draftItem}
         onUpdateDraft={(item) => {
           setDraftItem(item);
-          if (item) setActiveItemId(item.id);
-          else setActiveItemId(null);
+          if (item) setSelectedItemIds(new Set([item.id]));
+          else setSelectedItemIds(new Set());
         }}
         viewStartDate={simulationStartDate}
         viewEndDate={simulationEndDate}
@@ -268,9 +272,17 @@ const AppPage: React.FC = () => {
         <div className={`w-full flex flex-col transition-all duration-300 ease-in-out ${isTimelineCollapsed ? 'h-10 shrink-0' : 'h-[40%] shrink-0'} `}>
           <TimelineEvents
             items={displayedItems.filter(i => i.accountId === activeAccountId || i.toAccountId === activeAccountId)}
-            activeItemId={activeItemId}
+            selectedItemIds={selectedItemIds}
             onItemClick={(id) => {
-              setActiveItemId(id);
+              setSelectedItemIds(prev => {
+                const next = new Set(prev);
+                if (next.has(id)) {
+                  next.delete(id);
+                } else {
+                  next.add(id);
+                }
+                return next;
+              });
               // Clear draft when clicking a different item
               if (draftItem && draftItem.id !== id) {
                 setDraftItem(null);

@@ -8,7 +8,7 @@ import { GripVertical } from 'lucide-react';
 
 interface FormulaDisplayProps {
     items: FinancialItem[];
-    activeItemId?: string | null;
+    selectedItemIds?: Set<string>;
     onItemClick?: (id: string) => void;
     viewStartDate?: string;
     viewEndDate?: string;
@@ -18,7 +18,7 @@ interface FormulaDisplayProps {
 
 export const FormulaDisplay: React.FC<FormulaDisplayProps> = ({
     items,
-    activeItemId,
+    selectedItemIds,
     onItemClick,
     viewStartDate,
     viewEndDate,
@@ -45,7 +45,7 @@ export const FormulaDisplay: React.FC<FormulaDisplayProps> = ({
                     const isIncome = item.type === 'income';
                     const isExpense = item.type === 'expense';
                     const isEffect = item.type === 'effect';
-                    const isActive = activeItemId === item.id;
+                    const isActive = selectedItemIds?.has(item.id);
 
                     let bgColor = 'bg-gray-800/60';
                     let borderColor = 'border-gray-700';
