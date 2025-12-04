@@ -42,6 +42,37 @@
         },
         "architecture/data-models"
     ],
+    "sdlcSidebar": [
+        {
+            "type": "doc",
+            "id": "sdlc/index",
+            "label": "Release Notes"
+        },
+        {
+            "type": "category",
+            "label": "Workflows",
+            "items": [
+                "sdlc/workflows/git-workflow",
+                "sdlc/workflows/dev-workflow",
+                "sdlc/workflows/gh-workflow",
+                "sdlc/workflows/docs-workflow",
+                "sdlc/workflows/npm-workflow"
+            ]
+        },
+        {
+            "type": "category",
+            "label": "Versioning",
+            "items": [
+                "sdlc/versioning/semantics",
+                "sdlc/versioning/version-bump-rules",
+                "sdlc/versioning/automated-versioning",
+                "sdlc/versioning/release-process",
+                "sdlc/versioning/changelog-structure",
+                "sdlc/versioning/docs-versioning"
+            ]
+        },
+        "sdlc/contributing"
+    ],
     "releasesSidebar": [
         {
             "type": "doc",
