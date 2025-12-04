@@ -1,0 +1,22 @@
+{
+    "packageFiles": [
+        {
+            "filename": "package.json",
+            "type": "json"
+        },
+        {
+            "filename": "apps/finsim/package.json",
+            "type": "json"
+        }
+    ],
+    "bumpFiles": [
+        {
+            "filename": "package.json",
+            "type": "json"
+        },
+        {
+            "filename": "apps/finsim/package.json",
+            "type": "json"
+        }
+    ]
+}
