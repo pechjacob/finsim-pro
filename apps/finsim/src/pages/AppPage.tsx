@@ -8,6 +8,7 @@ import { runSimulation } from '../services/simulation';
 import { addDays, formatDate, generateUUID } from '../utils';
 import { Settings, Bug } from 'lucide-react';
 import { RightPanel } from '../components/RightPanel';
+import { getFullVersionString } from '../version';
 
 // Feature flag: Set to true to use lightweight-charts, false for Recharts
 const USE_LIGHTWEIGHT_CHARTS = true;
@@ -49,6 +50,7 @@ const AppPage: React.FC = () => {
   const [draftItem, setDraftItem] = useState<FinancialItem | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isDebugOpen, setIsDebugOpen] = useState(false);
+  const [isDebugMode, setIsDebugMode] = useState(true); // Debug mode toggle state
 
   // View Settings
   const today = new Date();
@@ -352,8 +354,10 @@ const AppPage: React.FC = () => {
                 setIsDebugOpen(!isDebugOpen);
                 setIsSettingsOpen(false);
               }}
-              className={`p-1.5 rounded transition-colors ${isDebugOpen ? 'text-pink-400 bg-gray-800 hover:bg-gray-700' : 'text-gray-500 hover:text-pink-400 hover:bg-gray-900'}`}
-              title="Debug Panel"
+              className={`p-1.5 rounded transition-colors ${isDebugOpen ? 'bg-gray-800 hover:bg-gray-700' : 'hover:bg-gray-900'
+                } ${isDebugMode ? 'text-green-400 hover:text-green-300' : 'text-red-400 hover:text-red-300'
+                }`}
+              title={`Debug Panel (${isDebugMode ? 'On' : 'Off'})`}
             >
               <Bug size={16} />
             </button>
@@ -388,9 +392,42 @@ const AppPage: React.FC = () => {
       <RightPanel
         isOpen={isDebugOpen}
         onClose={() => setIsDebugOpen(false)}
-        title="DEBUG"
+        title={(
+          <div className="flex items-center w-full">
+            <span>DEBUG</span>
+            {/* Debug Mode Slider Toggle */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsDebugMode(!isDebugMode);
+              }}
+              className={`relative w-20 h-6 rounded-full transition-all ml-auto ${isDebugMode
+                ? 'bg-green-500/30'
+                : 'bg-red-500/30'
+                }`}
+              title={`Debug Mode: ${isDebugMode ? 'On' : 'Off'}`}
+            >
+              {/* Slider */}
+              <div
+                className={`absolute top-0.5 h-5 w-10 rounded-full transition-all duration-200 flex items-center justify-center gap-1 font-medium text-[10px] ${isDebugMode
+                  ? 'right-0.5 bg-green-500 text-white'
+                  : 'left-0.5 bg-red-500 text-white'
+                  }`}
+              >
+                <Bug size={10} />
+                <span>{isDebugMode ? 'ON' : 'OFF'}</span>
+              </div>
+            </button>
+          </div>
+        )}
       >
         <div className="space-y-4 text-xs font-mono">
+          {/* Version Info */}
+          <div>
+            <div className="text-gray-500 mb-1">Version</div>
+            <div className="bg-gray-800 p-2 rounded">{getFullVersionString()}</div>
+          </div>
+
           <div>
             <div className="text-gray-500 mb-1">Active Account ID</div>
             <div className="bg-gray-800 p-2 rounded break-all">{activeAccountId}</div>

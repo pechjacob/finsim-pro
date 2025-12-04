@@ -5,7 +5,7 @@ import { ChevronRight } from 'lucide-react';
 interface RightPanelProps {
     isOpen: boolean;
     onClose: () => void;
-    title: string;
+    title: React.ReactNode;
     children: React.ReactNode;
 }
 
@@ -51,7 +51,7 @@ export const RightPanel: React.FC<RightPanelProps> = ({
                         <div className="w-80 h-full bg-gray-900/80 backdrop-blur-md border-l border-t border-gray-800 flex flex-col shadow-2xl -ml-[1px]">
                             {/* Header */}
                             <div className="h-12 border-b border-gray-800 flex items-center px-4 shrink-0">
-                                <h2 className="text-sm font-bold text-gray-100 tracking-wider uppercase">{title}</h2>
+                                <h2 className="text-sm font-bold text-gray-100 tracking-wider uppercase w-full">{title}</h2>
                             </div>
 
                             {/* Body */}
