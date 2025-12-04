@@ -313,9 +313,24 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
         })
     );
 
+    const [searchQuery, setSearchQuery] = useState('');
+    const searchInputRef = React.useRef<HTMLInputElement>(null);
     const [filterType, setFilterType] = useState<'income' | 'expense' | 'effect' | null>(null);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [isZoomTrackingEnabled, setIsZoomTrackingEnabled] = useState(true);
+
+    // Keyboard shortcut for search
+    React.useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                searchInputRef.current?.focus();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
 
     // Calculate effective view range based on zoom tracking state
     const isChartZoomed = isZoomed || (viewStartDate !== simulationStartDate || viewEndDate !== simulationEndDate);
@@ -350,9 +365,16 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
     });
 
     const filteredItems = useMemo(() => {
-        if (!filterType) return sortedItems;
-        return sortedItems.filter(item => item.type === filterType);
-    }, [sortedItems, filterType]);
+        let result = sortedItems;
+
+        if (searchQuery) {
+            result = result.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()));
+        } else if (filterType) {
+            result = result.filter(item => item.type === filterType);
+        }
+
+        return result;
+    }, [sortedItems, filterType, searchQuery]);
 
     const zoomToggle = (
         <div
@@ -408,18 +430,38 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                             className="flex items-center justify-between px-4 h-10 bg-gray-900 hover:bg-gray-800 border-b border-gray-800 shrink-0 z-30 relative cursor-pointer group transition-colors"
                             onClick={onToggleCollapse}
                         >
-                            <div className="flex items-center space-x-2">
-                                <div className="text-gray-500 group-hover:text-white transition-colors">
+                            <div className="flex items-center space-x-2 flex-1 mr-4">
+                                <div className="text-gray-500 group-hover:text-white transition-colors shrink-0">
                                     <ChevronDown size={16} />
                                 </div>
-                                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider shrink-0">
                                     Event Timeline
                                 </span>
-                                <span className="text-xs text-gray-500 ml-2">
-                                    Select an event or effect to edit
-                                </span>
+
+                                {/* Search Bar */}
+                                <div className="relative ml-4 flex-1 max-w-md group/search" onClick={(e) => e.stopPropagation()}>
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <Search size={14} className="text-gray-500 group-focus-within/search:text-blue-400 transition-colors" />
+                                    </div>
+                                    <input
+                                        ref={searchInputRef}
+                                        type="text"
+                                        className="block w-full pl-10 pr-12 py-1 bg-gray-800 border border-gray-700 rounded-md text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                        placeholder="Select Event/Effect to Edit"
+                                        value={searchQuery}
+                                        onChange={(e) => {
+                                            setSearchQuery(e.target.value);
+                                        }}
+                                    />
+                                    <div className="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none">
+                                        <div className="flex items-center space-x-0.5">
+                                            <kbd className="inline-flex items-center justify-center h-5 min-w-[20px] px-1 text-[10px] font-medium text-gray-400 bg-gray-700 border border-gray-600 rounded">⌘</kbd>
+                                            <kbd className="inline-flex items-center justify-center h-5 min-w-[20px] px-1 text-[10px] font-medium text-gray-400 bg-gray-700 border border-gray-600 rounded">K</kbd>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="flex items-center space-x-3">
+                            <div className="flex items-center space-x-3 shrink-0">
                                 {zoomToggle}
                                 <button
                                     onClick={(e) => { e.stopPropagation(); onFlip(); }}
@@ -436,10 +478,17 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                             setIsFilterOpen(!isFilterOpen);
                                         }}
                                         onMouseDown={(e) => e.stopPropagation()}
-                                        className="flex items-center space-x-1 text-gray-400 hover:text-white text-xs bg-gray-800 px-2 py-1 rounded border border-gray-700"
+                                        className={`flex items-center justify-between space-x-1 text-xs px-2 py-1 rounded border transition-colors w-24 ${(searchQuery || filterType)
+                                            ? 'bg-blue-900/30 border-blue-500/50 text-blue-200 hover:bg-blue-900/50 hover:text-white'
+                                            : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white'
+                                            }`}
                                     >
-                                        <Filter size={12} />
-                                        <span>{filterType ? (filterType.charAt(0).toUpperCase() + filterType.slice(1)) : 'All Events'}</span>
+                                        <div className="flex items-center space-x-1 overflow-hidden">
+                                            <Filter size={12} className="shrink-0" />
+                                            <span className="truncate">
+                                                {searchQuery ? 'Search' : (filterType ? (filterType.charAt(0).toUpperCase() + filterType.slice(1)) : 'All Events')}
+                                            </span>
+                                        </div>
                                     </button>
 
                                     {isFilterOpen && (
@@ -558,16 +607,35 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                             className="flex items-center justify-between px-4 h-10 bg-gray-900 hover:bg-gray-800 border-b border-gray-800 shrink-0 z-30 relative cursor-pointer group transition-colors"
                             onClick={onToggleCollapse}
                         >
-                            <div className="flex items-center space-x-2">
-                                <div className="text-gray-500 group-hover:text-white transition-colors">
+                            <div className="flex items-center space-x-2 flex-1 mr-4">
+                                <div className="text-gray-500 group-hover:text-white transition-colors shrink-0">
                                     <ChevronDown size={16} />
                                 </div>
-                                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider shrink-0">
                                     Event Timeline
                                 </span>
-                                <span className="text-xs text-gray-500 ml-2">
-                                    Select an event or effect to edit
-                                </span>
+
+                                {/* Search Bar */}
+                                <div className="relative ml-4 flex-1 max-w-md group/search" onClick={(e) => e.stopPropagation()}>
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <Search size={14} className="text-gray-500 group-focus-within/search:text-blue-400 transition-colors" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        className="block w-full pl-10 pr-12 py-1 bg-gray-800 border border-gray-700 rounded-md text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                        placeholder="Select Event/Effect to Edit"
+                                        value={searchQuery}
+                                        onChange={(e) => {
+                                            setSearchQuery(e.target.value);
+                                        }}
+                                    />
+                                    <div className="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none">
+                                        <div className="flex items-center space-x-0.5">
+                                            <kbd className="inline-flex items-center justify-center h-5 min-w-[20px] px-1 text-[10px] font-medium text-gray-400 bg-gray-700 border border-gray-600 rounded">⌘</kbd>
+                                            <kbd className="inline-flex items-center justify-center h-5 min-w-[20px] px-1 text-[10px] font-medium text-gray-400 bg-gray-700 border border-gray-600 rounded">K</kbd>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div className="flex items-center space-x-3">
                                 {zoomToggle}
@@ -582,10 +650,17 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                 <div className="relative group">
                                     <button
                                         onClick={(e) => { e.stopPropagation(); setIsFilterOpen(!isFilterOpen); }}
-                                        className="flex items-center space-x-1 text-gray-400 hover:text-white text-xs bg-gray-800 px-2 py-1 rounded border border-gray-700"
+                                        className={`flex items-center justify-between space-x-1 text-xs px-2 py-1 rounded border transition-colors w-24 ${(searchQuery || filterType)
+                                                ? 'bg-blue-900/30 border-blue-500/50 text-blue-200 hover:bg-blue-900/50 hover:text-white'
+                                                : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white'
+                                            }`}
                                     >
-                                        <Filter size={12} />
-                                        <span>{filterType ? (filterType.charAt(0).toUpperCase() + filterType.slice(1)) : 'All Events'}</span>
+                                        <div className="flex items-center space-x-1 overflow-hidden">
+                                            <Filter size={12} className="shrink-0" />
+                                            <span className="truncate">
+                                                {searchQuery ? 'Search' : (filterType ? (filterType.charAt(0).toUpperCase() + filterType.slice(1)) : 'All Events')}
+                                            </span>
+                                        </div>
                                     </button>
 
                                     {isFilterOpen && (

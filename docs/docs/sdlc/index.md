@@ -15,6 +15,7 @@ sidebar_position: 6
 - Add changelog automation and preview scripts
 
 **Bug Fixes:**
+- Remove legacy labels and fix header spacing
 - Update release notes formatting and legacy labels
 - Update next banner wording and sync app version to 1.3.0
 - Restructure release notes with unreleased at top
