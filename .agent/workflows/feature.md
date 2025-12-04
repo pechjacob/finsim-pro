@@ -47,6 +47,10 @@ git commit -m "feat(scope): add feature description"
 - Lowercase description
 - No period at end
 
+**Post-commit hook:**
+- Automatically updates "Unreleased" section in release notes
+- Visible in "Next" docs version
+
 ## 4. Add Documentation
 
 If user-facing feature:

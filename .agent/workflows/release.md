@@ -23,7 +23,21 @@ Check what will be included:
 git log $(git describe --tags --abbrev=0)..HEAD --oneline
 ```
 
-## 3. Run Release Command
+## 3. Preview Release (Optional)
+
+Preview the release before creating it:
+
+```bash
+// turbo
+npm run release:preview
+```
+
+This shows:
+- What version will be created
+- Changelog preview
+- Docs impact
+
+## 4. Run Release Command
 
 ### Automatic Version Detection
 
@@ -36,6 +50,7 @@ This will:
 - Determine version bump (major/minor/patch)
 - Update `package.json` versions
 - Generate `CHANGELOG.md`
+- **Auto-sync** to `/docs/docs/sdlc/index.md`
 - Create commit: `chore(release): X.Y.Z`
 - Create git tag: `vX.Y.Z`
 
@@ -52,7 +67,7 @@ npm run release:minor
 npm run release:major
 ```
 
-## 4. Review Changes
+## 5. Review Changes
 
 ```bash
 git show HEAD
@@ -64,7 +79,7 @@ Verify:
 - ✅ Changelog entries accurate
 - ✅ Commit message follows format
 
-## 5. Push with Tags
+## 6. Push with Tags
 
 ```bash
 git push --follow-tags origin main
@@ -74,14 +89,14 @@ This triggers:
 - GitHub Actions deployment workflow
 - GitHub Release creation workflow
 
-## 6. Verify Deployment
+## 7. Verify Deployment
 
 Check these URLs:
 - App: https://pechjacob.github.io/finsim-pro/
 - Docs: https://pechjacob.github.io/finsim-pro/docs/
 - Release: https://github.com/pechjacob/finsim-pro/releases
 
-## 7. Create Docs Version (Optional)
+## 8. Create Docs Version (Optional)
 
 For major/minor releases:
 
