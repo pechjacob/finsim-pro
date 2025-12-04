@@ -44,3 +44,22 @@
 .navbar {
   border-bottom: 1px solid var(--ifm-toc-border-color);
 }
+
+/* Override Docusaurus "Next" version banner text */
+div[class*="docVersionBanner"] a::before {
+  content: "For latest stable documentation, see the Current official version (";
+}
+
+div[class*="docVersionBanner"] a::after {
+  content: ").";
+}
+
+/* Hide the original text */
+div[class*="docVersionBanner"] a {
+  font-size: 0;
+}
+
+div[class*="docVersionBanner"] a::before,
+div[class*="docVersionBanner"] a::after {
+  font-size: 1rem;
+}
