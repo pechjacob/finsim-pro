@@ -8,6 +8,7 @@ sidebar_position: 6
 ## Unreleased
 
 **Features:**
+- Implement multi-selection and refined toggle logic
 - Refine timeline header layout and add new controls
 - Refine timeline search and filter ui
 - Fix version sync and add dev server restart automation
