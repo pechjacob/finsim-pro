@@ -34,9 +34,9 @@ try {
     console.log('✓ Will update package.json and package-lock.json');
     console.log('✓ Will generate CHANGELOG.md entry');
 
-    // Check if there are actual changes
-    const changelogMatch = output.match(/### \[([\d.]+)\][\s\S]*?---\s*([\s\S]*?)\s*---/);
-    const changelogContent = changelogMatch ? changelogMatch[2].trim() : '';
+    // Extract changelog between the --- markers
+    const changelogMatch = output.match(/---\n([\s\S]*?)\n---/);
+    const changelogContent = changelogMatch ? changelogMatch[1].trim() : '';
 
     if (!changelogContent || changelogContent.length === 0) {
         console.log('\n⚠️  CHANGELOG:\n');
@@ -44,10 +44,9 @@ try {
         console.log('(Version will still bump, but changelog will be empty)');
     } else {
         console.log('\n📄 CHANGELOG PREVIEW:\n');
-        console.log('---');
-        console.log(`### [${nextVersion}](https://github.com/pechjacob/finsim-pro/compare/v${currentVersion}...v${nextVersion}) (${new Date().toISOString().split('T')[0]})`);
+        console.log('-'.repeat(41) + 'START' + '-'.repeat(58));
         console.log(changelogContent);
-        console.log('---');
+        console.log('-'.repeat(42) + 'END' + '-'.repeat(59));
     }
 
     // Show docs impact
@@ -55,6 +54,8 @@ try {
     console.log(`✓ Will update docs/docs/sdlc/index.md (Release Notes)`);
     console.log(`  - v${nextVersion} will become "(Current)"`);
     console.log(`  - v${currentVersion} will no longer be "(Current)"`);
+
+    console.log('\n' + '#'.repeat(50));
 
     // Show next steps
     console.log('\n🚀 NEXT STEPS:\n');

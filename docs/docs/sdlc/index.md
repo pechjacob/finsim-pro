@@ -20,6 +20,9 @@ sidebar_position: 6
 - Implement dynamic versioning with git describe
 - Add changelog automation and preview scripts
 
+**Bug Fixes:**
+- Sync monorepo versions and add spa routing support
+
 ## v1.1.0
 *   **Landing Page**: New landing page with modern glass-morphism navbar
 *   **Routing**: React Router integration with `/finsim-pro` and `/finsim-pro/app` routes
