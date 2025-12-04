@@ -5,17 +5,6 @@ sidebar_position: 6
 
 # Release Notes
 
-## Unreleased
-
-**Features:**
-- Automate docs versioning and enhance release preview
-- Enhance debug panel with slider toggle and version info
-- Implement dynamic versioning with git describe
-- Add changelog automation and preview scripts
-
-**Bug Fixes:**
-- Restructure release notes with unreleased at top
-- Sync monorepo versions and add spa routing support
 
 ## v1.3.0 (Current)
 * **ci:** add master sdlc workflow and update contributing guide ([369409e](https://github.com/pechjacob/finsim-pro/commit/369409e943db88e1c6d31581c0370cc770d1f82a))
