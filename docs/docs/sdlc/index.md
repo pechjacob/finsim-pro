@@ -15,6 +15,7 @@ sidebar_position: 6
 - Add changelog automation and preview scripts
 
 **Bug Fixes:**
+- Update release notes formatting and legacy labels
 - Update next banner wording and sync app version to 1.3.0
 - Restructure release notes with unreleased at top
 - Sync monorepo versions and add spa routing support
@@ -25,6 +26,7 @@ sidebar_position: 6
 * **ci:** make docs versioning mandatory for all releases ([78eb59c](https://github.com/pechjacob/finsim-pro/commit/78eb59ce887224a243cbfce527d58a4a412e8414))
 * **ci:** update workflows for changelog automation ([0b15611](https://github.com/pechjacob/finsim-pro/commit/0b15611c5bdfd627e5ea90c6c1a8dc5bce53095f))
 * **docs:** update workflow guide and release notes ([dc67ff3](https://github.com/pechjacob/finsim-pro/commit/dc67ff3735a2fa8b662ce3eff5fb249b5f834169))
+
 **Features:**
 * **app:** implement dynamic versioning with git describe ([95d26c5](https://github.com/pechjacob/finsim-pro/commit/95d26c55db8b56c020b8ffd61ac1245f2ed2199c))
 * **ci:** add changelog automation and preview scripts ([3f07f88](https://github.com/pechjacob/finsim-pro/commit/3f07f88f6183c57933f18b8f8e3d840b3337b2cc))

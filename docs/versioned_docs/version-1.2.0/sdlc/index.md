@@ -4,7 +4,7 @@ sidebar_position: 6
 
 # Release Notes
 
-## v1.2.0 (Legacy Release)
+## v1.2.0
 **Features:**
 * **app:** implement dynamic versioning with git describe ([95d26c5](https://github.com/pechjacob/finsim-pro/commit/95d26c55db8b56c020b8ffd61ac1245f2ed2199c))
 * **ci:** add changelog automation and preview scripts ([3f07f88](https://github.com/pechjacob/finsim-pro/commit/3f07f88f6183c57933f18b8f8e3d840b3337b2cc))
@@ -13,7 +13,7 @@ sidebar_position: 6
 * **ci:** update workflows for changelog automation ([0b15611](https://github.com/pechjacob/finsim-pro/commit/0b15611c5bdfd627e5ea90c6c1a8dc5bce53095f))
 * **docs:** update workflow guide and release notes ([dc67ff3](https://github.com/pechjacob/finsim-pro/commit/dc67ff3735a2fa8b662ce3eff5fb249b5f834169))
 
-## v1.1.0 (Legacy Release)
+## v1.1.0
 *   **Landing Page**: New landing page with modern glass-morphism navbar
 *   **Routing**: React Router integration with `/finsim-pro` and `/finsim-pro/app` routes
 *   **Bug Fixes**: Resolved TypeScript build errors and CI deployment issues
