@@ -48,7 +48,31 @@ export default defineConfig(({ mode }) => {
     ],
     define: {
       'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
+      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
+      'import.meta.env.VITE_COMMIT_SHA': JSON.stringify(
+        process.env.VITE_COMMIT_SHA ||
+        (() => {
+          try {
+            return require('child_process').execSync('git rev-parse HEAD').toString().trim();
+          } catch {
+            return 'dev-build';
+          }
+        })()
+      ),
+      'import.meta.env.VITE_COMMIT_COUNT': JSON.stringify(
+        process.env.VITE_COMMIT_COUNT ||
+        (() => {
+          try {
+            // Use git describe to get commits since last tag: v1.1.0-3-gabc1234
+            const describe = require('child_process').execSync('git describe --tags --long').toString().trim();
+            // Extract the commit count (the "3" in "v1.1.0-3-gabc1234")
+            const match = describe.match(/-(\d+)-g[a-f0-9]+$/);
+            return match ? match[1] : '0';
+          } catch {
+            return '0';
+          }
+        })()
+      ),
     },
     resolve: {
       alias: {

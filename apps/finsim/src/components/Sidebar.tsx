@@ -5,6 +5,7 @@ import { Trash2, Plus, X, Save, Download, Upload, ChevronLeft, ChevronRight, Eye
 import { motion } from 'framer-motion';
 import { InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
+import { getVersionString } from '../version';
 
 interface SidebarProps {
     account: Account;
@@ -671,7 +672,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                 {renderItemForm()}
 
                                 <div className="mt-auto pt-10 text-xs text-gray-600 flex flex-col gap-1">
-                                    <p>FinSim Pro v1.0.0</p>
+                                    <p>FinSim Pro v{getVersionString()}</p>
                                     <a
                                         href={
                                             import.meta.env.DEV
