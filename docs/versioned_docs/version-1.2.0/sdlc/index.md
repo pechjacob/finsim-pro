@@ -13,16 +13,6 @@ sidebar_position: 6
 * **ci:** update workflows for changelog automation ([0b15611](https://github.com/pechjacob/finsim-pro/commit/0b15611c5bdfd627e5ea90c6c1a8dc5bce53095f))
 * **docs:** update workflow guide and release notes ([dc67ff3](https://github.com/pechjacob/finsim-pro/commit/dc67ff3735a2fa8b662ce3eff5fb249b5f834169))
 
-## Unreleased
-
-**Features:**
-- Enhance debug panel with slider toggle and version info
-- Implement dynamic versioning with git describe
-- Add changelog automation and preview scripts
-
-**Bug Fixes:**
-- Sync monorepo versions and add spa routing support
-
 ## v1.1.0
 *   **Landing Page**: New landing page with modern glass-morphism navbar
 *   **Routing**: React Router integration with `/finsim-pro` and `/finsim-pro/app` routes

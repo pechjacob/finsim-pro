@@ -93,16 +93,24 @@ function formatForReleaseNotes(changelogSection) {
 function updateReleaseNotes(version, formattedContent) {
     const releaseNotes = fs.readFileSync(RELEASE_NOTES_PATH, 'utf-8');
 
-    // Find the insertion point (after "# Release Notes")
-    const headerRegex = /# Release Notes\n/;
-    const match = releaseNotes.match(headerRegex);
+    // Find the "Unreleased" section end (insert after it)
+    const unreleasedRegex = /## Unreleased[\s\S]*?(?=\n## v|\n$)/;
+    const unreleasedMatch = releaseNotes.match(unreleasedRegex);
 
-    if (!match) {
-        console.error('❌ Could not find "# Release Notes" header');
-        process.exit(1);
+    let insertIndex;
+    if (unreleasedMatch) {
+        // Insert after Unreleased section
+        insertIndex = unreleasedMatch.index + unreleasedMatch[0].length;
+    } else {
+        // Fallback: insert after "# Release Notes" header
+        const headerRegex = /# Release Notes\n/;
+        const headerMatch = releaseNotes.match(headerRegex);
+        if (!headerMatch) {
+            console.error('❌ Could not find "# Release Notes" header');
+            process.exit(1);
+        }
+        insertIndex = headerMatch.index + headerMatch[0].length;
     }
-
-    const insertIndex = match.index + match[0].length;
 
     // Create new version section
     const newSection = `\n## v${version} (Current)\n${formattedContent}\n`;
@@ -120,6 +128,27 @@ function updateReleaseNotes(version, formattedContent) {
     fs.writeFileSync(RELEASE_NOTES_PATH, finalContent, 'utf-8');
 
     console.log(`✅ Updated ${RELEASE_NOTES_PATH} with v${version}`);
+}
+
+/**
+ * Remove Unreleased section from versioned docs snapshot
+ */
+function removeUnreleasedFromVersionedDocs(version) {
+    const versionedDocsPath = path.join(__dirname, `../docs/versioned_docs/version-${version}/sdlc/index.md`);
+
+    if (!fs.existsSync(versionedDocsPath)) {
+        console.log(`⚠️  Versioned docs not found at ${versionedDocsPath}`);
+        return;
+    }
+
+    let content = fs.readFileSync(versionedDocsPath, 'utf-8');
+
+    // Remove Unreleased section
+    const unreleasedRegex = /## Unreleased[\s\S]*?(?=\n## v)/;
+    content = content.replace(unreleasedRegex, '');
+
+    fs.writeFileSync(versionedDocsPath, content, 'utf-8');
+    console.log(`✅ Removed "Unreleased" section from versioned docs v${version}`);
 }
 
 /**
@@ -152,6 +181,9 @@ function main() {
         const { execSync } = require('child_process');
         execSync(`cd docs && npm run docusaurus docs:version ${version}`, { stdio: 'inherit' });
         console.log(`✅ Created docs version ${version}`);
+
+        // Remove Unreleased section from the versioned snapshot
+        removeUnreleasedFromVersionedDocs(version);
 
         // Add versioned docs to git
         execSync('git add docs/', { stdio: 'inherit' });
