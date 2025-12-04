@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/pechjacob/finsim-pro/compare/v1.1.0...v1.2.0) (2025-12-04)
+
+
+### ✨ Features
+
+* **app:** implement dynamic versioning with git describe ([95d26c5](https://github.com/pechjacob/finsim-pro/commit/95d26c55db8b56c020b8ffd61ac1245f2ed2199c))
+* **ci:** add changelog automation and preview scripts ([3f07f88](https://github.com/pechjacob/finsim-pro/commit/3f07f88f6183c57933f18b8f8e3d840b3337b2cc))
+* **ui:** enhance debug panel with slider toggle and version info ([aa8b05c](https://github.com/pechjacob/finsim-pro/commit/aa8b05ce264f0cffd24e9cfc5e4e61424ce3f37e))
+
+
+### 📚 Documentation
+
+* **ci:** add master sdlc workflow and update contributing guide ([369409e](https://github.com/pechjacob/finsim-pro/commit/369409e943db88e1c6d31581c0370cc770d1f82a))
+* **ci:** update workflows for changelog automation ([0b15611](https://github.com/pechjacob/finsim-pro/commit/0b15611c5bdfd627e5ea90c6c1a8dc5bce53095f))
+* **docs:** update workflow guide and release notes ([dc67ff3](https://github.com/pechjacob/finsim-pro/commit/dc67ff3735a2fa8b662ce3eff5fb249b5f834169))
+
 ## [1.1.0](https://github.com/pechjacob/finsim-pro/compare/v1.0.0...v1.1.0) (2025-12-03)
 
 
