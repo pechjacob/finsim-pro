@@ -146,17 +146,30 @@ function main() {
     // Update docs
     updateReleaseNotes(version, formatted);
 
+    // Auto-version documentation
+    console.log('\n📚 Versioning documentation...');
+    try {
+        const { execSync } = require('child_process');
+        execSync(`cd docs && npm run docusaurus docs:version ${version}`, { stdio: 'inherit' });
+        console.log(`✅ Created docs version ${version}`);
+
+        // Add versioned docs to git
+        execSync('git add docs/', { stdio: 'inherit' });
+    } catch (error) {
+        console.error('❌ Failed to version docs:', error.message);
+        console.log('   Manually run:');
+        console.log(`     cd docs && npm run docusaurus docs:version ${version}`);
+    }
+
     // Auto-commit the changes
     console.log('\n📦 Auto-committing changes...');
     try {
         const { execSync } = require('child_process');
-        execSync('git add docs/docs/sdlc/index.md', { stdio: 'inherit' });
         execSync('git commit --amend --no-edit', { stdio: 'inherit' });
         console.log('✅ Changes automatically added to release commit');
     } catch (error) {
         console.log('⚠️  Could not auto-commit (this is normal if not in a git repository)');
         console.log('   Manually run:');
-        console.log('     git add docs/docs/sdlc/index.md');
         console.log('     git commit --amend --no-edit');
     }
 

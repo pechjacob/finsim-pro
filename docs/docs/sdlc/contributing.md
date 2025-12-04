@@ -56,9 +56,16 @@
    git checkout main
    git pull
    npm run release:preview  # Preview first
-   npm run release          # Create release
+   npm run release          # Automatically versions docs!
    git push --follow-tags origin main
    ```
+   
+   **What `npm run release` does automatically**:
+   - Bumps version in all package.json files (root, app, docs)
+   - Generates CHANGELOG.md
+   - Versions documentation (creates snapshot)
+   - Auto-syncs to release notes
+   - Creates commit and git tag
 
 ## Changelog Automation
 

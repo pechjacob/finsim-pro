@@ -1,12 +1,11 @@
 #!/usr/bin/env node
 
 /**
- * Enhanced release preview with better messaging
- * Wraps standard-version --dry-run and adds custom output
+ * Enhanced release preview with version range breakdown
+ * Shows which commits come from current version vs previous versions
  */
 
 const { execSync } = require('child_process');
-const fs = require('path');
 
 try {
     // Get current version
@@ -31,8 +30,9 @@ try {
     // Show what will happen
     console.log('📝 WILL HAPPEN ON RELEASE:\n');
     console.log(`✓ Will bump version from v${currentVersion} to v${nextVersion}`);
-    console.log('✓ Will update package.json and package-lock.json');
+    console.log('✓ Will update all package.json files (root, app, docs)');
     console.log('✓ Will generate CHANGELOG.md entry');
+    console.log('✓ Will auto-version documentation');
 
     // Extract changelog between the --- markers
     const changelogMatch = output.match(/---\n([\s\S]*?)\n---/);
@@ -43,14 +43,55 @@ try {
         console.log('### No conventional commits found since last release');
         console.log('(Version will still bump, but changelog will be empty)');
     } else {
+        // Extract the comparison range from the changelog link
+        const comparisonMatch = changelogContent.match(/compare\/v([\d.]+)\.\.\.v([\d.]+)/);
+        const comparisonFrom = comparisonMatch ? comparisonMatch[1] : 'unknown';
+        const comparisonTo = comparisonMatch ? comparisonMatch[2] : nextVersion;
+
         console.log('\n📄 CHANGELOG PREVIEW:\n');
         console.log('-'.repeat(41) + 'START' + '-'.repeat(58));
         console.log(changelogContent);
+
+        // Add version range breakdown if comparison doesn't match current version
+        if (comparisonFrom !== currentVersion) {
+            console.log('\n' + '='.repeat(104));
+            console.log('⚠️  VERSION RANGE BREAKDOWN');
+            console.log('='.repeat(104));
+            console.log(`\n📌 Comparison shows: v${comparisonFrom} → v${comparisonTo}`);
+            console.log(`📌 Current version:  v${currentVersion}`);
+            console.log(`\n💡 This means the changelog includes commits from v${comparisonFrom} onwards.`);
+            console.log(`   Some commits may have been made AFTER the v${currentVersion} tag was created.`);
+
+            // Try to get commits for each range
+            try {
+                const commitsFromPrevious = execSync(`git log --oneline v${comparisonFrom}..v${currentVersion}`, { encoding: 'utf-8' }).trim();
+                const commitsFromCurrent = execSync(`git log --oneline v${currentVersion}..HEAD`, { encoding: 'utf-8' }).trim();
+
+                if (commitsFromPrevious) {
+                    console.log(`\n   #FROM v${comparisonFrom} TO v${currentVersion}:`);
+                    commitsFromPrevious.split('\n').forEach(line => console.log(`     ${line}`));
+                }
+
+                if (commitsFromCurrent) {
+                    console.log(`\n   #FROM v${currentVersion} TO HEAD:`);
+                    commitsFromCurrent.split('\n').forEach(line => console.log(`     ${line}`));
+                } else {
+                    console.log(`\n   #FROM v${currentVersion} TO HEAD:`);
+                    console.log(`     NONE (no new commits since v${currentVersion})`);
+                }
+            } catch (err) {
+                console.log(`\n   (Could not fetch commit details: ${err.message})`);
+            }
+            console.log('\n' + '='.repeat(104));
+        }
+
         console.log('-'.repeat(42) + 'END' + '-'.repeat(59));
     }
 
     // Show docs impact
     console.log('\n📚 DOCS IMPACT:\n');
+    console.log(`✓ Will create versioned docs: /docs/versioned_docs/version-${nextVersion}/`);
+    console.log(`✓ Will update docs/versions.json`);
     console.log(`✓ Will update docs/docs/sdlc/index.md (Release Notes)`);
     console.log(`  - v${nextVersion} will become "(Current)"`);
     console.log(`  - v${currentVersion} will no longer be "(Current)"`);

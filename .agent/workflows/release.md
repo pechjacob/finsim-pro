@@ -90,31 +90,26 @@ This triggers:
 - GitHub Release creation workflow
 
 ## 7. Verify Deployment
+## 6. Verify Deployment
 
 Check these URLs:
 - App: https://pechjacob.github.io/finsim-pro/
 - Docs: https://pechjacob.github.io/finsim-pro/docs/
 - Release: https://github.com/pechjacob/finsim-pro/releases
 
-## 8. Version Documentation
-
-**MANDATORY** for all releases:
+## 7. Push with Tags
 
 ```bash
-cd docs
-npm run docusaurus docs:version X.Y.Z
-cd ..
-git add docs/
-git commit -m "chore(docs): snapshot vX.Y.Z documentation"
+git push --follow-tags origin main
 ```
 
-This:
-- Creates versioned snapshot in `/docs/versioned_docs/version-X.Y.Z/`
-- Updates `/docs/versions.json`
-- Makes version visible in docs dropdown
-- Preserves historical documentation
+This triggers:
+- GitHub Actions deployment workflow
+- GitHub Release creation workflow
 
-## 9. Push Release
+**Note**: Documentation is automatically versioned during Step 4 (Release Command).
+
+## 8. Push Release
 
 For critical bugs in production:
 
