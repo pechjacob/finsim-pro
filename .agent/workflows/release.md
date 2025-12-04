@@ -37,22 +37,27 @@ This shows:
 - Changelog preview
 - Docs impact
 
-## 4. Run Release Command
+## 4. Release Command
 
-### Automatic Version Detection
+Choose one:
 
+**Option A: Standard Release (Recommended)**
 ```bash
 npm run release
 ```
+*Manual restart required for dev servers*
 
-This will:
-- Analyze commits since last release
-- Determine version bump (major/minor/patch)
-- Update `package.json` versions
-- Generate `CHANGELOG.md`
-- **Auto-sync** to `/docs/docs/sdlc/index.md`
-- Create commit: `chore(release): X.Y.Z`
-- Create git tag: `vX.Y.Z`
+**Option B: Release + Auto-Restart**
+```bash
+npm run release:dev
+```
+*Automatically restarts dev servers to show changes immediately*
+
+Both commands will:
+- Bump version
+- Generate changelog
+- Version documentation
+- Create git tag
 
 ### Manual Version Bump
 

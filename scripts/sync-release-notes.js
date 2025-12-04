@@ -206,6 +206,8 @@ function main() {
     }
 
     console.log('\n✨ Done! Ready to push.\n');
+    console.log('💡 TIP: To auto-restart dev servers next time, run:');
+    console.log('  npm run release:dev\n');
     console.log('Next step:');
     console.log('  git push --follow-tags origin main');
 }

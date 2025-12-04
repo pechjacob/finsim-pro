@@ -56,7 +56,10 @@
    git checkout main
    git pull
    npm run release:preview  # Preview first
-   npm run release          # Automatically versions docs!
+   npm run release          # Standard release
+   # OR
+   npm run release:dev      # Release + Auto-restart dev servers
+   
    git push --follow-tags origin main
    ```
    

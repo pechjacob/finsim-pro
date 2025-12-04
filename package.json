@@ -30,6 +30,7 @@
     "changelog:preview": "node scripts/preview-changelog.js",
     "changelog:sync": "node scripts/preview-changelog.js --sync",
     "release": "standard-version && node scripts/sync-release-notes.js",
+    "release:dev": "npm run release && bash scripts/restart-dev.sh",
     "release:minor": "standard-version --release-as minor && node scripts/sync-release-notes.js",
     "release:major": "standard-version --release-as major && node scripts/sync-release-notes.js",
     "release:patch": "standard-version --release-as patch && node scripts/sync-release-notes.js",
