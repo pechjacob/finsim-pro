@@ -22,6 +22,10 @@
 
 ## Workflow
 
+> **IMPORTANT**: For the complete SDLC process, see [Complete Development Workflow](./complete-workflow.md)
+
+### Quick Start
+
 1. **Create feature branch**:
    ```bash
    git checkout -b feat/your-feature-name
@@ -32,16 +36,51 @@
    git add .
    git commit -m "feat(chart): add new visualization option"
    ```
+   
+   **Post-commit automation:**
+   - Husky hook automatically updates "Unreleased" section in release notes
+   - Changes visible in "Next" docs version
 
-3. **Push and create PR**:
+3. **Preview changelog** (optional):
+   ```bash
+   npm run changelog:preview
+   ```
+
+4. **Push and create PR**:
    ```bash
    git push origin feat/your-feature-name
    ```
 
-4. **After merge**, create release:
+5. **After merge**, preview and create release:
    ```bash
    git checkout main
    git pull
-   npm run release
+   npm run release:preview  # Preview first
+   npm run release          # Create release
    git push --follow-tags origin main
    ```
+
+## Changelog Automation
+
+### Scripts
+
+- `npm run changelog:preview` - View unreleased changes in CLI
+- `npm run changelog:sync` - Manually sync to docs (auto on commit)
+- `npm run release:preview` - Preview next version and changelog
+
+### Post-Commit Hook
+
+Every conventional commit automatically:
+- Analyzes commits since last tag
+- Updates `/docs/docs/sdlc/index.md` (Unreleased section)
+- Shows changes in "Next" docs version
+
+### Release Process
+
+When you run `npm run release`:
+- Bumps version based on commits
+- Generates `CHANGELOG.md`
+- Auto-syncs to release notes docs
+- Creates commit and git tag
+
+For details, see [Changelog Automation](./changelog-automation.md)
