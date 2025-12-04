@@ -96,20 +96,25 @@ Check these URLs:
 - Docs: https://pechjacob.github.io/finsim-pro/docs/
 - Release: https://github.com/pechjacob/finsim-pro/releases
 
-## 8. Create Docs Version (Optional)
+## 8. Version Documentation
 
-For major/minor releases:
+**MANDATORY** for all releases:
 
 ```bash
 cd docs
-npm run docusaurus docs:version 1.1.0
+npm run docusaurus docs:version X.Y.Z
 cd ..
 git add docs/
-git commit -m "docs(versioning): snapshot v1.1.0 documentation"
-git push origin main
+git commit -m "chore(docs): snapshot vX.Y.Z documentation"
 ```
 
-## Hotfix Release
+This:
+- Creates versioned snapshot in `/docs/versioned_docs/version-X.Y.Z/`
+- Updates `/docs/versions.json`
+- Makes version visible in docs dropdown
+- Preserves historical documentation
+
+## 9. Push Release
 
 For critical bugs in production:
 
