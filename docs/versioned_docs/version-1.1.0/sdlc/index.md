@@ -4,7 +4,7 @@ sidebar_position: 6
 
 # Release Notes
 
-## v1.1.0 (Current)
+## v1.1.0 (Legacy Release)
 *   **Landing Page**: New landing page with modern glass-morphism navbar
 *   **Routing**: React Router integration with `/finsim-pro` and `/finsim-pro/app` routes
 *   **Bug Fixes**: Resolved TypeScript build errors and CI deployment issues

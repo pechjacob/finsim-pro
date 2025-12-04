@@ -20,6 +20,7 @@ sidebar_position: 6
 - Sync monorepo versions and add spa routing support
 
 ## v1.3.0 (Current)
+**Documentation:**
 * **ci:** add master sdlc workflow and update contributing guide ([369409e](https://github.com/pechjacob/finsim-pro/commit/369409e943db88e1c6d31581c0370cc770d1f82a))
 * **ci:** make docs versioning mandatory for all releases ([78eb59c](https://github.com/pechjacob/finsim-pro/commit/78eb59ce887224a243cbfce527d58a4a412e8414))
 * **ci:** update workflows for changelog automation ([0b15611](https://github.com/pechjacob/finsim-pro/commit/0b15611c5bdfd627e5ea90c6c1a8dc5bce53095f))

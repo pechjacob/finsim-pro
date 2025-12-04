@@ -69,6 +69,18 @@ function formatForReleaseNotes(changelogSection) {
             formatted.push('\n**Bug Fixes:**');
             continue;
         }
+        if (line.startsWith('### 📚 Documentation')) {
+            formatted.push('\n**Documentation:**');
+            continue;
+        }
+        if (line.startsWith('### ⚡️ Performance')) {
+            formatted.push('\n**Performance:**');
+            continue;
+        }
+        if (line.startsWith('### ✅ Tests')) {
+            formatted.push('\n**Tests:**');
+            continue;
+        }
         if (line.startsWith('### ♻️')) {
             formatted.push('\n**Code Refactoring:**');
             continue;
@@ -116,6 +128,8 @@ function updateReleaseNotes(version, formattedContent) {
     const newSection = `\n## v${version} (Current)\n${formattedContent}\n`;
 
     // Update previous "Current" to remove that label
+    // NOTE: We don't add "(Legacy Release)" here because we want the main docs to just show version numbers
+    // The "(Legacy Release)" label is only for versioned snapshots (handled in removeUnreleasedFromVersionedDocs)
     const updatedContent = releaseNotes.substring(insertIndex)
         .replace(/## v(\d+\.\d+\.\d+) \(Current\)/, '## v$1');
 
@@ -131,7 +145,7 @@ function updateReleaseNotes(version, formattedContent) {
 }
 
 /**
- * Remove Unreleased section from versioned docs snapshot
+ * Remove Unreleased section and update labels in versioned docs snapshot
  */
 function removeUnreleasedFromVersionedDocs(version) {
     const versionedDocsPath = path.join(__dirname, `../docs/versioned_docs/version-${version}/sdlc/index.md`);
@@ -143,12 +157,20 @@ function removeUnreleasedFromVersionedDocs(version) {
 
     let content = fs.readFileSync(versionedDocsPath, 'utf-8');
 
-    // Remove Unreleased section
+    // 1. Remove Unreleased section
     const unreleasedRegex = /## Unreleased[\s\S]*?(?=\n## v)/;
     content = content.replace(unreleasedRegex, '');
 
+    // 2. Update previous versions to show (Legacy Release)
+    // This replaces "## vX.Y.Z" with "## vX.Y.Z (Legacy Release)" for all versions EXCEPT the current one
+    // The current one is already marked as (Current) from the updateReleaseNotes step
+
+    // Find all version headers that are NOT the current version
+    const versionHeaderRegex = /^## v(\d+\.\d+\.\d+)(?! \(Current\))/gm;
+    content = content.replace(versionHeaderRegex, '## v$1 (Legacy Release)');
+
     fs.writeFileSync(versionedDocsPath, content, 'utf-8');
-    console.log(`✅ Removed "Unreleased" section from versioned docs v${version}`);
+    console.log(`✅ Cleaned up versioned docs v${version} (removed Unreleased, added Legacy labels)`);
 }
 
 /**

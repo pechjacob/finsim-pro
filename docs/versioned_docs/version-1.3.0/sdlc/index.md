@@ -7,6 +7,7 @@ sidebar_position: 6
 
 
 ## v1.3.0 (Current)
+**Documentation:**
 * **ci:** add master sdlc workflow and update contributing guide ([369409e](https://github.com/pechjacob/finsim-pro/commit/369409e943db88e1c6d31581c0370cc770d1f82a))
 * **ci:** make docs versioning mandatory for all releases ([78eb59c](https://github.com/pechjacob/finsim-pro/commit/78eb59ce887224a243cbfce527d58a4a412e8414))
 * **ci:** update workflows for changelog automation ([0b15611](https://github.com/pechjacob/finsim-pro/commit/0b15611c5bdfd627e5ea90c6c1a8dc5bce53095f))
@@ -21,7 +22,7 @@ sidebar_position: 6
 * **ci:** sync monorepo versions and add spa routing support ([b3fca7d](https://github.com/pechjacob/finsim-pro/commit/b3fca7d1005bacc11b56248cd392700e54ae7892))
 * **docs:** restructure release notes with unreleased at top ([1bdd3aa](https://github.com/pechjacob/finsim-pro/commit/1bdd3aaeb2d647183bdd6b0e6086c2a3d54270f5))
 
-## v1.2.0
+## v1.2.0 (Legacy Release)
 **Features:**
 * **app:** implement dynamic versioning with git describe ([95d26c5](https://github.com/pechjacob/finsim-pro/commit/95d26c55db8b56c020b8ffd61ac1245f2ed2199c))
 * **ci:** add changelog automation and preview scripts ([3f07f88](https://github.com/pechjacob/finsim-pro/commit/3f07f88f6183c57933f18b8f8e3d840b3337b2cc))
