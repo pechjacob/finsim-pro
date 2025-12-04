@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { FinancialItem, FormulaType, SimulationPoint, Frequency } from '../types';
 import { formatCurrency } from '../utils';
 import { calculateTotalDelta } from '../services/simulation';
-import { ChevronUp, ChevronDown, GripVertical, Trash2, Eye, Filter, Search } from 'lucide-react';
+import { ChevronUp, ChevronDown, GripVertical, Trash2, Eye, Filter, Search, CheckSquare, RotateCcw, LineChart } from 'lucide-react';
 import { DndContext, closestCenter, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -438,8 +438,20 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                     Event Timeline
                                 </span>
 
+                                {/* Moved Zoom and Flip here */}
+                                <div className="flex items-center space-x-2 mx-2">
+                                    {zoomToggle}
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); onFlip(); }}
+                                        className={`p-1.5 rounded-md transition-colors ${isFlipped ? 'bg-blue-900/50 text-blue-400' : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800'}`}
+                                        title={isFlipped ? "Switch to Timeline" : "Switch to Formula View"}
+                                    >
+                                        <FlipIcon size={16} />
+                                    </button>
+                                </div>
+
                                 {/* Search Bar */}
-                                <div className="relative ml-4 flex-1 max-w-md group/search" onClick={(e) => e.stopPropagation()}>
+                                <div className="relative ml-2 flex-1 max-w-md group/search" onClick={(e) => e.stopPropagation()}>
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <Search size={14} className="text-gray-500 group-focus-within/search:text-blue-400 transition-colors" />
                                     </div>
@@ -462,13 +474,17 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                 </div>
                             </div>
                             <div className="flex items-center space-x-3 shrink-0">
-                                {zoomToggle}
+                                {/* Select All Toggle */}
                                 <button
-                                    onClick={(e) => { e.stopPropagation(); onFlip(); }}
-                                    className={`p-1.5 rounded-md transition-colors ${isFlipped ? 'bg-blue-900/50 text-blue-400' : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800'}`}
-                                    title={isFlipped ? "Switch to Timeline" : "Switch to Formula View"}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onToggleAllItems();
+                                    }}
+                                    onMouseDown={(e) => e.stopPropagation()}
+                                    className="text-gray-400 hover:text-white focus:outline-none p-1 hover:bg-gray-800 rounded"
+                                    title="Toggle All Visibility"
                                 >
-                                    <FlipIcon size={16} />
+                                    <CheckSquare size={16} />
                                 </button>
 
                                 <div className="relative group">
@@ -519,6 +535,11 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                             </div>
                                         </>
                                     )}
+                                </div>
+
+                                {/* Chart Icon (Placeholder) */}
+                                <div className="text-gray-500 p-1">
+                                    <LineChart size={16} />
                                 </div>
 
                                 <button
@@ -615,8 +636,20 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                     Event Timeline
                                 </span>
 
+                                {/* Moved Zoom and Flip here */}
+                                <div className="flex items-center space-x-2 mx-2">
+                                    {zoomToggle}
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); onFlip(); }}
+                                        className={`p-1.5 rounded-md transition-colors ${isFlipped ? 'bg-blue-900/50 text-blue-400 hover:bg-blue-900/80 hover:text-blue-300' : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800'}`}
+                                        title={isFlipped ? "Switch to Timeline" : "Switch to Formula View"}
+                                    >
+                                        <FlipIcon size={16} />
+                                    </button>
+                                </div>
+
                                 {/* Search Bar */}
-                                <div className="relative ml-4 flex-1 max-w-md group/search" onClick={(e) => e.stopPropagation()}>
+                                <div className="relative ml-2 flex-1 max-w-md group/search" onClick={(e) => e.stopPropagation()}>
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <Search size={14} className="text-gray-500 group-focus-within/search:text-blue-400 transition-colors" />
                                     </div>
@@ -637,22 +670,26 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex items-center space-x-3">
-                                {zoomToggle}
+                            <div className="flex items-center space-x-3 shrink-0">
+                                {/* Select All Toggle */}
                                 <button
-                                    onClick={(e) => { e.stopPropagation(); onFlip(); }}
-                                    className={`p-1.5 rounded-md transition-colors ${isFlipped ? 'bg-blue-900/50 text-blue-400 hover:bg-blue-900/80 hover:text-blue-300' : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800'}`}
-                                    title={isFlipped ? "Switch to Timeline" : "Switch to Formula View"}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onToggleAllItems();
+                                    }}
+                                    onMouseDown={(e) => e.stopPropagation()}
+                                    className="text-gray-400 hover:text-white focus:outline-none p-1 hover:bg-gray-800 rounded"
+                                    title="Toggle All Visibility"
                                 >
-                                    <FlipIcon size={16} />
+                                    <CheckSquare size={16} />
                                 </button>
 
                                 <div className="relative group">
                                     <button
                                         onClick={(e) => { e.stopPropagation(); setIsFilterOpen(!isFilterOpen); }}
                                         className={`flex items-center justify-between space-x-1 text-xs px-2 py-1 rounded border transition-colors w-24 ${(searchQuery || filterType)
-                                                ? 'bg-blue-900/30 border-blue-500/50 text-blue-200 hover:bg-blue-900/50 hover:text-white'
-                                                : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white'
+                                            ? 'bg-blue-900/30 border-blue-500/50 text-blue-200 hover:bg-blue-900/50 hover:text-white'
+                                            : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white'
                                             }`}
                                     >
                                         <div className="flex items-center space-x-1 overflow-hidden">
@@ -688,6 +725,25 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                             </div>
                                         </>
                                     )}
+                                </div>
+
+                                {/* Reset Icon (Conditional) */}
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSearchQuery('');
+                                        setFilterType(null);
+                                    }}
+                                    className={`text-gray-400 hover:text-white focus:outline-none p-1 hover:bg-gray-800 rounded transition-opacity duration-200 ${(searchQuery || filterType) ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                                        }`}
+                                    title="Reset Filter"
+                                >
+                                    <RotateCcw size={16} />
+                                </button>
+
+                                {/* Chart Icon (Placeholder) */}
+                                <div className="text-gray-500 p-1">
+                                    <LineChart size={16} />
                                 </div>
 
                                 <button

@@ -8,6 +8,7 @@ sidebar_position: 6
 ## Unreleased
 
 **Features:**
+- Refine timeline search and filter ui
 - Fix version sync and add dev server restart automation
 - Automate docs versioning and enhance release preview
 - Enhance debug panel with slider toggle and version info
