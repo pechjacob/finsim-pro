@@ -8,6 +8,7 @@ sidebar_position: 6
 ## Unreleased
 
 **Features:**
+- Replace add buttons with cascading dropdown menu
 - Implement multi-selection and refined toggle logic
 - Refine timeline header layout and add new controls
 - Refine timeline search and filter ui
