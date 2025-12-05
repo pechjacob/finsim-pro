@@ -491,7 +491,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                         });
                                     }}
                                     onMouseDown={(e) => e.stopPropagation()}
-                                    className="p-1.5 rounded-md hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
+                                    className="flex items-center justify-center h-[26px] w-[26px] rounded hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
                                     title={(() => {
                                         const allSelected = filteredItems.length > 0 && filteredItems.every(i => selectedItemIds.has(i.id));
                                         const someSelected = filteredItems.some(i => selectedItemIds.has(i.id));
@@ -728,7 +728,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                         });
                                     }}
                                     onMouseDown={(e) => e.stopPropagation()}
-                                    className="p-1.5 rounded-md hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
+                                    className="flex items-center justify-center h-[26px] w-[26px] rounded hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
                                     title={(() => {
                                         const allSelected = filteredItems.length > 0 && filteredItems.every(i => selectedItemIds.has(i.id));
                                         const someSelected = filteredItems.some(i => selectedItemIds.has(i.id));
