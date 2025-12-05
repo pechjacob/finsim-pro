@@ -16,6 +16,7 @@ sidebar_position: 6
 - Fix version sync and add dev server restart automation
 
 **Bug Fixes:**
+- Implement persistent search bar active state
 - Refine search bar width and hover highlights
 - Add timeline filter active state and search hover
 - Standardize timeline filter width and add chevron
