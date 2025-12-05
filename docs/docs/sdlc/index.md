@@ -15,6 +15,7 @@ sidebar_position: 6
 - Fix version sync and add dev server restart automation
 
 **Bug Fixes:**
+- Separate select toggle from filter and fix cascading menu submenu visibility
 - Connect select toggle to filter dropdown with unified styling
 - Correct cascading menu arrow rotation and hover behavior
 - Correct select toggle icon states and disable visibility toggle when nothing selected
