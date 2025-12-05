@@ -491,10 +491,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                         });
                                     }}
                                     onMouseDown={(e) => e.stopPropagation()}
-                                    className={`flex items-center justify-center px-2 py-1 border transition-colors rounded ${(searchQuery || filterType)
-                                        ? 'bg-blue-900/30 border-blue-500/50 text-blue-200 hover:bg-blue-900/50 hover:text-white'
-                                        : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white'
-                                        }`}
+                                    className="p-1.5 rounded-md hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
                                     title={(() => {
                                         const allSelected = filteredItems.length > 0 && filteredItems.every(i => selectedItemIds.has(i.id));
                                         const someSelected = filteredItems.some(i => selectedItemIds.has(i.id));
@@ -731,10 +728,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                         });
                                     }}
                                     onMouseDown={(e) => e.stopPropagation()}
-                                    className={`flex items-center justify-center px-2 py-1 border transition-colors rounded ${(searchQuery || filterType)
-                                            ? 'bg-blue-900/30 border-blue-500/50 text-blue-200 hover:bg-blue-900/50 hover:text-white'
-                                            : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white'
-                                        }`}
+                                    className="p-1.5 rounded-md hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
                                     title={(() => {
                                         const allSelected = filteredItems.length > 0 && filteredItems.every(i => selectedItemIds.has(i.id));
                                         const someSelected = filteredItems.some(i => selectedItemIds.has(i.id));
@@ -766,8 +760,8 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                     <button
                                         onClick={(e) => { e.stopPropagation(); setIsFilterOpen(!isFilterOpen); }}
                                         className={`flex items-center justify-between space-x-1 text-xs px-2 py-1 rounded border transition-colors w-24 ${(searchQuery || filterType)
-                                                ? 'bg-blue-900/30 border-blue-500/50 text-blue-200 hover:bg-blue-900/50 hover:text-white'
-                                                : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white'
+                                            ? 'bg-blue-900/30 border-blue-500/50 text-blue-200 hover:bg-blue-900/50 hover:text-white'
+                                            : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white'
                                             }`}
                                     >
                                         <div className="flex items-center space-x-1 overflow-hidden">

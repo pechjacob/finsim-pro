@@ -635,7 +635,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                         <>
                                             {/* Background overlay */}
                                             <div
-                                                className="fixed inset-0 z-40"
+                                                className="fixed inset-0 z-30"
                                                 onClick={() => {
                                                     setIsAddMenuOpen(false);
                                                     setHoveredCategory(null);
@@ -643,7 +643,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                             />
 
                                             {/* Main dropdown */}
-                                            <div className="absolute left-0 top-full mt-1 w-full bg-gray-800 border border-gray-700 rounded-lg shadow-2xl z-50 overflow-hidden">
+                                            <div className="absolute left-0 top-full mt-1 w-full bg-gray-800 border border-gray-700 rounded-lg shadow-2xl z-40 overflow-visible">
                                                 {/* Events */}
                                                 <div
                                                     className="relative group"
