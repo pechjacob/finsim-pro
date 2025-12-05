@@ -491,7 +491,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                         });
                                     }}
                                     onMouseDown={(e) => e.stopPropagation()}
-                                    className="flex items-center justify-center h-[26px] w-[26px] rounded hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
+                                    className="flex items-center justify-center h-[28px] w-[28px] rounded hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
                                     title={(() => {
                                         const allSelected = filteredItems.length > 0 && filteredItems.every(i => selectedItemIds.has(i.id));
                                         const someSelected = filteredItems.some(i => selectedItemIds.has(i.id));
@@ -526,7 +526,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                             setIsFilterOpen(!isFilterOpen);
                                         }}
                                         onMouseDown={(e) => e.stopPropagation()}
-                                        className={`flex items-center justify-between space-x-1 text-xs px-2 py-1 rounded border transition-colors w-24 ${(searchQuery || filterType)
+                                        className={`flex items-center justify-between space-x-1 text-xs px-2 h-[26px] rounded border transition-colors w-24 ${(searchQuery || filterType)
                                             ? 'bg-blue-900/30 border-blue-500/50 text-blue-200 hover:bg-blue-900/50 hover:text-white'
                                             : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white'
                                             }`}
@@ -728,7 +728,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                         });
                                     }}
                                     onMouseDown={(e) => e.stopPropagation()}
-                                    className="flex items-center justify-center h-[26px] w-[26px] rounded hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
+                                    className="flex items-center justify-center h-[px] w-[28px] rounded hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
                                     title={(() => {
                                         const allSelected = filteredItems.length > 0 && filteredItems.every(i => selectedItemIds.has(i.id));
                                         const someSelected = filteredItems.some(i => selectedItemIds.has(i.id));
@@ -758,18 +758,17 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                 {/* Filter Dropdown */}
                                 <div className="relative group">
                                     <button
-                                        onClick={(e) => { e.stopPropagation(); setIsFilterOpen(!isFilterOpen); }}
-                                        className={`flex items-center justify-between space-x-1 text-xs px-2 py-1 rounded border transition-colors w-24 ${(searchQuery || filterType)
+                                        onClick={() => setIsFilterOpen(!isFilterOpen)}
+                                        className={`flex items-center justify-between space-x-1 text-xs px-2 h-[26px] rounded border transition-colors w-24 ${isFilterOpen || filterType
                                             ? 'bg-blue-900/30 border-blue-500/50 text-blue-200 hover:bg-blue-900/50 hover:text-white'
                                             : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white'
                                             }`}
                                     >
                                         <div className="flex items-center space-x-1 overflow-hidden">
                                             <Filter size={12} className="shrink-0" />
-                                            <span className="truncate">
-                                                {searchQuery ? 'Search' : (filterType ? (filterType.charAt(0).toUpperCase() + filterType.slice(1)) : 'All Events')}
-                                            </span>
+                                            <span className="truncate">{filterType ? filterType.charAt(0).toUpperCase() + filterType.slice(1) : 'All Events'}</span>
                                         </div>
+                                        {isFilterOpen ? <ChevronUp size={12} className="shrink-0" /> : <ChevronDown size={12} className="shrink-0" />}
                                     </button>
 
                                     {isFilterOpen && (

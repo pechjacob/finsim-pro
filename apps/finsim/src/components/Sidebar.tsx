@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Account, FinancialItem, FormulaType, CompoundingPeriod } from '../types';
 import { formatDate, formatCurrency } from '../utils';
 import { Trash2, Plus, X, Save, Download, Upload, ChevronLeft, ChevronRight, Eye, EyeOff, TrendingUp, TrendingDown, Percent, Receipt, ChevronDown } from 'lucide-react';
@@ -68,6 +69,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
     // Cascading menu state
     const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
     const [hoveredCategory, setHoveredCategory] = useState<'events' | 'effects' | null>(null);
+    const [submenuPosition, setSubmenuPosition] = useState({ top: 0, left: 0 });
+    const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    const handleMouseEnter = (category: 'events' | 'effects', rect: DOMRect) => {
+        if (hoverTimeoutRef.current) {
+            clearTimeout(hoverTimeoutRef.current);
+            hoverTimeoutRef.current = null;
+        }
+        setSubmenuPosition({ top: rect.top, left: rect.right });
+        setHoveredCategory(category);
+    };
+
+    const handleMouseLeave = () => {
+        hoverTimeoutRef.current = setTimeout(() => {
+            setHoveredCategory(null);
+        }, 100);
+    };
 
     // useEffect(() => {
     //     setLocalName(account.name);
@@ -570,7 +588,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     return (
         <div className={`relative h-full shrink-0 perspective-1000 transition-all duration-300 ease-in-out ${isCollapsed ? 'w-12' : 'w-80'}`}>
             <motion.div
-                className="relative h-full overflow-x-visible overflow-y-hidden"
+                className="relative h-full overflow-visible"
                 initial={false}
                 animate={{
                     opacity: isCollapsed ? 0 : 1,
@@ -647,27 +665,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                                 {/* Events */}
                                                 <div
                                                     className="relative group"
-                                                    onMouseEnter={() => setHoveredCategory('events')}
-                                                    onMouseLeave={(e) => {
-                                                        // Only close if not moving to submenu
-                                                        const relatedTarget = e.relatedTarget as HTMLElement;
-                                                        if (!relatedTarget?.closest('.submenu-events')) {
-                                                            setHoveredCategory(null);
-                                                        }
+                                                    onMouseEnter={(e) => {
+                                                        const rect = e.currentTarget.getBoundingClientRect();
+                                                        handleMouseEnter('events', rect);
                                                     }}
+                                                    onMouseLeave={handleMouseLeave}
                                                 >
                                                     <div className={`px-4 py-3 flex items-center justify-between cursor-pointer transition-colors ${hoveredCategory === 'events' ? 'bg-gray-700' : 'hover:bg-gray-700'
                                                         }`}>
                                                         <span className="text-sm font-medium text-gray-200">Events</span>
-                                                        <ChevronRight size={16} className="text-gray-400" />
+                                                        {hoveredCategory === 'events' ? (
+                                                            <ChevronDown size={16} className="text-white" />
+                                                        ) : (
+                                                            <ChevronRight size={16} className="text-gray-400 group-hover:text-white" />
+                                                        )}
                                                     </div>
 
                                                     {/* Events Submenu */}
-                                                    {hoveredCategory === 'events' && (
+                                                    {hoveredCategory === 'events' && createPortal(
                                                         <div
-                                                            className="submenu-events absolute left-full top-0 ml-1 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-2xl overflow-hidden z-[200]"
-                                                            onMouseEnter={() => setHoveredCategory('events')}
-                                                            onMouseLeave={() => setHoveredCategory(null)}
+                                                            className="submenu-events fixed w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-2xl overflow-hidden z-[9999]"
+                                                            style={{ top: submenuPosition.top, left: submenuPosition.left }}
+                                                            onMouseEnter={() => handleMouseEnter('events', { top: submenuPosition.top, right: submenuPosition.left } as DOMRect)}
+                                                            onMouseLeave={handleMouseLeave}
                                                         >
                                                             {/* Income */}
                                                             <button
@@ -714,34 +734,37 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                                                 <TrendingDown size={16} className="text-red-400 group-hover:text-red-300" />
                                                                 <span className="text-sm font-medium text-red-400 group-hover:text-red-300">Expense</span>
                                                             </button>
-                                                        </div>
+                                                        </div>,
+                                                        document.body
                                                     )}
                                                 </div>
 
                                                 {/* Effects */}
                                                 <div
                                                     className="relative group"
-                                                    onMouseEnter={() => setHoveredCategory('effects')}
-                                                    onMouseLeave={(e) => {
-                                                        // Only close if not moving to submenu
-                                                        const relatedTarget = e.relatedTarget as HTMLElement;
-                                                        if (!relatedTarget?.closest('.submenu-effects')) {
-                                                            setHoveredCategory(null);
-                                                        }
+                                                    onMouseEnter={(e) => {
+                                                        const rect = e.currentTarget.getBoundingClientRect();
+                                                        handleMouseEnter('effects', rect);
                                                     }}
+                                                    onMouseLeave={handleMouseLeave}
                                                 >
                                                     <div className={`px-4 py-3 flex items-center justify-between cursor-pointer transition-colors ${hoveredCategory === 'effects' ? 'bg-gray-700' : 'hover:bg-gray-700'
                                                         }`}>
                                                         <span className="text-sm font-medium text-gray-200">Effects</span>
-                                                        <ChevronRight size={16} className="text-gray-400" />
+                                                        {hoveredCategory === 'effects' ? (
+                                                            <ChevronDown size={16} className="text-white" />
+                                                        ) : (
+                                                            <ChevronRight size={16} className="text-gray-400 group-hover:text-white" />
+                                                        )}
                                                     </div>
 
                                                     {/* Effects Submenu */}
-                                                    {hoveredCategory === 'effects' && (
+                                                    {hoveredCategory === 'effects' && createPortal(
                                                         <div
-                                                            className="submenu-effects absolute left-full top-0 ml-1 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-2xl overflow-hidden z-[200]"
-                                                            onMouseEnter={() => setHoveredCategory('effects')}
-                                                            onMouseLeave={() => setHoveredCategory(null)}
+                                                            className="submenu-effects fixed w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-2xl overflow-hidden z-[9999]"
+                                                            style={{ top: submenuPosition.top, left: submenuPosition.left }}
+                                                            onMouseEnter={() => handleMouseEnter('effects', { top: submenuPosition.top, right: submenuPosition.left } as DOMRect)}
+                                                            onMouseLeave={handleMouseLeave}
                                                         >
                                                             {/* Interest */}
                                                             <button
@@ -779,7 +802,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                                                 <Receipt size={16} className="text-yellow-500" />
                                                                 <span className="text-sm font-medium text-yellow-500">Taxes</span>
                                                             </button>
-                                                        </div>
+                                                        </div>,
+                                                        document.body
                                                     )}
                                                 </div>
                                             </div>
