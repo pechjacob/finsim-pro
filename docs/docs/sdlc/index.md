@@ -15,6 +15,7 @@ sidebar_position: 6
 - Fix version sync and add dev server restart automation
 
 **Bug Fixes:**
+- Resize select toggle icon to match filter height
 - Resolve submenu clipping and align toggle heights
 - Match select toggle height to filter and remove gap
 - Remove gap completely and fix submenu overflow clipping
