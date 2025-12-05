@@ -474,17 +474,48 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                 </div>
                             </div>
                             <div className="flex items-center space-x-3 shrink-0">
-                                {/* Select All Toggle */}
+                                {/* Select All Toggle (Left of Filter) */}
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        onToggleAllItems();
+                                        // Select all filtered items (or deselect all if all are selected)
+                                        const allSelected = filteredItems.length > 0 && filteredItems.every(i => selectedItemIds.has(i.id));
+                                        filteredItems.forEach(i => {
+                                            if (allSelected) {
+                                                // Deselect all
+                                                if (selectedItemIds.has(i.id)) onItemClick(i.id);
+                                            } else {
+                                                // Select all unselected
+                                                if (!selectedItemIds.has(i.id)) onItemClick(i.id);
+                                            }
+                                        });
                                     }}
                                     onMouseDown={(e) => e.stopPropagation()}
-                                    className="text-gray-400 hover:text-white focus:outline-none p-1 hover:bg-gray-800 rounded"
-                                    title="Toggle All Visibility"
+                                    className="p-1.5 rounded-md hover:bg-gray-800 text-gray-400 hover:text-white transition-colors relative"
+                                    title={(() => {
+                                        const allSelected = filteredItems.length > 0 && filteredItems.every(i => selectedItemIds.has(i.id));
+                                        const someSelected = filteredItems.some(i => selectedItemIds.has(i.id));
+                                        return allSelected ? "Deselect All" : (someSelected ? "Select All" : "Select All");
+                                    })()}
                                 >
-                                    <CheckSquare size={16} />
+                                    {(() => {
+                                        const allSelected = filteredItems.length > 0 && filteredItems.every(i => selectedItemIds.has(i.id));
+                                        const someSelected = filteredItems.some(i => selectedItemIds.has(i.id));
+
+                                        if (allSelected) {
+                                            return <CheckSquare size={16} />;
+                                        } else if (someSelected) {
+                                            // Indeterminate state (dash)
+                                            return (
+                                                <div className="relative flex items-center justify-center w-4 h-4 border-2 border-current rounded-[3px]">
+                                                    <div className="w-2 h-0.5 bg-current rounded-full" />
+                                                </div>
+                                            );
+                                        } else {
+                                            // Empty box
+                                            return <div className="w-4 h-4 border-2 border-current rounded-[3px]" />;
+                                        }
+                                    })()}
                                 </button>
 
                                 <div className="relative group">
@@ -542,14 +573,22 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                     <LineChart size={16} />
                                 </div>
 
+                                {/* Visibility Toggle (Eye Icon) - Only works on selected items */}
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        onToggleAllItems();
+                                        if (selectedItemIds.size === 0) return;
+                                        // Get selected items and toggle their visibility
+                                        const selectedItems = filteredItems.filter(i => selectedItemIds.has(i.id));
+                                        onToggleAllItems(selectedItems.map(i => i.id));
                                     }}
                                     onMouseDown={(e) => e.stopPropagation()}
-                                    className="text-gray-400 hover:text-white focus:outline-none"
-                                    title="Toggle All Visibility"
+                                    disabled={selectedItemIds.size === 0}
+                                    className={`p-1.5 rounded-md transition-colors ${selectedItemIds.size > 0
+                                        ? 'hover:bg-gray-800 text-gray-400 hover:text-white'
+                                        : 'text-gray-600 cursor-not-allowed'
+                                        }`}
+                                    title={selectedItemIds.size > 0 ? "Toggle Visibility of Selected" : "Select items to toggle visibility"}
                                 >
                                     <Eye size={16} />
                                 </button>
@@ -671,17 +710,48 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                 </div>
                             </div>
                             <div className="flex items-center space-x-3 shrink-0">
-                                {/* Select All Toggle */}
+                                {/* Select All Toggle (Left of Filter) */}
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        onToggleAllItems();
+                                        // Select all filtered items (or deselect all if all are selected)
+                                        const allSelected = filteredItems.length > 0 && filteredItems.every(i => selectedItemIds.has(i.id));
+                                        filteredItems.forEach(i => {
+                                            if (allSelected) {
+                                                // Deselect all
+                                                if (selectedItemIds.has(i.id)) onItemClick(i.id);
+                                            } else {
+                                                // Select all unselected
+                                                if (!selectedItemIds.has(i.id)) onItemClick(i.id);
+                                            }
+                                        });
                                     }}
                                     onMouseDown={(e) => e.stopPropagation()}
-                                    className="text-gray-400 hover:text-white focus:outline-none p-1 hover:bg-gray-800 rounded"
-                                    title="Toggle All Visibility"
+                                    className="p-1.5 rounded-md hover:bg-gray-800 text-gray-400 hover:text-white transition-colors relative"
+                                    title={(() => {
+                                        const allSelected = filteredItems.length > 0 && filteredItems.every(i => selectedItemIds.has(i.id));
+                                        const someSelected = filteredItems.some(i => selectedItemIds.has(i.id));
+                                        return allSelected ? "Deselect All" : (someSelected ? "Select All" : "Select All");
+                                    })()}
                                 >
-                                    <CheckSquare size={16} />
+                                    {(() => {
+                                        const allSelected = filteredItems.length > 0 && filteredItems.every(i => selectedItemIds.has(i.id));
+                                        const someSelected = filteredItems.some(i => selectedItemIds.has(i.id));
+
+                                        if (allSelected) {
+                                            return <CheckSquare size={16} />;
+                                        } else if (someSelected) {
+                                            // Indeterminate state (dash)
+                                            return (
+                                                <div className="relative flex items-center justify-center w-4 h-4 border-2 border-current rounded-[3px]">
+                                                    <div className="w-2 h-0.5 bg-current rounded-full" />
+                                                </div>
+                                            );
+                                        } else {
+                                            // Empty box
+                                            return <div className="w-4 h-4 border-2 border-current rounded-[3px]" />;
+                                        }
+                                    })()}
                                 </button>
 
                                 <div className="relative group">
@@ -746,14 +816,22 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                     <LineChart size={16} />
                                 </div>
 
+                                {/* Visibility Toggle (Eye Icon) - Only works on selected items */}
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        onToggleAllItems();
+                                        if (selectedItemIds.size === 0) return;
+                                        // Get selected items and toggle their visibility
+                                        const selectedItems = filteredItems.filter(i => selectedItemIds.has(i.id));
+                                        onToggleAllItems(selectedItems.map(i => i.id));
                                     }}
                                     onMouseDown={(e) => e.stopPropagation()}
-                                    className="text-gray-400 hover:text-white focus:outline-none"
-                                    title="Toggle All Visibility"
+                                    disabled={selectedItemIds.size === 0}
+                                    className={`p-1.5 rounded-md transition-colors ${selectedItemIds.size > 0
+                                            ? 'hover:bg-gray-800 text-gray-400 hover:text-white'
+                                            : 'text-gray-600 cursor-not-allowed'
+                                        }`}
+                                    title={selectedItemIds.size > 0 ? "Toggle Visibility of Selected" : "Select items to toggle visibility"}
                                 >
                                     <Eye size={16} />
                                 </button>

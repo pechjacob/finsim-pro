@@ -12,17 +12,12 @@ sidebar_position: 6
 - Refine timeline header layout and add new controls
 - Refine timeline search and filter ui
 - Fix version sync and add dev server restart automation
-- Automate docs versioning and enhance release preview
-- Enhance debug panel with slider toggle and version info
-- Implement dynamic versioning with git describe
-- Add changelog automation and preview scripts
 
 **Bug Fixes:**
+- Fix vite 6 es module compatibility for version count
 - Remove legacy labels and fix header spacing
 - Update release notes formatting and legacy labels
 - Update next banner wording and sync app version to 1.3.0
-- Restructure release notes with unreleased at top
-- Sync monorepo versions and add spa routing support
 
 ## v1.3.0 (Current)
 **Documentation:**
