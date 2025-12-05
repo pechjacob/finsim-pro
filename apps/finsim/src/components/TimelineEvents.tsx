@@ -462,14 +462,14 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                 </div>
 
                                 {/* Search Bar */}
-                                <div className="relative ml-2 flex-1 max-w-md group/search" onClick={(e) => e.stopPropagation()}>
+                                <div className="relative ml-2 w-64 group/search" onClick={(e) => e.stopPropagation()}>
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <Search size={14} className="text-gray-500 group-focus-within/search:text-blue-400 transition-colors" />
+                                        <Search size={14} className="text-gray-500 group-focus-within/search:text-blue-400 group-hover/search:text-white transition-colors" />
                                     </div>
                                     <input
                                         ref={searchInputRef}
                                         type="text"
-                                        className="block w-full pl-10 pr-12 py-1 bg-gray-800 border border-gray-700 hover:border-white rounded-md text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                        className="block w-full pl-10 pr-12 py-1 bg-gray-800 border border-gray-700 hover:border-white rounded-md text-xs text-gray-200 placeholder-gray-500 group-hover/search:placeholder-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                         placeholder="Select Event/Effect to Edit"
                                         value={searchQuery}
                                         onChange={(e) => {
@@ -478,8 +478,8 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                     />
                                     <div className="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none">
                                         <div className="flex items-center space-x-0.5">
-                                            <kbd className="inline-flex items-center justify-center h-5 min-w-[20px] px-1 text-[10px] font-medium text-gray-400 bg-gray-700 border border-gray-600 rounded">⌘</kbd>
-                                            <kbd className="inline-flex items-center justify-center h-5 min-w-[20px] px-1 text-[10px] font-medium text-gray-400 bg-gray-700 border border-gray-600 rounded">K</kbd>
+                                            <kbd className="inline-flex items-center justify-center h-5 min-w-[20px] px-1 text-[10px] font-medium text-gray-400 bg-gray-700 border border-gray-600 rounded group-hover/search:text-white group-hover/search:border-gray-500 transition-colors">⌘</kbd>
+                                            <kbd className="inline-flex items-center justify-center h-5 min-w-[20px] px-1 text-[10px] font-medium text-gray-400 bg-gray-700 border border-gray-600 rounded group-hover/search:text-white group-hover/search:border-gray-500 transition-colors">K</kbd>
                                         </div>
                                     </div>
                                 </div>
