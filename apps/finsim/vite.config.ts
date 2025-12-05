@@ -1,6 +1,7 @@
 import path from 'path';
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
+import { execSync } from 'child_process';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '../../', '');
@@ -53,7 +54,7 @@ export default defineConfig(({ mode }) => {
         process.env.VITE_COMMIT_SHA ||
         (() => {
           try {
-            return require('child_process').execSync('git rev-parse HEAD').toString().trim();
+            return execSync('git rev-parse HEAD').toString().trim();
           } catch {
             return 'dev-build';
           }
@@ -64,7 +65,7 @@ export default defineConfig(({ mode }) => {
         (() => {
           try {
             // Use git describe to get commits since last tag: v1.1.0-3-gabc1234
-            const describe = require('child_process').execSync('git describe --tags --long').toString().trim();
+            const describe = execSync('git describe --tags --long').toString().trim();
             // Extract the commit count (the "3" in "v1.1.0-3-gabc1234")
             const match = describe.match(/-(\d+)-g[a-f0-9]+$/);
             return match ? match[1] : '0';
