@@ -473,7 +473,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex items-center space-x-1 shrink-0">
+                            <div className="flex items-center space-x-0 shrink-0">
                                 {/* Select All Toggle */}
                                 <button
                                     onClick={(e) => {
@@ -710,7 +710,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex items-center space-x-1 shrink-0">
+                            <div className="flex items-center space-x-0 shrink-0">
                                 {/* Select All Toggle */}
                                 <button
                                     onClick={(e) => {

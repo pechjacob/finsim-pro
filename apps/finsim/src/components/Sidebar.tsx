@@ -570,7 +570,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     return (
         <div className={`relative h-full shrink-0 perspective-1000 transition-all duration-300 ease-in-out ${isCollapsed ? 'w-12' : 'w-80'}`}>
             <motion.div
-                className="relative h-full overflow-hidden"
+                className="relative h-full overflow-x-visible overflow-y-hidden"
                 initial={false}
                 animate={{
                     opacity: isCollapsed ? 0 : 1,
@@ -590,7 +590,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         style={{ backfaceVisibility: 'hidden', pointerEvents: isFlipped ? 'none' : 'auto' }}
                     >
                         <div className="flex h-full relative">
-                            <div className="flex-1 flex flex-col text-gray-200 overflow-y-auto scrollbar-hide p-4">
+                            <div className="flex-1 flex flex-col text-gray-200 overflow-y-auto overflow-x-visible scrollbar-hide p-4">
                                 <div className="mb-2">
                                     <div className="flex justify-between items-center mb-2">
                                         <h2 className="text-xs font-bold text-gray-500 tracking-wider">ACCOUNT: <span className="text-gray-300">{account.name}</span></h2>
