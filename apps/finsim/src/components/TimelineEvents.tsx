@@ -2,7 +2,19 @@ import React, { useState, useMemo } from 'react';
 import { FinancialItem, FormulaType, SimulationPoint, Frequency } from '../types';
 import { formatCurrency } from '../utils';
 import { calculateTotalDelta } from '../services/simulation';
-import { ChevronUp, ChevronDown, GripVertical, Trash2, Eye, Filter, Search, CheckSquare, RotateCcw, LineChart } from 'lucide-react';
+import {
+    ChevronDown,
+    ChevronUp,
+    Filter,
+    LineChart,
+    Search,
+    Trash2,
+    Eye,
+    CheckSquare,
+    FlipHorizontal as FlipIcon,
+    RotateCcw,
+    GripVertical
+} from 'lucide-react';
 import { DndContext, closestCenter, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -10,7 +22,6 @@ import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { TimelineSyncChart } from './TimelineSyncChart';
 import { motion } from 'framer-motion';
 import { FormulaDisplay } from './FormulaDisplay';
-import { FlipIcon } from './FlipIcon';
 
 interface TimelineEventsProps {
     items: FinancialItem[];
@@ -569,8 +580,23 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                     )}
                                 </div>
 
+                                {/* Reset Icon */}
+                                <div className={`flex items-center justify-center w-[26px] h-[26px] ${(searchQuery || filterType) ? 'visible' : 'invisible'}`}>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setSearchQuery('');
+                                            setFilterType(null);
+                                        }}
+                                        className="text-gray-400 hover:text-white transition-colors"
+                                        title="Reset Filter & Search"
+                                    >
+                                        <RotateCcw size={16} />
+                                    </button>
+                                </div>
+
                                 {/* Chart Icon (Placeholder) */}
-                                <div className="text-gray-500 p-1">
+                                <div className="text-gray-500 p-1 ml-2">
                                     <LineChart size={16} />
                                 </div>
 
@@ -585,7 +611,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                     }}
                                     onMouseDown={(e) => e.stopPropagation()}
                                     disabled={selectedItemIds.size === 0}
-                                    className={`p-1.5 rounded-md transition-colors ${selectedItemIds.size > 0
+                                    className={`p-1.5 rounded-md transition-colors ml-1 ${selectedItemIds.size > 0
                                         ? 'hover:bg-gray-800 text-gray-400 hover:text-white'
                                         : 'text-gray-600 cursor-not-allowed'
                                         }`}
@@ -600,13 +626,13 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                         onDeleteAllItems();
                                     }}
                                     onMouseDown={(e) => e.stopPropagation()}
-                                    className="text-gray-400 hover:text-red-400 focus:outline-none"
+                                    className="text-gray-400 hover:text-red-400 focus:outline-none ml-1"
                                     title="Delete All Events"
                                 >
                                     <Trash2 size={16} />
                                 </button>
 
-                                <div className="text-xs text-gray-500 font-mono">
+                                <div className="text-xs text-gray-500 font-mono ml-4">
                                     Delta in View
                                 </div>
                             </div>
@@ -798,22 +824,23 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                     )}
                                 </div>
 
-                                {/* Reset Icon (Conditional) */}
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setSearchQuery('');
-                                        setFilterType(null);
-                                    }}
-                                    className={`text-gray-400 hover:text-white focus:outline-none p-1 hover:bg-gray-800 rounded transition-opacity duration-200 ${(searchQuery || filterType) ? 'opacity-100' : 'opacity-0 pointer-events-none'
-                                        }`}
-                                    title="Reset Filter"
-                                >
-                                    <RotateCcw size={16} />
-                                </button>
+                                {/* Reset Icon */}
+                                <div className={`flex items-center justify-center w-[26px] h-[26px] ${(searchQuery || filterType) ? 'visible' : 'invisible'}`}>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setSearchQuery('');
+                                            setFilterType(null);
+                                        }}
+                                        className="text-gray-400 hover:text-white transition-colors"
+                                        title="Reset Filter & Search"
+                                    >
+                                        <RotateCcw size={16} />
+                                    </button>
+                                </div>
 
                                 {/* Chart Icon (Placeholder) */}
-                                <div className="text-gray-500 p-1">
+                                <div className="text-gray-500 p-1 ml-2">
                                     <LineChart size={16} />
                                 </div>
 
@@ -828,7 +855,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                     }}
                                     onMouseDown={(e) => e.stopPropagation()}
                                     disabled={selectedItemIds.size === 0}
-                                    className={`p-1.5 rounded-md transition-colors ${selectedItemIds.size > 0
+                                    className={`p-1.5 rounded-md transition-colors ml-1 ${selectedItemIds.size > 0
                                         ? 'hover:bg-gray-800 text-gray-400 hover:text-white'
                                         : 'text-gray-600 cursor-not-allowed'
                                         }`}
@@ -843,13 +870,13 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                         onDeleteAllItems();
                                     }}
                                     onMouseDown={(e) => e.stopPropagation()}
-                                    className="text-gray-400 hover:text-red-400 focus:outline-none"
+                                    className="text-gray-400 hover:text-red-400 focus:outline-none ml-1"
                                     title="Delete All Events"
                                 >
                                     <Trash2 size={16} />
                                 </button>
 
-                                <div className="text-xs text-gray-500 font-mono">
+                                <div className="text-xs text-gray-500 font-mono ml-4">
                                     Delta in View
                                 </div>
                             </div>
