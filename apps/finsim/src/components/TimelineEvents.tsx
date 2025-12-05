@@ -491,7 +491,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                         });
                                     }}
                                     onMouseDown={(e) => e.stopPropagation()}
-                                    className="flex items-center justify-center h-[28px] w-[28px] rounded hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
+                                    className="flex items-center justify-center h-[26px] w-[26px] rounded hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
                                     title={(() => {
                                         const allSelected = filteredItems.length > 0 && filteredItems.every(i => selectedItemIds.has(i.id));
                                         const someSelected = filteredItems.some(i => selectedItemIds.has(i.id));
@@ -503,17 +503,17 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                         const someSelected = filteredItems.some(i => selectedItemIds.has(i.id));
 
                                         if (allSelected) {
-                                            return <CheckSquare size={16} />;
+                                            return <CheckSquare size={22} />;
                                         } else if (someSelected) {
                                             // Indeterminate state (dash)
                                             return (
-                                                <div className="relative flex items-center justify-center w-4 h-4 border-2 border-current rounded-[3px]">
-                                                    <div className="w-2 h-0.5 bg-current rounded-full" />
+                                                <div className="relative flex items-center justify-center w-[22px] h-[22px] border-2 border-current rounded-[3px]">
+                                                    <div className="w-3 h-0.5 bg-current rounded-full" />
                                                 </div>
                                             );
                                         } else {
                                             // Empty box
-                                            return <div className="w-4 h-4 border-2 border-current rounded-[3px]" />;
+                                            return <div className="w-[22px] h-[22px] border-2 border-current rounded-[3px]" />;
                                         }
                                     })()}
                                 </button>
@@ -728,7 +728,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                         });
                                     }}
                                     onMouseDown={(e) => e.stopPropagation()}
-                                    className="flex items-center justify-center h-[px] w-[28px] rounded hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
+                                    className="flex items-center justify-center h-[26px] w-[26px] rounded hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
                                     title={(() => {
                                         const allSelected = filteredItems.length > 0 && filteredItems.every(i => selectedItemIds.has(i.id));
                                         const someSelected = filteredItems.some(i => selectedItemIds.has(i.id));
@@ -740,17 +740,17 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                         const someSelected = filteredItems.some(i => selectedItemIds.has(i.id));
 
                                         if (allSelected) {
-                                            return <CheckSquare size={16} />;
+                                            return <CheckSquare size={22} />;
                                         } else if (someSelected) {
                                             // Indeterminate state (dash)
                                             return (
-                                                <div className="relative flex items-center justify-center w-4 h-4 border-2 border-current rounded-[3px]">
-                                                    <div className="w-2 h-0.5 bg-current rounded-full" />
+                                                <div className="relative flex items-center justify-center w-[22px] h-[22px] border-2 border-current rounded-[3px]">
+                                                    <div className="w-3 h-0.5 bg-current rounded-full" />
                                                 </div>
                                             );
                                         } else {
                                             // Empty box
-                                            return <div className="w-4 h-4 border-2 border-current rounded-[3px]" />;
+                                            return <div className="w-[22px] h-[22px] border-2 border-current rounded-[3px]" />;
                                         }
                                     })()}
                                 </button>
