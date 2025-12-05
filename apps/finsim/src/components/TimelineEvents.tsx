@@ -784,8 +784,11 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                 {/* Filter Dropdown */}
                                 <div className="relative group">
                                     <button
-                                        onClick={() => setIsFilterOpen(!isFilterOpen)}
-                                        className={`flex items-center justify-between space-x-1 text-xs px-2 h-[26px] rounded border transition-colors w-24 ${isFilterOpen || filterType
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setIsFilterOpen(!isFilterOpen);
+                                        }}
+                                        className={`flex items-center justify-between space-x-1 text-xs px-2 h-[26px] rounded border transition-colors w-28 ${isFilterOpen || filterType
                                             ? 'bg-blue-900/30 border-blue-500/50 text-blue-200 hover:bg-blue-900/50 hover:text-white'
                                             : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white'
                                             }`}
