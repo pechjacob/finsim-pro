@@ -15,6 +15,7 @@ sidebar_position: 6
 - Fix version sync and add dev server restart automation
 
 **Bug Fixes:**
+- Match select toggle height to filter and remove gap
 - Remove gap completely and fix submenu overflow clipping
 - Increase submenu z-index and reduce gap between select and filter
 - Remove box from select toggle and fix cascading menu z-index
