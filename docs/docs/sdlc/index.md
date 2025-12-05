@@ -15,6 +15,7 @@ sidebar_position: 6
 - Fix version sync and add dev server restart automation
 
 **Bug Fixes:**
+- Increase submenu z-index and reduce gap between select and filter
 - Remove box from select toggle and fix cascading menu z-index
 - Separate select toggle from filter and fix cascading menu submenu visibility
 - Connect select toggle to filter dropdown with unified styling
