@@ -14,6 +14,7 @@ sidebar_position: 6
 - Fix version sync and add dev server restart automation
 
 **Bug Fixes:**
+- Correct select toggle icon states and disable visibility toggle when nothing selected
 - Fix vite 6 es module compatibility for version count
 - Remove legacy labels and fix header spacing
 - Update release notes formatting and legacy labels
