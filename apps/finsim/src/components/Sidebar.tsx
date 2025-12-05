@@ -665,7 +665,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                                     {/* Events Submenu */}
                                                     {hoveredCategory === 'events' && (
                                                         <div
-                                                            className="submenu-events absolute left-full top-0 ml-1 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-2xl overflow-hidden"
+                                                            className="submenu-events absolute left-full top-0 ml-1 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-2xl overflow-hidden z-[100]"
                                                             onMouseEnter={() => setHoveredCategory('events')}
                                                             onMouseLeave={() => setHoveredCategory(null)}
                                                         >
@@ -739,7 +739,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                                     {/* Effects Submenu */}
                                                     {hoveredCategory === 'effects' && (
                                                         <div
-                                                            className="submenu-effects absolute left-full top-0 ml-1 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-2xl overflow-hidden"
+                                                            className="submenu-effects absolute left-full top-0 ml-1 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-2xl overflow-hidden z-[100]"
                                                             onMouseEnter={() => setHoveredCategory('effects')}
                                                             onMouseLeave={() => setHoveredCategory(null)}
                                                         >
