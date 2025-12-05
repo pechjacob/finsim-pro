@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Account, FinancialItem, FormulaType, CompoundingPeriod } from '../types';
 import { formatDate, formatCurrency } from '../utils';
-import { Trash2, Plus, X, Save, Download, Upload, ChevronLeft, ChevronRight, Eye, EyeOff } from 'lucide-react';
+import { Trash2, Plus, X, Save, Download, Upload, ChevronLeft, ChevronRight, Eye, EyeOff, TrendingUp, TrendingDown, Percent, Receipt } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
@@ -61,8 +61,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
     const activeItem = selectedItemIds.size === 1
         ? items.find(i => i.id === Array.from(selectedItemIds)[0])
         : null;
+
     const [editingItem, setEditingItem] = useState<FinancialItem | null>(null);
     const [originalItem, setOriginalItem] = useState<FinancialItem | null>(null);
+
+    // Cascading menu state
+    const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
+    const [hoveredCategory, setHoveredCategory] = useState<'events' | 'effects' | null>(null);
 
     // useEffect(() => {
     //     setLocalName(account.name);
@@ -613,64 +618,175 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
                                 <div className="border-t border-gray-800 my-2"></div>
 
-                                <div className="flex flex-col space-y-2">
+
+                                <div className="relative">
+                                    {/* Main Add New Button */}
                                     <button
-                                        onClick={() => {
-                                            if (onUpdateDraft) {
-                                                onUpdateDraft({
-                                                    id: crypto.randomUUID(),
-                                                    accountId: account.id,
-                                                    name: 'New Income',
-                                                    type: 'income',
-                                                    startDate: getDefaultStartDate(),
-                                                    formula: FormulaType.MONTHLY_SUM,
-                                                    amount: 1000
-                                                });
-                                            }
-                                        }}
-                                        className="text-left flex items-center text-green-400 hover:text-green-300 text-xs font-medium transition-colors"
+                                        onClick={() => setIsAddMenuOpen(!isAddMenuOpen)}
+                                        className="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors flex items-center justify-center space-x-2"
                                     >
-                                        <Plus size={14} className="mr-1" /> Add Income
+                                        <Plus size={16} />
+                                        <span>Add New</span>
+                                        <ChevronRight size={14} className={`transition-transform ${isAddMenuOpen ? 'rotate-90' : 'rotate-0'}`} />
                                     </button>
-                                    <button
-                                        onClick={() => {
-                                            if (onUpdateDraft) {
-                                                onUpdateDraft({
-                                                    id: crypto.randomUUID(),
-                                                    accountId: account.id,
-                                                    name: 'New Expense',
-                                                    type: 'expense',
-                                                    startDate: getDefaultStartDate(),
-                                                    formula: FormulaType.MONTHLY_SUM,
-                                                    amount: 500
-                                                });
-                                            }
-                                        }}
-                                        className="text-left flex items-center text-red-400 hover:text-red-300 text-xs font-medium transition-colors"
-                                    >
-                                        <Plus size={14} className="mr-1" /> Add Expense
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            if (onUpdateDraft) {
-                                                onUpdateDraft({
-                                                    id: crypto.randomUUID(),
-                                                    accountId: account.id,
-                                                    name: 'New Effect',
-                                                    type: 'effect',
-                                                    startDate: getDefaultStartDate(),
-                                                    formula: FormulaType.COMPOUNDING,
-                                                    interestRate: 5,
-                                                    compoundingPeriod: CompoundingPeriod.MONTHLY,
-                                                    compoundingFrequency: 1
-                                                });
-                                            }
-                                        }}
-                                        className="text-left flex items-center text-purple-400 hover:text-purple-300 text-xs font-medium transition-colors"
-                                    >
-                                        <Plus size={14} className="mr-1" /> Add Interest Effect
-                                    </button>
+
+                                    {/* Dropdown Menu */}
+                                    {isAddMenuOpen && (
+                                        <>
+                                            {/* Background overlay */}
+                                            <div
+                                                className="fixed inset-0 z-40"
+                                                onClick={() => {
+                                                    setIsAddMenuOpen(false);
+                                                    setHoveredCategory(null);
+                                                }}
+                                            />
+
+                                            {/* Main dropdown */}
+                                            <div className="absolute left-0 top-full mt-1 w-full bg-gray-800 border border-gray-700 rounded-lg shadow-2xl z-50 overflow-hidden">
+                                                {/* Events */}
+                                                <div
+                                                    className="relative group"
+                                                    onMouseEnter={() => setHoveredCategory('events')}
+                                                    onMouseLeave={(e) => {
+                                                        // Only close if not moving to submenu
+                                                        const relatedTarget = e.relatedTarget as HTMLElement;
+                                                        if (!relatedTarget?.closest('.submenu-events')) {
+                                                            setHoveredCategory(null);
+                                                        }
+                                                    }}
+                                                >
+                                                    <div className={`px-4 py-3 flex items-center justify-between cursor-pointer transition-colors ${hoveredCategory === 'events' ? 'bg-gray-700' : 'hover:bg-gray-750'
+                                                        }`}>
+                                                        <span className="text-sm font-medium text-gray-200">Events</span>
+                                                        <ChevronRight size={16} className="text-gray-400" />
+                                                    </div>
+
+                                                    {/* Events Submenu */}
+                                                    {hoveredCategory === 'events' && (
+                                                        <div
+                                                            className="submenu-events absolute left-full top-0 ml-1 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-2xl overflow-hidden"
+                                                            onMouseEnter={() => setHoveredCategory('events')}
+                                                            onMouseLeave={() => setHoveredCategory(null)}
+                                                        >
+                                                            {/* Income */}
+                                                            <button
+                                                                onClick={() => {
+                                                                    if (onUpdateDraft) {
+                                                                        onUpdateDraft({
+                                                                            id: crypto.randomUUID(),
+                                                                            accountId: account.id,
+                                                                            name: 'New Income',
+                                                                            type: 'income',
+                                                                            startDate: getDefaultStartDate(),
+                                                                            formula: FormulaType.MONTHLY_SUM,
+                                                                            amount: 1000
+                                                                        });
+                                                                    }
+                                                                    setIsAddMenuOpen(false);
+                                                                    setHoveredCategory(null);
+                                                                }}
+                                                                className="w-full px-4 py-3 flex items-center space-x-3 text-left hover:bg-gray-700 transition-colors group"
+                                                            >
+                                                                <TrendingUp size={16} className="text-green-400 group-hover:text-green-300" />
+                                                                <span className="text-sm font-medium text-green-400 group-hover:text-green-300">Income</span>
+                                                            </button>
+
+                                                            {/* Expense */}
+                                                            <button
+                                                                onClick={() => {
+                                                                    if (onUpdateDraft) {
+                                                                        onUpdateDraft({
+                                                                            id: crypto.randomUUID(),
+                                                                            accountId: account.id,
+                                                                            name: 'New Expense',
+                                                                            type: 'expense',
+                                                                            startDate: getDefaultStartDate(),
+                                                                            formula: FormulaType.MONTHLY_SUM,
+                                                                            amount: 500
+                                                                        });
+                                                                    }
+                                                                    setIsAddMenuOpen(false);
+                                                                    setHoveredCategory(null);
+                                                                }}
+                                                                className="w-full px-4 py-3 flex items-center space-x-3 text-left hover:bg-gray-700 transition-colors group"
+                                                            >
+                                                                <TrendingDown size={16} className="text-red-400 group-hover:text-red-300" />
+                                                                <span className="text-sm font-medium text-red-400 group-hover:text-red-300">Expense</span>
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/* Effects */}
+                                                <div
+                                                    className="relative group"
+                                                    onMouseEnter={() => setHoveredCategory('effects')}
+                                                    onMouseLeave={(e) => {
+                                                        // Only close if not moving to submenu
+                                                        const relatedTarget = e.relatedTarget as HTMLElement;
+                                                        if (!relatedTarget?.closest('.submenu-effects')) {
+                                                            setHoveredCategory(null);
+                                                        }
+                                                    }}
+                                                >
+                                                    <div className={`px-4 py-3 flex items-center justify-between cursor-pointer transition-colors ${hoveredCategory === 'effects' ? 'bg-gray-700' : 'hover:bg-gray-750'
+                                                        }`}>
+                                                        <span className="text-sm font-medium text-gray-200">Effects</span>
+                                                        <ChevronRight size={16} className="text-gray-400" />
+                                                    </div>
+
+                                                    {/* Effects Submenu */}
+                                                    {hoveredCategory === 'effects' && (
+                                                        <div
+                                                            className="submenu-effects absolute left-full top-0 ml-1 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-2xl overflow-hidden"
+                                                            onMouseEnter={() => setHoveredCategory('effects')}
+                                                            onMouseLeave={() => setHoveredCategory(null)}
+                                                        >
+                                                            {/* Interest */}
+                                                            <button
+                                                                onClick={() => {
+                                                                    if (onUpdateDraft) {
+                                                                        onUpdateDraft({
+                                                                            id: crypto.randomUUID(),
+                                                                            accountId: account.id,
+                                                                            name: 'New Effect',
+                                                                            type: 'effect',
+                                                                            startDate: getDefaultStartDate(),
+                                                                            formula: FormulaType.COMPOUNDING,
+                                                                            interestRate: 5,
+                                                                            compoundingPeriod: CompoundingPeriod.MONTHLY,
+                                                                            compoundingFrequency: 1
+                                                                        });
+                                                                    }
+                                                                    setIsAddMenuOpen(false);
+                                                                    setHoveredCategory(null);
+                                                                }}
+                                                                className="w-full px-4 py-3 flex items-center space-x-3 text-left hover:bg-gray-700 transition-colors group"
+                                                            >
+                                                                <Percent size={16} className="text-purple-400 group-hover:text-purple-300" />
+                                                                <span className="text-sm font-medium text-purple-400 group-hover:text-purple-300">Interest</span>
+                                                            </button>
+
+                                                            {/* Taxes (Placeholder) */}
+                                                            <button
+                                                                onClick={() => {
+                                                                    // No action for now
+                                                                }}
+                                                                className="w-full px-4 py-3 flex items-center space-x-3 text-left hover:bg-gray-700 transition-colors group cursor-not-allowed opacity-60"
+                                                                disabled
+                                                            >
+                                                                <Receipt size={16} className="text-yellow-500" />
+                                                                <span className="text-sm font-medium text-yellow-500">Taxes</span>
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
+
 
                                 {renderItemForm()}
 
