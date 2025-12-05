@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Account, FinancialItem, FormulaType, CompoundingPeriod } from '../types';
 import { formatDate, formatCurrency } from '../utils';
-import { Trash2, Plus, X, Save, Download, Upload, ChevronLeft, ChevronRight, Eye, EyeOff, TrendingUp, TrendingDown, Percent, Receipt } from 'lucide-react';
+import { Trash2, Plus, X, Save, Download, Upload, ChevronLeft, ChevronRight, Eye, EyeOff, TrendingUp, TrendingDown, Percent, Receipt, ChevronDown } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
@@ -623,11 +623,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                     {/* Main Add New Button */}
                                     <button
                                         onClick={() => setIsAddMenuOpen(!isAddMenuOpen)}
-                                        className="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors flex items-center justify-center space-x-2"
+                                        className="group w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors flex items-center justify-center space-x-2"
                                     >
                                         <Plus size={16} />
                                         <span>Add New</span>
-                                        <ChevronRight size={14} className={`transition-transform ${isAddMenuOpen ? 'rotate-90' : 'rotate-0'}`} />
+                                        <ChevronDown size={14} className={`transition-transform group-hover:text-white ${isAddMenuOpen ? 'rotate-[-90deg]' : 'rotate-0'}`} />
                                     </button>
 
                                     {/* Dropdown Menu */}
@@ -656,7 +656,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                                         }
                                                     }}
                                                 >
-                                                    <div className={`px-4 py-3 flex items-center justify-between cursor-pointer transition-colors ${hoveredCategory === 'events' ? 'bg-gray-700' : 'hover:bg-gray-750'
+                                                    <div className={`px-4 py-3 flex items-center justify-between cursor-pointer transition-colors ${hoveredCategory === 'events' ? 'bg-gray-700' : 'hover:bg-gray-700'
                                                         }`}>
                                                         <span className="text-sm font-medium text-gray-200">Events</span>
                                                         <ChevronRight size={16} className="text-gray-400" />
@@ -730,7 +730,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                                         }
                                                     }}
                                                 >
-                                                    <div className={`px-4 py-3 flex items-center justify-between cursor-pointer transition-colors ${hoveredCategory === 'effects' ? 'bg-gray-700' : 'hover:bg-gray-750'
+                                                    <div className={`px-4 py-3 flex items-center justify-between cursor-pointer transition-colors ${hoveredCategory === 'effects' ? 'bg-gray-700' : 'hover:bg-gray-700'
                                                         }`}>
                                                         <span className="text-sm font-medium text-gray-200">Effects</span>
                                                         <ChevronRight size={16} className="text-gray-400" />
