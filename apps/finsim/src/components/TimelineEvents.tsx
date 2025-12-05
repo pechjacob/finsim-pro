@@ -537,7 +537,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                             setIsFilterOpen(!isFilterOpen);
                                         }}
                                         onMouseDown={(e) => e.stopPropagation()}
-                                        className={`flex items-center justify-between space-x-1 text-xs px-2 h-[26px] rounded border transition-colors w-24 ${(searchQuery || filterType)
+                                        className={`flex items-center justify-between space-x-1 text-xs px-2 h-[26px] rounded border transition-colors w-28 ${(searchQuery || filterType)
                                             ? 'bg-blue-900/30 border-blue-500/50 text-blue-200 hover:bg-blue-900/50 hover:text-white'
                                             : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white'
                                             }`}
@@ -548,6 +548,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                                 {searchQuery ? 'Search' : (filterType ? (filterType.charAt(0).toUpperCase() + filterType.slice(1)) : 'All Events')}
                                             </span>
                                         </div>
+                                        {isFilterOpen ? <ChevronUp size={12} className="shrink-0" /> : <ChevronDown size={12} className="shrink-0" />}
                                     </button>
 
                                     {isFilterOpen && (
