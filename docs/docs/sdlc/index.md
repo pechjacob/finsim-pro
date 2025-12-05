@@ -16,6 +16,7 @@ sidebar_position: 6
 - Fix version sync and add dev server restart automation
 
 **Bug Fixes:**
+- Rearrange timeline header layout
 - Restore search bar border and fix icon focus state
 - Implement persistent search bar active state
 - Refine search bar width and hover highlights
