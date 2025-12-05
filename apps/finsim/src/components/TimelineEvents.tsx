@@ -474,58 +474,63 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                 </div>
                             </div>
                             <div className="flex items-center space-x-3 shrink-0">
-                                {/* Select All Toggle (Left of Filter) */}
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        // Select all filtered items (or deselect all if all are selected)
-                                        const allSelected = filteredItems.length > 0 && filteredItems.every(i => selectedItemIds.has(i.id));
-                                        filteredItems.forEach(i => {
+                                {/* Select Toggle + Filter Dropdown (Combined) */}
+                                <div className="relative group flex items-center">
+                                    {/* Select All Toggle */}
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            // Select all filtered items (or deselect all if all are selected)
+                                            const allSelected = filteredItems.length > 0 && filteredItems.every(i => selectedItemIds.has(i.id));
+                                            filteredItems.forEach(i => {
+                                                if (allSelected) {
+                                                    // Deselect all
+                                                    if (selectedItemIds.has(i.id)) onItemClick(i.id);
+                                                } else {
+                                                    // Select all unselected
+                                                    if (!selectedItemIds.has(i.id)) onItemClick(i.id);
+                                                }
+                                            });
+                                        }}
+                                        onMouseDown={(e) => e.stopPropagation()}
+                                        className={`flex items-center justify-center px-2 py-1 border transition-colors rounded-l ${(searchQuery || filterType)
+                                            ? 'bg-blue-900/30 border-blue-500/50 text-blue-200 hover:bg-blue-900/50 hover:text-white'
+                                            : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white'
+                                            }`}
+                                        title={(() => {
+                                            const allSelected = filteredItems.length > 0 && filteredItems.every(i => selectedItemIds.has(i.id));
+                                            const someSelected = filteredItems.some(i => selectedItemIds.has(i.id));
+                                            return allSelected ? "Deselect All" : (someSelected ? "Select All" : "Select All");
+                                        })()}
+                                    >
+                                        {(() => {
+                                            const allSelected = filteredItems.length > 0 && filteredItems.every(i => selectedItemIds.has(i.id));
+                                            const someSelected = filteredItems.some(i => selectedItemIds.has(i.id));
+
                                             if (allSelected) {
-                                                // Deselect all
-                                                if (selectedItemIds.has(i.id)) onItemClick(i.id);
+                                                return <CheckSquare size={16} />;
+                                            } else if (someSelected) {
+                                                // Indeterminate state (dash)
+                                                return (
+                                                    <div className="relative flex items-center justify-center w-4 h-4 border-2 border-current rounded-[3px]">
+                                                        <div className="w-2 h-0.5 bg-current rounded-full" />
+                                                    </div>
+                                                );
                                             } else {
-                                                // Select all unselected
-                                                if (!selectedItemIds.has(i.id)) onItemClick(i.id);
+                                                // Empty box
+                                                return <div className="w-4 h-4 border-2 border-current rounded-[3px]" />;
                                             }
-                                        });
-                                    }}
-                                    onMouseDown={(e) => e.stopPropagation()}
-                                    className="p-1.5 rounded-md hover:bg-gray-800 text-gray-400 hover:text-white transition-colors relative"
-                                    title={(() => {
-                                        const allSelected = filteredItems.length > 0 && filteredItems.every(i => selectedItemIds.has(i.id));
-                                        const someSelected = filteredItems.some(i => selectedItemIds.has(i.id));
-                                        return allSelected ? "Deselect All" : (someSelected ? "Select All" : "Select All");
-                                    })()}
-                                >
-                                    {(() => {
-                                        const allSelected = filteredItems.length > 0 && filteredItems.every(i => selectedItemIds.has(i.id));
-                                        const someSelected = filteredItems.some(i => selectedItemIds.has(i.id));
+                                        })()}
+                                    </button>
 
-                                        if (allSelected) {
-                                            return <CheckSquare size={16} />;
-                                        } else if (someSelected) {
-                                            // Indeterminate state (dash)
-                                            return (
-                                                <div className="relative flex items-center justify-center w-4 h-4 border-2 border-current rounded-[3px]">
-                                                    <div className="w-2 h-0.5 bg-current rounded-full" />
-                                                </div>
-                                            );
-                                        } else {
-                                            // Empty box
-                                            return <div className="w-4 h-4 border-2 border-current rounded-[3px]" />;
-                                        }
-                                    })()}
-                                </button>
-
-                                <div className="relative group">
+                                    {/* Filter Dropdown */}
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             setIsFilterOpen(!isFilterOpen);
                                         }}
                                         onMouseDown={(e) => e.stopPropagation()}
-                                        className={`flex items-center justify-between space-x-1 text-xs px-2 py-1 rounded border transition-colors w-24 ${(searchQuery || filterType)
+                                        className={`flex items-center justify-between space-x-1 text-xs px-2 py-1 border-y border-r transition-colors w-24 rounded-r -ml-px ${(searchQuery || filterType)
                                             ? 'bg-blue-900/30 border-blue-500/50 text-blue-200 hover:bg-blue-900/50 hover:text-white'
                                             : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white'
                                             }`}
@@ -710,56 +715,61 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                 </div>
                             </div>
                             <div className="flex items-center space-x-3 shrink-0">
-                                {/* Select All Toggle (Left of Filter) */}
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        // Select all filtered items (or deselect all if all are selected)
-                                        const allSelected = filteredItems.length > 0 && filteredItems.every(i => selectedItemIds.has(i.id));
-                                        filteredItems.forEach(i => {
+                                {/* Select Toggle + Filter Dropdown (Combined) */}
+                                <div className="relative group flex items-center">
+                                    {/* Select All Toggle */}
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            // Select all filtered items (or deselect all if all are selected)
+                                            const allSelected = filteredItems.length > 0 && filteredItems.every(i => selectedItemIds.has(i.id));
+                                            filteredItems.forEach(i => {
+                                                if (allSelected) {
+                                                    // Deselect all
+                                                    if (selectedItemIds.has(i.id)) onItemClick(i.id);
+                                                } else {
+                                                    // Select all unselected
+                                                    if (!selectedItemIds.has(i.id)) onItemClick(i.id);
+                                                }
+                                            });
+                                        }}
+                                        onMouseDown={(e) => e.stopPropagation()}
+                                        className={`flex items-center justify-center px-2 py-1 border transition-colors rounded-l ${(searchQuery || filterType)
+                                                ? 'bg-blue-900/30 border-blue-500/50 text-blue-200 hover:bg-blue-900/50 hover:text-white'
+                                                : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white'
+                                            }`}
+                                        title={(() => {
+                                            const allSelected = filteredItems.length > 0 && filteredItems.every(i => selectedItemIds.has(i.id));
+                                            const someSelected = filteredItems.some(i => selectedItemIds.has(i.id));
+                                            return allSelected ? "Deselect All" : (someSelected ? "Select All" : "Select All");
+                                        })()}
+                                    >
+                                        {(() => {
+                                            const allSelected = filteredItems.length > 0 && filteredItems.every(i => selectedItemIds.has(i.id));
+                                            const someSelected = filteredItems.some(i => selectedItemIds.has(i.id));
+
                                             if (allSelected) {
-                                                // Deselect all
-                                                if (selectedItemIds.has(i.id)) onItemClick(i.id);
+                                                return <CheckSquare size={16} />;
+                                            } else if (someSelected) {
+                                                // Indeterminate state (dash)
+                                                return (
+                                                    <div className="relative flex items-center justify-center w-4 h-4 border-2 border-current rounded-[3px]">
+                                                        <div className="w-2 h-0.5 bg-current rounded-full" />
+                                                    </div>
+                                                );
                                             } else {
-                                                // Select all unselected
-                                                if (!selectedItemIds.has(i.id)) onItemClick(i.id);
+                                                // Empty box
+                                                return <div className="w-4 h-4 border-2 border-current rounded-[3px]" />;
                                             }
-                                        });
-                                    }}
-                                    onMouseDown={(e) => e.stopPropagation()}
-                                    className="p-1.5 rounded-md hover:bg-gray-800 text-gray-400 hover:text-white transition-colors relative"
-                                    title={(() => {
-                                        const allSelected = filteredItems.length > 0 && filteredItems.every(i => selectedItemIds.has(i.id));
-                                        const someSelected = filteredItems.some(i => selectedItemIds.has(i.id));
-                                        return allSelected ? "Deselect All" : (someSelected ? "Select All" : "Select All");
-                                    })()}
-                                >
-                                    {(() => {
-                                        const allSelected = filteredItems.length > 0 && filteredItems.every(i => selectedItemIds.has(i.id));
-                                        const someSelected = filteredItems.some(i => selectedItemIds.has(i.id));
+                                        })()}
+                                    </button>
 
-                                        if (allSelected) {
-                                            return <CheckSquare size={16} />;
-                                        } else if (someSelected) {
-                                            // Indeterminate state (dash)
-                                            return (
-                                                <div className="relative flex items-center justify-center w-4 h-4 border-2 border-current rounded-[3px]">
-                                                    <div className="w-2 h-0.5 bg-current rounded-full" />
-                                                </div>
-                                            );
-                                        } else {
-                                            // Empty box
-                                            return <div className="w-4 h-4 border-2 border-current rounded-[3px]" />;
-                                        }
-                                    })()}
-                                </button>
-
-                                <div className="relative group">
+                                    {/* Filter Dropdown */}
                                     <button
                                         onClick={(e) => { e.stopPropagation(); setIsFilterOpen(!isFilterOpen); }}
-                                        className={`flex items-center justify-between space-x-1 text-xs px-2 py-1 rounded border transition-colors w-24 ${(searchQuery || filterType)
-                                            ? 'bg-blue-900/30 border-blue-500/50 text-blue-200 hover:bg-blue-900/50 hover:text-white'
-                                            : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white'
+                                        className={`flex items-center justify-between space-x-1 text-xs px-2 py-1 border-y border-r transition-colors w-24 rounded-r -ml-px ${(searchQuery || filterType)
+                                                ? 'bg-blue-900/30 border-blue-500/50 text-blue-200 hover:bg-blue-900/50 hover:text-white'
+                                                : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white'
                                             }`}
                                     >
                                         <div className="flex items-center space-x-1 overflow-hidden">
@@ -828,8 +838,8 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                     onMouseDown={(e) => e.stopPropagation()}
                                     disabled={selectedItemIds.size === 0}
                                     className={`p-1.5 rounded-md transition-colors ${selectedItemIds.size > 0
-                                            ? 'hover:bg-gray-800 text-gray-400 hover:text-white'
-                                            : 'text-gray-600 cursor-not-allowed'
+                                        ? 'hover:bg-gray-800 text-gray-400 hover:text-white'
+                                        : 'text-gray-600 cursor-not-allowed'
                                         }`}
                                     title={selectedItemIds.size > 0 ? "Toggle Visibility of Selected" : "Select items to toggle visibility"}
                                 >
