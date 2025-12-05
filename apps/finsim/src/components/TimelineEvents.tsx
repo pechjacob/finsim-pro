@@ -449,17 +449,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                     Event Timeline
                                 </span>
 
-                                {/* Moved Zoom and Flip here */}
-                                <div className="flex items-center space-x-2 mx-2">
-                                    {zoomToggle}
-                                    <button
-                                        onClick={(e) => { e.stopPropagation(); onFlip(); }}
-                                        className={`p-1.5 rounded-md transition-colors ${isFlipped ? 'bg-blue-900/50 text-blue-400' : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800'}`}
-                                        title={isFlipped ? "Switch to Timeline" : "Switch to Formula View"}
-                                    >
-                                        <FlipIcon size={16} />
-                                    </button>
-                                </div>
+
 
                                 {/* Search Bar */}
                                 <div className="relative ml-2 w-64 group/search" onClick={(e) => e.stopPropagation()}>
@@ -485,6 +475,17 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                 </div>
                             </div>
                             <div className="flex items-center space-x-0 shrink-0">
+                                {/* Zoom and Flip Icons */}
+                                <div className="flex items-center space-x-1 mr-2">
+                                    {zoomToggle}
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); onFlip(); }}
+                                        className={`p-1.5 rounded-md transition-colors ${isFlipped ? 'bg-blue-900/50 text-blue-400' : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800'}`}
+                                        title={isFlipped ? "Switch to Timeline" : "Switch to Formula View"}
+                                    >
+                                        <FlipIcon size={16} />
+                                    </button>
+                                </div>
                                 {/* Select All Toggle */}
                                 <button
                                     onClick={(e) => {
