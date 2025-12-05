@@ -464,12 +464,12 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                 {/* Search Bar */}
                                 <div className="relative ml-2 w-64 group/search" onClick={(e) => e.stopPropagation()}>
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <Search size={14} className={`transition-colors ${searchQuery ? 'text-blue-500' : 'text-gray-500 group-focus-within/search:text-blue-500 group-hover/search:text-white'}`} />
+                                        <Search size={14} className={`transition-colors ${searchQuery ? 'text-blue-500' : 'text-gray-500 group-hover/search:text-white group-focus-within/search:!text-blue-500'}`} />
                                     </div>
                                     <input
                                         ref={searchInputRef}
                                         type="text"
-                                        className={`block w-full pl-10 pr-12 py-1 bg-gray-800 rounded-md text-xs text-gray-200 placeholder-gray-500 group-hover/search:placeholder-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all ${searchQuery ? 'border-blue-500 ring-1 ring-blue-500' : 'border-gray-700 hover:border-white'}`}
+                                        className={`block w-full pl-10 pr-12 py-1 bg-gray-800 border rounded-md text-xs text-gray-200 placeholder-gray-500 group-hover/search:placeholder-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all ${searchQuery ? 'border-blue-500 ring-1 ring-blue-500' : 'border-gray-700 hover:border-white'}`}
                                         placeholder="Select Event/Effect to Edit"
                                         value={searchQuery}
                                         onChange={(e) => {
