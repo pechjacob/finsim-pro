@@ -469,7 +469,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                     <input
                                         ref={searchInputRef}
                                         type="text"
-                                        className="block w-full pl-10 pr-12 py-1 bg-gray-800 border border-gray-700 rounded-md text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                        className="block w-full pl-10 pr-12 py-1 bg-gray-800 border border-gray-700 hover:border-white rounded-md text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                         placeholder="Select Event/Effect to Edit"
                                         value={searchQuery}
                                         onChange={(e) => {
@@ -537,7 +537,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                             setIsFilterOpen(!isFilterOpen);
                                         }}
                                         onMouseDown={(e) => e.stopPropagation()}
-                                        className={`flex items-center justify-between space-x-1 text-xs px-2 h-[26px] rounded border transition-colors w-28 ${(searchQuery || filterType)
+                                        className={`flex items-center justify-between space-x-1 text-xs px-2 h-[26px] rounded border transition-colors w-28 ${(isFilterOpen || searchQuery || filterType)
                                             ? 'bg-blue-900/30 border-blue-500/50 text-blue-200 hover:bg-blue-900/50 hover:text-white'
                                             : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white'
                                             }`}

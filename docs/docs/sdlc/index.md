@@ -16,6 +16,7 @@ sidebar_position: 6
 - Fix version sync and add dev server restart automation
 
 **Bug Fixes:**
+- Standardize timeline filter width and add chevron
 - Correct formula view filter width and collapse behavior
 - Resize select toggle icon to match filter height
 - Resolve submenu clipping and align toggle heights
