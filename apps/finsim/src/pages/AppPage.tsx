@@ -6,6 +6,7 @@ import { LightweightFinancialChart } from '../components/LightweightFinancialCha
 import { TimelineEvents } from '../components/TimelineEvents';
 import { runSimulation } from '../services/simulation';
 import { addDays, formatDate, generateUUID } from '../utils';
+import { generateUniqueColor } from '../colorUtils';
 import { Settings, Bug } from 'lucide-react';
 import { RightPanel } from '../components/RightPanel';
 import { getFullVersionString } from '../version';
@@ -33,6 +34,7 @@ const AppPage: React.FC = () => {
       formula: FormulaType.MONTHLY_SUM,
       startDate: formatDate(new Date()), // Start today
       isChartVisible: true, // Default to visible
+      chartColor: generateUniqueColor(0), // Pre-assign color
     },
     {
       id: generateUUID(),
@@ -43,6 +45,7 @@ const AppPage: React.FC = () => {
       formula: FormulaType.MONTHLY_SUM,
       startDate: formatDate(new Date()),
       isChartVisible: true, // Default to visible
+      chartColor: generateUniqueColor(1), // Pre-assign color
     }
   ]);
 
@@ -110,7 +113,11 @@ const AppPage: React.FC = () => {
       if (exists) {
         return prev.map(i => i.id === item.id ? item : i);
       }
-      return [...prev, item];
+      // New item - assign a color if it doesn't have one
+      const itemWithColor = item.chartColor
+        ? item
+        : { ...item, chartColor: generateUniqueColor(prev.length) };
+      return [...prev, itemWithColor];
     });
     setSelectedItemIds(new Set([item.id])); // Focus the new/edited item
   };
