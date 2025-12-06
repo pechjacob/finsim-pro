@@ -170,7 +170,14 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
 
     // Prepare individual item series data from simulationPoints
     const itemSeriesData = useMemo(() => {
+        console.log('[Chart] itemSeriesData memo running:', {
+            showIndividualSeries,
+            itemsLength: items.length,
+            pointsLength: simulationPoints.length
+        });
+
         if (!showIndividualSeries || items.length === 0 || simulationPoints.length === 0) {
+            console.log('[Chart] Returning empty map - early return');
             return new Map<string, Array<{ time: string; value: number }>>();
         }
 
@@ -178,6 +185,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
 
         // Get visible items with chart enabled
         const visibleItems = items.filter(item => item.isEnabled !== false && item.isChartVisible !== false);
+        console.log('[Chart] Visible items:', visibleItems.map(i => i.name));
 
         // Prepare data for each visible item
         visibleItems.forEach(item => {
@@ -203,6 +211,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
             );
         });
 
+        console.log('[Chart] Series map created with', seriesMap.size, 'series');
         return seriesMap;
     }, [items, simulationPoints, showIndividualSeries, frequency]);
 
@@ -678,6 +687,13 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                 // Convert HSL to hex for lightweight-charts compatibility
                 const color = hslStringToHex(colorRaw);
 
+                console.log('[Chart] Creating NEW series for:', item.name, {
+                    hadChartColor: !!item.chartColor,
+                    colorRaw,
+                    colorHex: color,
+                    willCallCallback: !item.chartColor && !!onSeriesColorAssigned
+                });
+
                 series = chart.addAreaSeries({
                     lineColor: color,
                     topColor: `${color}80`, // 50% opacity
@@ -691,8 +707,11 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
 
                 // Notify parent if color was auto-assigned (not already on item)
                 if (!item.chartColor && onSeriesColorAssigned) {
+                    console.log('[Chart] Calling onSeriesColorAssigned:', { itemId, color });
                     onSeriesColorAssigned(itemId, color);
                 }
+            } else {
+                console.log('[Chart] Using EXISTING series for:', item.name);
             }
 
             // Update data
