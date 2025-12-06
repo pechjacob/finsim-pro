@@ -14,6 +14,8 @@ sidebar_position: 6
 - Add settings panel with multi-series toggle (#4)
 
 **Bug Fixes:**
+- Remove callback prop and memoize filtered items
+- Remove auto color callback to break infinite loop
 - Use stable items key to prevent simulation loop
 - Remove stableitems workaround no longer needed
 - Prevent infinite loop with eslint disable
