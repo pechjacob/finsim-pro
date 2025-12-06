@@ -11,7 +11,7 @@ import {
     constrainToBounds,
     aggregateData
 } from '../utils';
-import { getDistinctColor } from '../colorUtils';
+import { getDistinctColor, hslStringToHex } from '../colorUtils';
 
 export interface BalanceDataPoint {
     date: string;
@@ -672,7 +672,9 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                     .map(id => items.find(i => i.id === id)?.chartColor)
                     .filter(Boolean) as string[];
 
-                const color = item.chartColor || getDistinctColor(existingColors, items.indexOf(item));
+                const colorRaw = item.chartColor || getDistinctColor(existingColors, items.indexOf(item));
+                // Convert HSL to hex for lightweight-charts compatibility
+                const color = hslStringToHex(colorRaw);
 
                 series = chart.addAreaSeries({
                     lineColor: color,

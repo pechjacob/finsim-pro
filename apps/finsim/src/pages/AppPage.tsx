@@ -264,8 +264,8 @@ const AppPage: React.FC = () => {
             <button
               onClick={() => setShowIndividualSeries(!showIndividualSeries)}
               className={`px-3 py-1 text-xs rounded transition-colors ${showIndividualSeries
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                 }`}
             >
               {showIndividualSeries ? 'Individual Series ON' : 'Individual Series OFF'}
@@ -284,7 +284,7 @@ const AppPage: React.FC = () => {
               frequency={granularity}
               onFrequencyChange={setGranularity}
               onHover={setHoverDate}
-              items={items.filter(i => i.accountId === activeAccountId)}
+              items={items.filter(i => i.accountId === activeAccountId && i.isEnabled !== false)}
               simulationPoints={simulationPoints}
               showIndividualSeries={showIndividualSeries}
             />
