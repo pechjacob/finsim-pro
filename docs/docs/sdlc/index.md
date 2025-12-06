@@ -8,6 +8,7 @@ sidebar_position: 6
 ## Unreleased
 
 **Features:**
+- Implement clickable chart icon toggle
 - Implement manual event series toggle
 - Rename toggle to manual event series toggling
 - Complete color sync between chart and timeline

@@ -710,7 +710,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                 // Convert HSL to hex for lightweight-charts compatibility
                 const color = hslStringToHex(colorRaw);
 
-                console.log(`[Chart] Creating series for "${item.name}":`, { color, dataLength: data.length });
+                console.log(`[Chart] Creating series for "${item.name}":`, { color, dataLength: data.length, isVisible: item.isChartVisible ?? true });
 
                 series = chart.addAreaSeries({
                     lineColor: color,
@@ -719,12 +719,16 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                     lineWidth: 1,
                     priceLineVisible: false,
                     lastValueVisible: false,
+                    visible: item.isChartVisible ?? true, // Default to visible if not set
                 });
 
                 itemSeriesRef.current.set(itemId, series);
 
                 // Note: Color assignment removed to prevent infinite loop
                 // Colors are assigned client-side only and not persisted
+            } else {
+                // Series already exists, update visibility
+                series.applyOptions({ visible: item.isChartVisible ?? true });
             }
 
             // Update data
