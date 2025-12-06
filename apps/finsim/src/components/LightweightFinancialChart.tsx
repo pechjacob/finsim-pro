@@ -694,6 +694,20 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
         console.log('[Chart] Individual series toggle ON - showing individual series');
         const chart = chartRef.current;
 
+        // If no item series data is available yet (e.g., simulation not ready on first load),
+        // fall back to showing total balance series until data is ready
+        if (itemSeriesData.length === 0) {
+            console.log('[Chart] No individual series data available, showing total balance as fallback');
+            if (seriesRef.current) {
+                seriesRef.current.applyOptions({ visible: true });
+                seriesRef.current.setData(chartData);
+                if (chart) {
+                    chart.timeScale().fitContent();
+                }
+            }
+            return;
+        }
+
         // Hide total balance series when showing individuals
         if (seriesRef.current) {
             seriesRef.current.applyOptions({ visible: false });

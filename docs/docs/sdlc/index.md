@@ -18,6 +18,7 @@ sidebar_position: 6
 - Add settings panel with multi-series toggle (#4)
 
 **Bug Fixes:**
+- Add comprehensive logging for series visibility
 - Set ischartvisible true by default on all new items
 - Force data refresh when showing total balance series
 - Ensure total balance series shows when toggle off
