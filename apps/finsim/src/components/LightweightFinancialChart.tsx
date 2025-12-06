@@ -1,7 +1,7 @@
 import React, { useRef, useState, useCallback, useMemo, useEffect } from 'react';
 import { createChart, ColorType, LineStyle, CrosshairMode, IChartApi, ISeriesApi, UTCTimestamp } from 'lightweight-charts';
 import { RotateCcw, Minus, Plus } from 'lucide-react';
-import { Frequency } from '../types';
+import { Frequency } from '../types'; // FinancialItem, SimulationPoint will be added in next commit
 import {
     formatDate,
     getDaysDifference,
@@ -28,6 +28,7 @@ interface LightweightFinancialChartProps {
     frequency: Frequency;
     onFrequencyChange: (frequency: Frequency) => void;
     onHover?: (date: string | null) => void;
+    // items, simulationPoints, showIndividualSeries will be added in follow-up commits
 }
 
 // Format date as MM/DD/YYYY
@@ -129,6 +130,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
     frequency,
     onFrequencyChange,
     onHover
+    // items, simulationPoints, showIndividualSeries will be added in next commit when implemented
 }) => {
     const chartContainerRef = useRef<HTMLDivElement>(null);
     const chartRef = useRef<IChartApi | null>(null);
