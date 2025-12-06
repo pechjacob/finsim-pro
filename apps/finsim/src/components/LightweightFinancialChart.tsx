@@ -660,7 +660,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
         console.log('[Chart useEffect] Entry:', {
             hasChart: !!chartRef.current,
             showIndividualSeries,
-            itemSeriesDataCount: itemSeriesData.length,
+            itemSeriesDataCount: itemSeriesData.size,
             chartDataPoints: chartData.length
         });
 
@@ -696,7 +696,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
 
         // If no item series data is available yet (e.g., simulation not ready on first load),
         // fall back to showing total balance series until data is ready
-        if (itemSeriesData.length === 0) {
+        if (itemSeriesData.size === 0) {
             console.log('[Chart] No individual series data available, showing total balance as fallback');
             if (seriesRef.current) {
                 seriesRef.current.applyOptions({ visible: true });
@@ -715,7 +715,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
 
         // Collect existing series IDs
         const existingItemIds = new Set(itemSeriesRef.current.keys());
-        const currentItemIds = new Set(itemSeriesData.map(d => d.item.id));
+        const currentItemIds = new Set(itemSeriesData.keys());
 
         // Remove series for items no longer in data
         for (const [itemId, series] of itemSeriesRef.current.entries()) {
@@ -727,8 +727,10 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
         }
 
         // Create or update series for each item
-        itemSeriesData.forEach(({ item, data }) => {
-            const itemId = item.id;
+        itemSeriesData.forEach((data, itemId) => {
+            const item = items.find(i => i.id === itemId);
+            if (!item) return;
+
             let series = itemSeriesRef.current.get(itemId);
 
             if (!series) {
