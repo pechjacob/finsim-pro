@@ -8,6 +8,7 @@ sidebar_position: 6
 ## Unreleased
 
 **Features:**
+- Add scoped delete functionality for selected items
 - Add filter reset icon and improve header spacing
 - Replace add buttons with cascading dropdown menu
 - Implement multi-selection and refined toggle logic

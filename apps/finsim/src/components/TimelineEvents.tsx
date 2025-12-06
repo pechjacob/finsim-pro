@@ -447,7 +447,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                 <div className="text-gray-500 group-hover:text-white transition-colors shrink-0">
                                     <ChevronDown size={16} />
                                 </div>
-                                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider shrink-0">
+                                <span className="text-xs font-semibold uppercase tracking-wider shrink-0 bg-gradient-to-r from-lime-400 via-purple-400 to-pink-500 bg-clip-text text-transparent">
                                     Event Timeline
                                 </span>
 

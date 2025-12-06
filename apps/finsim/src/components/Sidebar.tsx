@@ -641,7 +641,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                     {/* Main Add New Button */}
                                     <button
                                         onClick={() => setIsAddMenuOpen(!isAddMenuOpen)}
-                                        className="group w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors flex items-center justify-center space-x-2"
+                                        className="group w-full px-4 py-2.5 bg-gradient-to-r from-lime-400 via-purple-400 to-pink-500 hover:from-lime-500 hover:via-purple-500 hover:to-pink-600 text-white text-sm font-semibold rounded-lg transition-all flex items-center justify-center space-x-2"
                                     >
                                         <Plus size={16} />
                                         <span>Add New</span>
