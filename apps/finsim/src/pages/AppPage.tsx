@@ -449,17 +449,17 @@ const AppPage: React.FC = () => {
           {/* Chart Display Section */}
           <div>
             <div className="text-sm font-medium text-gray-300 mb-3 pb-2 border-b border-gray-700">
-              Chart Display
+              Chart Controls
             </div>
 
-            {/* Multi-Series Toggle */}
+            {/* Manual Event Series Toggle */}
             <label className="flex items-center justify-between cursor-pointer group">
               <div className="flex-1">
                 <div className="text-sm text-gray-300 group-hover:text-white transition-colors">
-                  Show Individual Event Series
+                  Manual Event Series Toggling
                 </div>
                 <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-                  Display income and expenses as separate colored areas on the chart
+                  Show chart icon and color indicators to manually toggle individual event series visibility
                 </p>
               </div>
               <button
