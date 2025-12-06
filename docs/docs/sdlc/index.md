@@ -8,7 +8,9 @@ sidebar_position: 6
 ## Unreleased
 
 **Features:**
-- Add settings panel with multi-series toggle
+- Sync series colors to items via callback
+- Add chart color indicators to event bars
+- Add settings panel with multi-series toggle (#4)
 
 ## v1.5.0 (Current)
 * **chart:** add individual event area series visualization ([#3](https://github.com/pechjacob/finsim-pro/issues/3)) ([ff5eed6](https://github.com/pechjacob/finsim-pro/commit/ff5eed68a49ae32e42e46c5a8c2232194918519c)), closes [#3d8bd9](https://github.com/pechjacob/finsim-pro/issues/3d8bd9)

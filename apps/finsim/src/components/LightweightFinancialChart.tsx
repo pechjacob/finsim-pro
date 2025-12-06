@@ -32,6 +32,7 @@ interface LightweightFinancialChartProps {
     items?: FinancialItem[];
     simulationPoints?: SimulationPoint[];
     showIndividualSeries?: boolean;
+    onSeriesColorAssigned?: (itemId: string, color: string) => void;
 }
 
 // Format date as MM/DD/YYYY
@@ -135,7 +136,8 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
     onHover,
     items = [],
     simulationPoints = [],
-    showIndividualSeries = false
+    showIndividualSeries = false,
+    onSeriesColorAssigned
 }) => {
     const chartContainerRef = useRef<HTMLDivElement>(null);
     const chartRef = useRef<IChartApi | null>(null);
@@ -686,6 +688,11 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                 });
 
                 itemSeriesRef.current.set(itemId, series);
+
+                // Notify parent if color was auto-assigned (not already on item)
+                if (!item.chartColor && onSeriesColorAssigned) {
+                    onSeriesColorAssigned(itemId, color);
+                }
             }
 
             // Update data

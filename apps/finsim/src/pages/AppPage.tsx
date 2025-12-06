@@ -232,6 +232,12 @@ const AppPage: React.FC = () => {
     setItems(prev => prev.map(i => idsToToggle.includes(i.id) ? { ...i, isEnabled: newState } : i));
   };
 
+  const handleSeriesColorAssigned = (itemId: string, color: string) => {
+    setItems(prev => prev.map(item =>
+      item.id === itemId ? { ...item, chartColor: color } : item
+    ));
+  };
+
   return (
     <div className="flex h-screen w-screen bg-gray-950 text-gray-100 font-sans overflow-hidden relative">
 
@@ -283,6 +289,7 @@ const AppPage: React.FC = () => {
               items={items.filter(i => i.accountId === activeAccountId && i.isEnabled !== false)}
               simulationPoints={simulationPoints}
               showIndividualSeries={showIndividualSeries}
+              onSeriesColorAssigned={handleSeriesColorAssigned}
             />
           ) : (
             <FinancialChart
