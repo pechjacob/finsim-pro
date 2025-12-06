@@ -13,6 +13,7 @@ sidebar_position: 6
 - Add foundation comments for multi-series support
 
 **Bug Fixes:**
+- Convert hsl colors to hex for multi-series rendering
 - Move tag after amending release commit to include docs
 
 ## v1.4.0 (Current)
