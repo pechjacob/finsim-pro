@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { Account, FinancialItem, Frequency, FormulaType } from '../types';
 import { Sidebar } from '../components/Sidebar';
 import { FinancialChart } from '../components/FinancialChart';
@@ -232,11 +232,11 @@ const AppPage: React.FC = () => {
     setItems(prev => prev.map(i => idsToToggle.includes(i.id) ? { ...i, isEnabled: newState } : i));
   };
 
-  const handleSeriesColorAssigned = (itemId: string, color: string) => {
+  const handleSeriesColorAssigned = useCallback((itemId: string, color: string) => {
     setItems(prev => prev.map(item =>
       item.id === itemId ? { ...item, chartColor: color } : item
     ));
-  };
+  }, []);
 
   return (
     <div className="flex h-screen w-screen bg-gray-950 text-gray-100 font-sans overflow-hidden relative">

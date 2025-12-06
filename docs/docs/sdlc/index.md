@@ -14,6 +14,8 @@ sidebar_position: 6
 - Add settings panel with multi-series toggle (#4)
 
 **Bug Fixes:**
+- Memoize color callback to prevent render loops
+- Stop infinite loop in series creation
 - Restore missing series data call
 - Hide total balance series when showing individual series
 - Initialize visible range on page load
