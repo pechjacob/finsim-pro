@@ -685,7 +685,17 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                     >
                                         <div className="pb-4 pt-1">
                                             {filteredItems.map((item) => (
-
+                                                <SortableEventItem
+                                                    key={item.id}
+                                                    item={item}
+                                                    isActive={selectedItemIds.has(item.id)}
+                                                    onItemClick={onItemClick}
+                                                    viewStartDate={effectiveStartDate}
+                                                    viewEndDate={effectiveEndDate}
+                                                    itemTotals={itemTotals}
+                                                    simulationPoints={simulationPoints}
+                                                    showIndividualSeries={showIndividualSeries}
+                                                />
                                             ))}
                                         </div>
                                     </SortableContext>
