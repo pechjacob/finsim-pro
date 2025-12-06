@@ -317,7 +317,7 @@ const AppPage: React.FC = () => {
         </div>
 
         {/* Timeline/Events Area (Lower Split) */}
-        <div className={`w - full flex flex - col transition - all duration - 300 ease -in -out ${isTimelineCollapsed ? 'h-10 shrink-0' : 'h-[40%] shrink-0'} `}>
+        <div className={`w-full flex flex-col transition-all duration-300 ease-in-out ${isTimelineCollapsed ? 'h-10 shrink-0' : 'h-[40%] shrink-0'}`}>
           <TimelineEvents
             items={displayedItems.filter(i => i.accountId === activeAccountId || i.toAccountId === activeAccountId)}
             selectedItemIds={selectedItemIds}
@@ -366,7 +366,7 @@ const AppPage: React.FC = () => {
                 e.stopPropagation();
                 setEditingAccountId(acc.id);
               }}
-              className={`px - 4 py - 1.5 text - xs rounded - t - md font - medium transition - colors ${activeAccountId === acc.id
+              className={`px-4 py-1.5 text-xs rounded-t-md font-medium transition-colors ${activeAccountId === acc.id
                 ? 'bg-gray-800 text-white border-t border-l border-r border-gray-700'
                 : 'text-gray-500 hover:bg-gray-900 hover:text-gray-300'
                 } `}
@@ -415,7 +415,7 @@ const AppPage: React.FC = () => {
                 setIsDebugOpen(!isDebugOpen);
                 setIsSettingsOpen(false);
               }}
-              className={`p - 1.5 rounded transition - colors ${isDebugOpen ? 'bg-gray-800 hover:bg-gray-700' : 'hover:bg-gray-900'
+              className={`p-1.5 rounded transition-colors ${isDebugOpen ? 'bg-gray-800 hover:bg-gray-700' : 'hover:bg-gray-900'
                 } ${isDebugMode ? 'text-green-400 hover:text-green-300' : 'text-red-400 hover:text-red-300'
                 } `}
               title={`Debug Panel(${isDebugMode ? 'On' : 'Off'})`}
@@ -430,7 +430,7 @@ const AppPage: React.FC = () => {
               setIsSettingsOpen(!isSettingsOpen);
               setIsDebugOpen(false);
             }}
-            className={`p - 1.5 rounded transition - colors ${isSettingsOpen ? 'text-green-400 bg-gray-800 hover:bg-gray-700' : 'text-gray-500 hover:text-green-400 hover:bg-gray-900'} `}
+            className={`p-1.5 rounded transition-colors ${isSettingsOpen ? 'text-green-400 bg-gray-800 hover:bg-gray-700' : 'text-gray-500 hover:text-green-400 hover:bg-gray-900'}`}
             title="Settings"
           >
             <Settings size={16} />
@@ -491,7 +491,7 @@ const AppPage: React.FC = () => {
                 e.stopPropagation();
                 setIsDebugMode(!isDebugMode);
               }}
-              className={`relative w - 20 h - 6 rounded - full transition - all ml - auto ${isDebugMode
+              className={`relative w-20 h-6 rounded-full transition-all ml-auto ${isDebugMode
                 ? 'bg-green-500/30'
                 : 'bg-red-500/30'
                 } `}
@@ -499,7 +499,7 @@ const AppPage: React.FC = () => {
             >
               {/* Slider */}
               <div
-                className={`absolute top - 0.5 h - 5 w - 10 rounded - full transition - all duration - 200 flex items - center justify - center gap - 1 font - medium text - [10px] ${isDebugMode
+                className={`absolute top-0.5 h-5 w-10 rounded-full transition-all duration-200 flex items-center justify-center gap-1 font-medium text-[10px] ${isDebugMode
                   ? 'right-0.5 bg-green-500 text-white'
                   : 'left-0.5 bg-red-500 text-white'
                   } `}
