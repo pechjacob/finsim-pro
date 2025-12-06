@@ -7,38 +7,8 @@ sidebar_position: 6
 
 ## Unreleased
 
-**Features:**
-- Add gradient styling to add new button and event timeline text
-- Add scoped delete functionality for selected items
-- Add filter reset icon and improve header spacing
-- Replace add buttons with cascading dropdown menu
-- Implement multi-selection and refined toggle logic
-- Refine timeline header layout and add new controls
-- Refine timeline search and filter ui
-- Fix version sync and add dev server restart automation
-
 **Bug Fixes:**
-- Rearrange timeline header layout
-- Restore search bar border and fix icon focus state
-- Implement persistent search bar active state
-- Refine search bar width and hover highlights
-- Add timeline filter active state and search hover
-- Standardize timeline filter width and add chevron
-- Correct formula view filter width and collapse behavior
-- Resize select toggle icon to match filter height
-- Resolve submenu clipping and align toggle heights
-- Match select toggle height to filter and remove gap
-- Remove gap completely and fix submenu overflow clipping
-- Increase submenu z-index and reduce gap between select and filter
-- Remove box from select toggle and fix cascading menu z-index
-- Separate select toggle from filter and fix cascading menu submenu visibility
-- Connect select toggle to filter dropdown with unified styling
-- Correct cascading menu arrow rotation and hover behavior
-- Correct select toggle icon states and disable visibility toggle when nothing selected
-- Fix vite 6 es module compatibility for version count
-- Remove legacy labels and fix header spacing
-- Update release notes formatting and legacy labels
-- Update next banner wording and sync app version to 1.3.0
+- Move tag after amending release commit to include docs
 
 ## v1.4.0 (Current)
 * **ci:** fix version sync and add dev server restart automation ([e293798](https://github.com/pechjacob/finsim-pro/commit/e2937981c75c36bfd18fe065f6c9dc47a21c193f))
