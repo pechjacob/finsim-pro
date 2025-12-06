@@ -220,12 +220,31 @@ function main() {
     console.log('\n📦 Auto-committing changes...');
     try {
         const { execSync } = require('child_process');
+
+        // Get the current version tag (should exist from standard-version)
+        const tag = `v${version}`;
+
+        // Delete the tag temporarily (it points to the pre-amend commit)
+        try {
+            execSync(`git tag -d ${tag}`, { stdio: 'pipe' });
+            console.log(`🏷️  Temporarily removed tag ${tag}`);
+        } catch (e) {
+            // Tag might not exist, that's ok
+        }
+
+        // Amend the release commit with docs changes
         execSync('git commit --amend --no-edit', { stdio: 'inherit' });
         console.log('✅ Changes automatically added to release commit');
+
+        // Recreate the tag on the amended commit
+        execSync(`git tag ${tag}`, { stdio: 'inherit' });
+        console.log(`🏷️  Tag ${tag} moved to updated commit`);
     } catch (error) {
         console.log('⚠️  Could not auto-commit (this is normal if not in a git repository)');
         console.log('   Manually run:');
+        console.log(`     git tag -d v${version}`);
         console.log('     git commit --amend --no-edit');
+        console.log(`     git tag v${version}`);
     }
 
     console.log('\n✨ Done! Ready to push.\n');
