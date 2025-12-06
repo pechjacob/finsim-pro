@@ -367,8 +367,8 @@ const AppPage: React.FC = () => {
                 setEditingAccountId(acc.id);
               }}
               className={`px - 4 py - 1.5 text - xs rounded - t - md font - medium transition - colors ${activeAccountId === acc.id
-                  ? 'bg-gray-800 text-white border-t border-l border-r border-gray-700'
-                  : 'text-gray-500 hover:bg-gray-900 hover:text-gray-300'
+                ? 'bg-gray-800 text-white border-t border-l border-r border-gray-700'
+                : 'text-gray-500 hover:bg-gray-900 hover:text-gray-300'
                 } `}
             >
               {editingAccountId === acc.id ? (
@@ -464,13 +464,13 @@ const AppPage: React.FC = () => {
               </div>
               <button
                 onClick={() => setShowIndividualSeries(!showIndividualSeries)}
-                className={`relative w - 14 h - 7 rounded - full transition - all ml - 4 flex - shrink - 0 ${showIndividualSeries ? 'bg-blue-600' : 'bg-gray-700'
-                  } `}
-                aria-label={`Toggle individual series ${showIndividualSeries ? 'off' : 'on'} `}
+                className={`relative w-14 h-7 rounded-full transition-all ml-4 flex-shrink-0 ${showIndividualSeries ? 'bg-blue-600' : 'bg-gray-700'
+                  }`}
+                aria-label={`Toggle individual series ${showIndividualSeries ? 'off' : 'on'}`}
               >
-                <div
-                  className={`absolute top - 1 h - 5 w - 5 rounded - full bg - white shadow - md transition - transform ${showIndividualSeries ? 'translate-x-8' : 'translate-x-1'
-                    } `}
+                <span
+                  className={`absolute left-1 top-1 w-5 h-5 rounded-full bg-white transition-transform ${showIndividualSeries ? 'translate-x-7' : 'translate-x-0'
+                    }`}
                 />
               </button>
             </label>
@@ -492,16 +492,16 @@ const AppPage: React.FC = () => {
                 setIsDebugMode(!isDebugMode);
               }}
               className={`relative w - 20 h - 6 rounded - full transition - all ml - auto ${isDebugMode
-                  ? 'bg-green-500/30'
-                  : 'bg-red-500/30'
+                ? 'bg-green-500/30'
+                : 'bg-red-500/30'
                 } `}
               title={`Debug Mode: ${isDebugMode ? 'On' : 'Off'} `}
             >
               {/* Slider */}
               <div
                 className={`absolute top - 0.5 h - 5 w - 10 rounded - full transition - all duration - 200 flex items - center justify - center gap - 1 font - medium text - [10px] ${isDebugMode
-                    ? 'right-0.5 bg-green-500 text-white'
-                    : 'left-0.5 bg-red-500 text-white'
+                  ? 'right-0.5 bg-green-500 text-white'
+                  : 'left-0.5 bg-red-500 text-white'
                   } `}
               >
                 <Bug size={10} />
