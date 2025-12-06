@@ -14,6 +14,7 @@ sidebar_position: 6
 - Add settings panel with multi-series toggle (#4)
 
 **Bug Fixes:**
+- Fix all broken tailwind classes causing layout issues
 - Remove spaces from tailwind classes in toggle
 - Add null check for crosshair series ref
 - Remove callback and memoize items to fix infinite loop

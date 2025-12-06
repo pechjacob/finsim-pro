@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Account, FinancialItem, Frequency, FormulaType } from '../types';
 import { Sidebar } from '../components/Sidebar';
 import { FinancialChart } from '../components/FinancialChart';
