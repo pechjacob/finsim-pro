@@ -32,6 +32,7 @@ interface LightweightFinancialChartProps {
     items?: FinancialItem[];
     simulationPoints?: SimulationPoint[];
     showIndividualSeries?: boolean;
+    onSeriesColorAssigned?: (itemId: string, color: string) => void;
 }
 
 // Format date as MM/DD/YYYY
@@ -135,7 +136,8 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
     onHover,
     items = [],
     simulationPoints = [],
-    showIndividualSeries = false
+    showIndividualSeries = false,
+    onSeriesColorAssigned
 }) => {
     const chartContainerRef = useRef<HTMLDivElement>(null);
     const chartRef = useRef<IChartApi | null>(null);
@@ -167,6 +169,9 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
     }, [balanceData, frequency]);
 
     // Prepare individual item series data from simulationPoints
+    // NOTE: We intentionally use `items` from props without listing it in dependencies
+    // This prevents infinite loop when chartColor is assigned via callback
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const itemSeriesData = useMemo(() => {
         if (!showIndividualSeries || items.length === 0 || simulationPoints.length === 0) {
             return new Map<string, Array<{ time: string; value: number }>>();
@@ -189,6 +194,13 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                 });
             });
 
+            console.log(`[Chart] Item "${item.name}" data:`, {
+                pointCount: itemData.length,
+                firstValue: itemData[0]?.value,
+                lastValue: itemData[itemData.length - 1]?.value,
+                hasContributions: simulationPoints.some(p => p.itemContributions?.[item.id])
+            });
+
             // Aggregate the data based on frequency
             const aggregated = aggregateData(
                 itemData.map(d => ({ date: d.time, balance: d.value })),
@@ -201,8 +213,12 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
             );
         });
 
+        console.log('[Chart] Series map created:', {
+            seriesCount: seriesMap.size,
+            itemNames: visibleItems.map(i => i.name)
+        });
         return seriesMap;
-    }, [items, simulationPoints, showIndividualSeries, frequency]);
+    }, [simulationPoints, showIndividualSeries, frequency]);
 
     const simStart = useMemo(() => new Date(simulationStartDate), [simulationStartDate]);
     const simEnd = useMemo(() => new Date(simulationEndDate), [simulationEndDate]);
@@ -481,6 +497,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
             lineWidth: 2,
             priceLineVisible: true,
             lastValueVisible: true,
+            visible: !showIndividualSeries, // Hide when individual series shown
         });
 
         chartRef.current = chart;
@@ -622,6 +639,11 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
     // Update data separately
     useEffect(() => {
         if (seriesRef.current) {
+            const isVisible = !showIndividualSeries;
+            console.log(`[Chart] Total balance series visibility: ${isVisible}`);
+            // Toggle visibility based on showIndividualSeries
+            seriesRef.current.applyOptions({ visible: isVisible });
+
             seriesRef.current.setData(chartData);
             // Ensure Sim lines are updated if chart is already ready when data loads
             if (chartRef.current) {
@@ -631,35 +653,81 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                 }, 50);
             }
         }
-    }, [chartData]);
+    }, [chartData, showIndividualSeries]);
 
-    // Manage individual item series
+    // Manage individual item series based on itemSeriesData
     useEffect(() => {
-        if (!chartRef.current || !showIndividualSeries) {
+        console.log('[Chart useEffect] Entry:', {
+            hasChart: !!chartRef.current,
+            showIndividualSeries,
+            itemSeriesDataCount: itemSeriesData.size,
+            chartDataPoints: chartData.length
+        });
+
+        if (!chartRef.current) {
+            console.log('[Chart] No chart ref, skipping');
+            return;
+        }
+
+        if (!showIndividualSeries) {
+            console.log('[Chart] Individual series toggle OFF - cleaning up individual series');
             // Clean up existing item series if feature is disabled
             itemSeriesRef.current.forEach(series => {
                 chartRef.current?.removeSeries(series);
             });
             itemSeriesRef.current.clear();
+
+            // Ensure total balance series is visible and data is refreshed
+            if (seriesRef.current && chartRef.current) {
+                console.log('[Chart] Showing total balance series');
+                seriesRef.current.applyOptions({ visible: true });
+                // Force data refresh
+                seriesRef.current.setData(chartData);
+                console.log('[Chart] Set chart data, points:', chartData.length);
+                // Force chart to fit content
+                chartRef.current.timeScale().fitContent();
+            }
             return;
         }
 
+        // showIndividualSeries is ON - show individual series
+        console.log('[Chart] Individual series toggle ON - showing individual series');
         const chart = chartRef.current;
-        const currentSeriesIds = new Set(itemSeriesRef.current.keys());
-        const newSeriesIds = new Set(itemSeriesData.keys());
 
-        // Remove series that no longer exist
-        currentSeriesIds.forEach(id => {
-            if (!newSeriesIds.has(id)) {
-                const series = itemSeriesRef.current.get(id);
-                if (series) {
-                    chart.removeSeries(series);
-                    itemSeriesRef.current.delete(id);
+        // If no item series data is available yet (e.g., simulation not ready on first load),
+        // fall back to showing total balance series until data is ready
+        if (itemSeriesData.size === 0) {
+            console.log('[Chart] No individual series data available, showing total balance as fallback');
+            if (seriesRef.current) {
+                seriesRef.current.applyOptions({ visible: true });
+                seriesRef.current.setData(chartData);
+                if (chart) {
+                    chart.timeScale().fitContent();
                 }
             }
-        });
+            return;
+        }
 
-        // Add or update series
+        // Ensure total balance series is ALSO visible when showing individuals
+        if (seriesRef.current) {
+            seriesRef.current.applyOptions({ visible: true });
+            seriesRef.current.setData(chartData);
+        }
+
+        // Collect existing series IDs
+        const existingItemIds = new Set(itemSeriesRef.current.keys());
+        const currentItemIds = new Set(itemSeriesData.keys());
+
+        // Remove series for items no longer in data
+        for (const [itemId, series] of itemSeriesRef.current.entries()) {
+            if (!currentItemIds.has(itemId)) {
+                chart.removeSeries(series);
+                itemSeriesRef.current.delete(itemId);
+                console.log(`[Chart] Removed series for deleted item: ${itemId}`);
+            }
+        }
+
+        // Create or update series for each item
         itemSeriesData.forEach((data, itemId) => {
             const item = items.find(i => i.id === itemId);
             if (!item) return;
@@ -672,9 +740,11 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                     .map(id => items.find(i => i.id === id)?.chartColor)
                     .filter(Boolean) as string[];
 
-                const colorRaw = item.chartColor || getDistinctColor(existingColors, items.indexOf(item));
+                const colorRaw = item.chartColor || getDistinctColor(existingColors, itemSeriesRef.current.size);
                 // Convert HSL to hex for lightweight-charts compatibility
                 const color = hslStringToHex(colorRaw);
+
+                console.log(`[Chart] Creating series for "${item.name}":`, { color, dataLength: data.length, isVisible: item.isChartVisible ?? true });
 
                 series = chart.addAreaSeries({
                     lineColor: color,
@@ -683,20 +753,34 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                     lineWidth: 1,
                     priceLineVisible: false,
                     lastValueVisible: false,
+                    visible: item.isChartVisible ?? true, // Default to visible if not set
                 });
 
                 itemSeriesRef.current.set(itemId, series);
+
+                // Note: Color assignment removed to prevent infinite loop
+                // Colors are assigned client-side only and not persisted
+            } else {
+                // Series already exists, update visibility
+                console.log(`[Chart] Updating series visibility for "${item.name}":`, item.isChartVisible ?? true);
+                series.applyOptions({ visible: item.isChartVisible ?? true });
             }
 
             // Update data
+            console.log(`[Chart] Setting data for "${item?.name}":`, { dataLength: data.length, visible: item.isChartVisible ?? true });
             series.setData(data);
         });
-    }, [itemSeriesData, showIndividualSeries, items]);
+
+        // Fit content after all series updated
+        if (chart) {
+            chart.timeScale().fitContent();
+            console.log('[Chart] Fit content to individual series');
+        }
+    }, [itemSeriesData, showIndividualSeries, chartData]);
 
     // Track previous chart data to detect changes
     const prevChartDataRef = useRef(chartData);
 
-    // Sync visible range from props
     useEffect(() => {
         if (!chartRef.current) return;
 

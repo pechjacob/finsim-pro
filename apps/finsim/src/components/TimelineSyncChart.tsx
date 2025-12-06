@@ -131,7 +131,10 @@ export const TimelineSyncChart: React.FC<TimelineSyncChartProps> = ({
             if (isNaN(hoverTime)) return;
 
             try {
-                chartRef.current.setCrosshairPosition(0, hoverTime, seriesRef.current);
+                // Only set crosshair if series exists
+                if (seriesRef.current) {
+                    chartRef.current.setCrosshairPosition(0, hoverTime, seriesRef.current);
+                }
             } catch (e) {
                 console.warn('Failed to set crosshair position', e);
             }
