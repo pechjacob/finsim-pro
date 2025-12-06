@@ -56,22 +56,32 @@ const AppPage: React.FC = () => {
   const today = new Date();
   const [simulationStartDate, setSimulationStartDate] = useState<string>(formatDate(today));
   const [simulationEndDate, setSimulationEndDate] = useState<string>(formatDate(addDays(today, 365 * 5))); // 5 years default
-  const [visibleStartDate, setVisibleStartDate] = useState<string>(formatDate(today));
-  const [visibleEndDate, setVisibleEndDate] = useState<string>(formatDate(addDays(today, 365 * 5)));
+  const [visibleStartDate, setVisibleStartDate] = useState<string>('');
+  const [visibleEndDate, setVisibleEndDate] = useState<string>('');
   const [granularity, setGranularity] = useState<Frequency>(Frequency.MONTHLY);
   const [isFlipped, setIsFlipped] = useState(false);
+  const [showIndividualSeries, setShowIndividualSeries] = useState(false); // Toggle for multi-series
 
   // Computed
   const activeAccount = accounts.find(a => a.id === activeAccountId) || accounts[0];
 
-  // Include draft item in displayed items for rendering
+  // Run simulation for displayed items (enabled or draft)
+  const simulationResult = useMemo(() => {
+    const displayedItems = items.filter((item) => {
+      if (draftItem && item.id === draftItem.id) return true;
+      return item.accountId === activeAccountId && item.isEnabled !== false;
+    });
+    return runSimulation(activeAccount, displayedItems, simulationStartDate, simulationEndDate);
+  }, [activeAccount, items, simulationStartDate, simulationEndDate, draftItem, activeAccountId]);
+
+  const simulationData = simulationResult.points;
+  const simulationPoints = simulationResult.points; // Full points with itemContributions
+  const itemTotals = simulationResult.itemTotals;
+
+  // Include draft item in displayed items for timeline rendering
   const displayedItems = useMemo(() => {
     return draftItem ? [...items, draftItem] : items;
   }, [items, draftItem]);
-
-  const { points: simulationData, itemTotals } = useMemo(() => {
-    return runSimulation(activeAccount, displayedItems, simulationStartDate, simulationEndDate);
-  }, [activeAccount, displayedItems, simulationStartDate, simulationEndDate]);
 
   // Handlers
   const handleUpsertItem = (item: FinancialItem) => {
@@ -248,7 +258,20 @@ const AppPage: React.FC = () => {
       <div className="flex-1 flex flex-col h-full min-w-0">
 
         {/* Chart Area (Upper Split) */}
-        <div className="flex-1 w-full border-b border-gray-800 min-h-0">
+        <div className="flex-1 w-full border-b border-gray-800 min-h-0 relative">
+          {/* Temporary Test Toggle for Multi-Series */}
+          <div className="absolute top-2 left-2 z-10">
+            <button
+              onClick={() => setShowIndividualSeries(!showIndividualSeries)}
+              className={`px-3 py-1 text-xs rounded transition-colors ${showIndividualSeries
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                }`}
+            >
+              {showIndividualSeries ? 'Individual Series ON' : 'Individual Series OFF'}
+            </button>
+          </div>
+
           {USE_LIGHTWEIGHT_CHARTS ? (
             <LightweightFinancialChart
               balanceData={React.useMemo(() => simulationData.map(p => ({ date: p.date, balance: p.balance })), [simulationData])}
@@ -261,6 +284,9 @@ const AppPage: React.FC = () => {
               frequency={granularity}
               onFrequencyChange={setGranularity}
               onHover={setHoverDate}
+              items={items.filter(i => i.accountId === activeAccountId)}
+              simulationPoints={simulationPoints}
+              showIndividualSeries={showIndividualSeries}
             />
           ) : (
             <FinancialChart

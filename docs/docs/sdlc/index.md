@@ -8,6 +8,7 @@ sidebar_position: 6
 ## Unreleased
 
 **Features:**
+- Implement multi-series rendering for individual events
 - Add foundation comments for multi-series support
 
 **Bug Fixes:**
