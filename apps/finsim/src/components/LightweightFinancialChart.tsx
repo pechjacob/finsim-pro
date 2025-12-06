@@ -215,7 +215,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
             itemNames: visibleItems.map(i => i.name)
         });
         return seriesMap;
-    }, [items, simulationPoints, showIndividualSeries, frequency]);
+    }, [simulationPoints, showIndividualSeries, frequency]);
 
     const simStart = useMemo(() => new Date(simulationStartDate), [simulationStartDate]);
     const simEnd = useMemo(() => new Date(simulationEndDate), [simulationEndDate]);
