@@ -8,10 +8,7 @@ sidebar_position: 6
 ## Unreleased
 
 **Features:**
-- Add individual event area series visualization (#3)
-
-**Bug Fixes:**
-- Move tag after amending release commit to include docs
+- Add settings panel with multi-series toggle
 
 ## v1.5.0 (Current)
 * **chart:** add individual event area series visualization ([#3](https://github.com/pechjacob/finsim-pro/issues/3)) ([ff5eed6](https://github.com/pechjacob/finsim-pro/commit/ff5eed68a49ae32e42e46c5a8c2232194918519c)), closes [#3d8bd9](https://github.com/pechjacob/finsim-pro/issues/3d8bd9)
