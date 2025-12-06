@@ -51,6 +51,10 @@ export interface FinancialItem {
   compoundingPeriod?: CompoundingPeriod;
   compoundingCustomDays?: number;
   compoundingFrequency?: number; // Application per period
+
+  // Chart series specifics
+  isChartVisible?: boolean; // Toggle for chart series visibility
+  chartColor?: string; // Custom color for chart series (hex format)
 }
 
 export interface SimulationPoint {
@@ -58,6 +62,7 @@ export interface SimulationPoint {
   balance: number;
   balanceBeforeEffects?: number;
   itemStartBalances?: Record<string, number>; // Balance before each specific item applies (keyed by item ID)
+  itemContributions?: Record<string, number>; // Cumulative contribution of each item to date
   [key: string]: number | string | undefined | Record<string, number>; // dynamic keys for multiple accounts if needed
 }
 
@@ -77,4 +82,5 @@ export interface ViewSettings {
   startDate: string;
   endDate: string;
   granularity: Frequency;
+  chartVisualizationMode?: 'split' | 'contribution'; // Chart visualization preference
 }
