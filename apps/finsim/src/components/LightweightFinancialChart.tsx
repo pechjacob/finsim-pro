@@ -655,9 +655,21 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
         }
     }, [chartData, showIndividualSeries]);
 
-    // Manage individual item series
+    // Manage individual item series based on itemSeriesData
     useEffect(() => {
-        if (!chartRef.current || !showIndividualSeries) {
+        console.log('[Chart useEffect] Entry:', {
+            hasChart: !!chartRef.current,
+            showIndividualSeries,
+            itemSeriesDataCount: itemSeriesData.length,
+            chartDataPoints: chartData.length
+        });
+
+        if (!chartRef.current) {
+            console.log('[Chart] No chart ref, skipping');
+            return;
+        }
+
+        if (!showIndividualSeries) {
             console.log('[Chart] Individual series toggle OFF - cleaning up individual series');
             // Clean up existing item series if feature is disabled
             itemSeriesRef.current.forEach(series => {
@@ -678,35 +690,36 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
             return;
         }
 
+        // showIndividualSeries is ON - show individual series
+        console.log('[Chart] Individual series toggle ON - showing individual series');
         const chart = chartRef.current;
-        const currentSeriesIds = new Set(itemSeriesRef.current.keys());
-        const newSeriesIds = new Set(itemSeriesData.keys());
 
-        // Remove series that no longer exist
-        currentSeriesIds.forEach(id => {
-            if (!newSeriesIds.has(id)) {
-                const series = itemSeriesRef.current.get(id);
-                if (series) {
-                    chart.removeSeries(series);
-                    itemSeriesRef.current.delete(id);
-                }
+        // Hide total balance series when showing individuals
+        if (seriesRef.current) {
+            seriesRef.current.applyOptions({ visible: false });
+        }
+
+        // Collect existing series IDs
+        const existingItemIds = new Set(itemSeriesRef.current.keys());
+        const currentItemIds = new Set(itemSeriesData.map(d => d.item.id));
+
+        // Remove series for items no longer in data
+        for (const [itemId, series] of itemSeriesRef.current.entries()) {
+            if (!currentItemIds.has(itemId)) {
+                chart.removeSeries(series);
+                itemSeriesRef.current.delete(itemId);
+                console.log(`[Chart] Removed series for deleted item: ${itemId}`);
             }
-        });
+        }
 
-        // Add or update series
-        itemSeriesData.forEach((data, itemId) => {
-            const item = items.find(i => i.id === itemId);
-            if (!item) return;
-
+        // Create or update series for each item
+        itemSeriesData.forEach(({ item, data }) => {
+            const itemId = item.id;
             let series = itemSeriesRef.current.get(itemId);
 
             if (!series) {
                 // Create new series
-                const existingColors = Array.from(itemSeriesRef.current.keys())
-                    .map(id => items.find(i => i.id === id)?.chartColor)
-                    .filter(Boolean) as string[];
-
-                const colorRaw = item.chartColor || getDistinctColor(existingColors, items.indexOf(item));
+                const colorRaw = item.chartColor || getDistinctColor(itemSeriesRef.current.size);
                 // Convert HSL to hex for lightweight-charts compatibility
                 const color = hslStringToHex(colorRaw);
 
@@ -728,19 +741,25 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                 // Colors are assigned client-side only and not persisted
             } else {
                 // Series already exists, update visibility
+                console.log(`[Chart] Updating series visibility for "${item.name}":`, item.isChartVisible ?? true);
                 series.applyOptions({ visible: item.isChartVisible ?? true });
             }
 
             // Update data
-            console.log(`[Chart] Setting data for "${item?.name}":`, { dataLength: data.length, firstPoint: data[0], lastPoint: data[data.length - 1] });
+            console.log(`[Chart] Setting data for "${item?.name}":`, { dataLength: data.length, visible: item.isChartVisible ?? true });
             series.setData(data);
         });
-    }, [itemSeriesData, showIndividualSeries]);
+
+        // Fit content after all series updated
+        if (chart) {
+            chart.timeScale().fitContent();
+            console.log('[Chart] Fit content to individual series');
+        }
+    }, [itemSeriesData, showIndividualSeries, chartData]);
 
     // Track previous chart data to detect changes
     const prevChartDataRef = useRef(chartData);
 
-    // Sync visible range from props
     useEffect(() => {
         if (!chartRef.current) return;
 
