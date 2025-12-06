@@ -708,9 +708,10 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
             return;
         }
 
-        // Hide total balance series when showing individuals
+        // Ensure total balance series is ALSO visible when showing individuals
         if (seriesRef.current) {
-            seriesRef.current.applyOptions({ visible: false });
+            seriesRef.current.applyOptions({ visible: true });
+            seriesRef.current.setData(chartData);
         }
 
         // Collect existing series IDs
