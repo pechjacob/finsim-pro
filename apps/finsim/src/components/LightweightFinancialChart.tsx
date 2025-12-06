@@ -709,10 +709,8 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
 
                 itemSeriesRef.current.set(itemId, series);
 
-                // Notify parent if color was auto-assigned (not already on item)
-                if (!item.chartColor && onSeriesColorAssigned) {
-                    onSeriesColorAssigned(itemId, color);
-                }
+                // Note: Color assignment removed to prevent infinite loop
+                // Colors are assigned client-side only and not persisted
             }
 
             // Update data
