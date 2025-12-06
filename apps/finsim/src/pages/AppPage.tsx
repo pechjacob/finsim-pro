@@ -60,7 +60,16 @@ const AppPage: React.FC = () => {
   const [visibleEndDate, setVisibleEndDate] = useState<string>('');
   const [granularity, setGranularity] = useState<Frequency>(Frequency.MONTHLY);
   const [isFlipped, setIsFlipped] = useState(false);
-  const [showIndividualSeries, setShowIndividualSeries] = useState(false); // Toggle for multi-series
+  // Initialize from localStorage, persist on change
+  const [showIndividualSeries, setShowIndividualSeries] = useState(() => {
+    const saved = localStorage.getItem('showIndividualSeries');
+    return saved ? JSON.parse(saved) : false;
+  });
+
+  // Persist showIndividualSeries preference
+  React.useEffect(() => {
+    localStorage.setItem('showIndividualSeries', JSON.stringify(showIndividualSeries));
+  }, [showIndividualSeries]);
 
   // Computed
   const activeAccount = accounts.find(a => a.id === activeAccountId) || accounts[0];
@@ -258,20 +267,7 @@ const AppPage: React.FC = () => {
       <div className="flex-1 flex flex-col h-full min-w-0">
 
         {/* Chart Area (Upper Split) */}
-        <div className="flex-1 w-full border-b border-gray-800 min-h-0 relative">
-          {/* Temporary Test Toggle for Multi-Series */}
-          <div className="absolute top-2 left-2 z-10">
-            <button
-              onClick={() => setShowIndividualSeries(!showIndividualSeries)}
-              className={`px-3 py-1 text-xs rounded transition-colors ${showIndividualSeries
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                }`}
-            >
-              {showIndividualSeries ? 'Individual Series ON' : 'Individual Series OFF'}
-            </button>
-          </div>
-
+        <div className="flex-1 w-full border-b border-gray-800 min-h-0">
           {USE_LIGHTWEIGHT_CHARTS ? (
             <LightweightFinancialChart
               balanceData={React.useMemo(() => simulationData.map(p => ({ date: p.date, balance: p.balance })), [simulationData])}
@@ -429,17 +425,46 @@ const AppPage: React.FC = () => {
 
       </div>
 
-      {/* Right Panels */}
+      {/* Settings Panel */}
       <RightPanel
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
         title="SETTINGS"
       >
-        <div className="text-xs text-gray-500">
-          <p>Application settings will appear here.</p>
+        <div className="space-y-6">
+          {/* Chart Display Section */}
+          <div>
+            <div className="text-sm font-medium text-gray-300 mb-3 pb-2 border-b border-gray-700">
+              Chart Display
+            </div>
+
+            {/* Multi-Series Toggle */}
+            <label className="flex items-center justify-between cursor-pointer group">
+              <div className="flex-1">
+                <div className="text-sm text-gray-300 group-hover:text-white transition-colors">
+                  Show Individual Event Series
+                </div>
+                <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+                  Display income and expenses as separate colored areas on the chart
+                </p>
+              </div>
+              <button
+                onClick={() => setShowIndividualSeries(!showIndividualSeries)}
+                className={`relative w-14 h-7 rounded-full transition-all ml-4 flex-shrink-0 ${showIndividualSeries ? 'bg-blue-600' : 'bg-gray-700'
+                  }`}
+                aria-label={`Toggle individual series ${showIndividualSeries ? 'off' : 'on'}`}
+              >
+                <div
+                  className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow-md transition-transform ${showIndividualSeries ? 'translate-x-8' : 'translate-x-1'
+                    }`}
+                />
+              </button>
+            </label>
+          </div>
         </div>
       </RightPanel>
 
+      {/* Debug Panel */}
       <RightPanel
         isOpen={isDebugOpen}
         onClose={() => setIsDebugOpen(false)}
