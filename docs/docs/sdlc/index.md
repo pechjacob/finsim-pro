@@ -14,6 +14,7 @@ sidebar_position: 6
 - Add settings panel with multi-series toggle (#4)
 
 **Bug Fixes:**
+- Restore missing series data call
 - Hide total balance series when showing individual series
 - Initialize visible range on page load
 - Move color indicator to far right edge of bar

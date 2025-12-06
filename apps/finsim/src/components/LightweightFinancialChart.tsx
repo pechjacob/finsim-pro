@@ -716,7 +716,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
             console.log(`[Chart] Setting data for "${item?.name}":`, { dataLength: data.length, firstPoint: data[0], lastPoint: data[data.length - 1] });
             series.setData(data);
         });
-    }, [itemSeriesData, showIndividualSeries, items]);
+    }, [itemSeriesData, showIndividualSeries]);
 
     // Track previous chart data to detect changes
     const prevChartDataRef = useRef(chartData);
