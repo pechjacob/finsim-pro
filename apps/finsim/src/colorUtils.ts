@@ -9,7 +9,8 @@
  */
 export function generateUniqueColor(index: number, saturation: number = 75, lightness: number = 55): string {
     const goldenRatio = 0.618033988749895;
-    const hue = ((index * goldenRatio) % 1) * 360;
+    // Ensure hue is always positive by adding 1 and taking modulo again
+    const hue = (((index * goldenRatio) % 1 + 1) % 1) * 360;
 
     return `hsl(${Math.floor(hue)}, ${saturation}%, ${lightness}%)`;
 }
