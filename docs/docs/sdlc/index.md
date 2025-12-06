@@ -14,6 +14,7 @@ sidebar_position: 6
 - Add settings panel with multi-series toggle (#4)
 
 **Bug Fixes:**
+- Remove callback and memoize items to fix infinite loop
 - Remove callback prop and memoize filtered items
 - Remove auto color callback to break infinite loop
 - Use stable items key to prevent simulation loop
