@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Account, FinancialItem, FormulaType, CompoundingPeriod } from '../types';
 import { formatDate, formatCurrency } from '../utils';
+import { generateUniqueColor } from '../colorUtils';
 import { Trash2, Plus, X, Save, Download, Upload, ChevronLeft, ChevronRight, Eye, EyeOff, TrendingUp, TrendingDown, Percent, Receipt, ChevronDown } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { InlineMath } from 'react-katex';
@@ -702,6 +703,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                                                             formula: FormulaType.MONTHLY_SUM,
                                                                             amount: 1000,
                                                                             isChartVisible: true, // Default to visible
+                                                                            chartColor: generateUniqueColor(items.length), // Assign color
                                                                         });
                                                                     }
                                                                     setIsAddMenuOpen(false);
@@ -726,6 +728,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                                                             formula: FormulaType.MONTHLY_SUM,
                                                                             amount: 500,
                                                                             isChartVisible: true, // Default to visible
+                                                                            chartColor: generateUniqueColor(items.length), // Assign color
                                                                         });
                                                                     }
                                                                     setIsAddMenuOpen(false);

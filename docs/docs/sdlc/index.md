@@ -18,6 +18,7 @@ sidebar_position: 6
 - Add settings panel with multi-series toggle (#4)
 
 **Bug Fixes:**
+- Pre-assign chart colors to fix missing color indicators
 - Pass both required arguments to getdistinctcolor
 - Correct typescript errors in series data iteration
 - Show total balance when individual series data not ready
