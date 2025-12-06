@@ -249,9 +249,11 @@ const SortableEventItem: React.FC<SortableEventItemProps> = ({
             {/* Chart Color Indicator - visible when toggle ON, hidden when OFF */}
             {item.chartColor && showIndividualSeries && (
                 <div
-                    className="absolute top-0 bottom-0 right-0 w-1.5 opacity-90"
-                    style={{ backgroundColor: item.chartColor }}
-                    title={`Chart color: ${item.chartColor}`}
+                    className="absolute top-0 bottom-0 right-0 w-1.5 opacity-90 transition-colors duration-300"
+                    style={{
+                        backgroundColor: (item.isChartVisible ?? true) ? item.chartColor : '#9ca3af' // gray-400
+                    }}
+                    title={(item.isChartVisible ?? true) ? `Chart color: ${item.chartColor}` : 'Series hidden from chart'}
                 />
             )}
 
