@@ -191,6 +191,13 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                 });
             });
 
+            console.log(`[Chart] Item "${item.name}" data:`, {
+                pointCount: itemData.length,
+                firstValue: itemData[0]?.value,
+                lastValue: itemData[itemData.length - 1]?.value,
+                hasContributions: simulationPoints.some(p => p.itemContributions?.[item.id])
+            });
+
             // Aggregate the data based on frequency
             const aggregated = aggregateData(
                 itemData.map(d => ({ date: d.time, balance: d.value })),
@@ -203,6 +210,10 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
             );
         });
 
+        console.log('[Chart] Series map created:', {
+            seriesCount: seriesMap.size,
+            itemNames: visibleItems.map(i => i.name)
+        });
         return seriesMap;
     }, [items, simulationPoints, showIndividualSeries, frequency]);
 
@@ -483,6 +494,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
             lineWidth: 2,
             priceLineVisible: true,
             lastValueVisible: true,
+            visible: !showIndividualSeries, // Hide when individual series shown
         });
 
         chartRef.current = chart;
@@ -624,6 +636,9 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
     // Update data separately
     useEffect(() => {
         if (seriesRef.current) {
+            // Toggle visibility based on showIndividualSeries
+            seriesRef.current.applyOptions({ visible: !showIndividualSeries });
+
             seriesRef.current.setData(chartData);
             // Ensure Sim lines are updated if chart is already ready when data loads
             if (chartRef.current) {
@@ -633,7 +648,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                 }, 50);
             }
         }
-    }, [chartData]);
+    }, [chartData, showIndividualSeries]);
 
     // Manage individual item series
     useEffect(() => {
@@ -678,6 +693,8 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                 // Convert HSL to hex for lightweight-charts compatibility
                 const color = hslStringToHex(colorRaw);
 
+                console.log(`[Chart] Creating series for "${item.name}":`, { color, dataLength: data.length });
+
                 series = chart.addAreaSeries({
                     lineColor: color,
                     topColor: `${color}80`, // 50% opacity
@@ -698,239 +715,237 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
             }
 
             // Update data
-            series.setData(data);
-        });
-    }, [itemSeriesData, showIndividualSeries, items]);
+        }, [itemSeriesData, showIndividualSeries, items]);
 
-    // Track previous chart data to detect changes
-    const prevChartDataRef = useRef(chartData);
+        // Track previous chart data to detect changes
+        const prevChartDataRef = useRef(chartData);
 
-    // Sync visible range from props
-    useEffect(() => {
-        if (!chartRef.current) return;
+        // Sync visible range from props
+        useEffect(() => {
+            if (!chartRef.current) return;
 
-        const chartDataChanged = prevChartDataRef.current !== chartData;
-        prevChartDataRef.current = chartData;
+            const chartDataChanged = prevChartDataRef.current !== chartData;
+            prevChartDataRef.current = chartData;
 
-        const currentRange = chartRef.current.timeScale().getVisibleRange();
+            const currentRange = chartRef.current.timeScale().getVisibleRange();
 
-        // Only check for skipping if chart data hasn't changed
-        if (!chartDataChanged && currentRange) {
-            const currentFrom = new Date(currentRange.from as string).getTime();
-            const currentTo = new Date(currentRange.to as string).getTime();
+            // Only check for skipping if chart data hasn't changed
+            if (!chartDataChanged && currentRange) {
+                const currentFrom = new Date(currentRange.from as string).getTime();
+                const currentTo = new Date(currentRange.to as string).getTime();
 
-            const propFrom = new Date(visibleStartDate).getTime();
-            const propTo = new Date(visibleEndDate).getTime();
+                const propFrom = new Date(visibleStartDate).getTime();
+                const propTo = new Date(visibleEndDate).getTime();
 
-            // Calculate difference in days
-            const diffFrom = Math.abs(currentFrom - propFrom) / (1000 * 60 * 60 * 24);
-            const diffTo = Math.abs(currentTo - propTo) / (1000 * 60 * 60 * 24);
+                // Calculate difference in days
+                const diffFrom = Math.abs(currentFrom - propFrom) / (1000 * 60 * 60 * 24);
+                const diffTo = Math.abs(currentTo - propTo) / (1000 * 60 * 60 * 24);
 
-            // If both are within 1 day of precision, don't force update
-            if (diffFrom < 1 && diffTo < 1) {
-                return;
-            }
-        }
-
-        const startTime = new Date(visibleStartDate).getTime() / 1000;
-        const endTime = new Date(visibleEndDate).getTime() / 1000;
-
-        const applyRange = () => {
-            try {
-                chartRef.current?.timeScale().setVisibleRange({ from: startTime as UTCTimestamp, to: endTime as UTCTimestamp });
-                // Mark as initialized after first successful set
-                if (!isInitialized.current) {
-                    setTimeout(() => {
-                        isInitialized.current = true;
-                    }, 100);
+                // If both are within 1 day of precision, don't force update
+                if (diffFrom < 1 && diffTo < 1) {
+                    return;
                 }
-            } catch (e) {
-                // Ignore if range is invalid
             }
-        };
 
-        if (chartDataChanged) {
-            // If data changed, wait a tick to let the chart process the new data and potentially reset view
-            // before we enforce our desired range
-            setTimeout(applyRange, 0);
-        } else {
-            applyRange();
-        }
-        // Re-apply visible range when chart data changes (e.g. frequency change) to maintain zoom
-    }, [visibleStartDate, visibleEndDate, chartData]);
+            const startTime = new Date(visibleStartDate).getTime() / 1000;
+            const endTime = new Date(visibleEndDate).getTime() / 1000;
 
-    // Initialize focus date
-    useEffect(() => {
-        if (isZoomed && !focusDate) {
-            const start = new Date(visibleStartDate).getTime();
-            const end = new Date(visibleEndDate).getTime();
-            setFocusDate(new Date(start + (end - start) / 2));
-        } else if (!isZoomed) {
-            setFocusDate(null);
-        }
-    }, [isZoomed, visibleStartDate, visibleEndDate, focusDate]);
+            const applyRange = () => {
+                try {
+                    chartRef.current?.timeScale().setVisibleRange({ from: startTime as UTCTimestamp, to: endTime as UTCTimestamp });
+                    // Mark as initialized after first successful set
+                    if (!isInitialized.current) {
+                        setTimeout(() => {
+                            isInitialized.current = true;
+                        }, 100);
+                    }
+                } catch (e) {
+                    // Ignore if range is invalid
+                }
+            };
 
-    const handleZoomChange = useCallback((newPercentage: number) => {
-        // Track the user's requested percentage separately
-        setRequestedZoomPercentage(newPercentage);
+            if (chartDataChanged) {
+                // If data changed, wait a tick to let the chart process the new data and potentially reset view
+                // before we enforce our desired range
+                setTimeout(applyRange, 0);
+            } else {
+                applyRange();
+            }
+            // Re-apply visible range when chart data changes (e.g. frequency change) to maintain zoom
+        }, [visibleStartDate, visibleEndDate, chartData]);
 
-        const newRangeDays = calculateRangeFromPercentage(newPercentage, maxRangeDays);
+        // Initialize focus date
+        useEffect(() => {
+            if (isZoomed && !focusDate) {
+                const start = new Date(visibleStartDate).getTime();
+                const end = new Date(visibleEndDate).getTime();
+                setFocusDate(new Date(start + (end - start) / 2));
+            } else if (!isZoomed) {
+                setFocusDate(null);
+            }
+        }, [isZoomed, visibleStartDate, visibleEndDate, focusDate]);
 
-        const currentStart = new Date(visibleStartDate);
-        const currentEnd = new Date(visibleEndDate);
-        const currentFocus = focusDate || new Date(currentStart.getTime() + (currentEnd.getTime() - currentStart.getTime()) / 2);
+        const handleZoomChange = useCallback((newPercentage: number) => {
+            // Track the user's requested percentage separately
+            setRequestedZoomPercentage(newPercentage);
 
-        const msPerDay = 1000 * 60 * 60 * 24;
-        const halfRangeMs = (newRangeDays * msPerDay) / 2;
+            const newRangeDays = calculateRangeFromPercentage(newPercentage, maxRangeDays);
 
-        let newStart = new Date(currentFocus.getTime() - halfRangeMs);
-        let newEnd = new Date(currentFocus.getTime() + halfRangeMs);
+            const currentStart = new Date(visibleStartDate);
+            const currentEnd = new Date(visibleEndDate);
+            const currentFocus = focusDate || new Date(currentStart.getTime() + (currentEnd.getTime() - currentStart.getTime()) / 2);
 
-        [newStart, newEnd] = constrainToBounds(newStart, newEnd, newRangeDays, dataStart, dataEnd);
+            const msPerDay = 1000 * 60 * 60 * 24;
+            const halfRangeMs = (newRangeDays * msPerDay) / 2;
 
-        setFocusDate(currentFocus);
-        onVisibleDateRangeChange(formatDate(newStart), formatDate(newEnd));
-    }, [focusDate, visibleStartDate, visibleEndDate, maxRangeDays, dataStart, dataEnd, onVisibleDateRangeChange]);
+            let newStart = new Date(currentFocus.getTime() - halfRangeMs);
+            let newEnd = new Date(currentFocus.getTime() + halfRangeMs);
 
-    const handleReset = useCallback(() => {
-        if (chartRef.current) {
-            chartRef.current.timeScale().fitContent();
-            setFocusDate(null);
-            setRequestedZoomPercentage(0);
-            // We don't need to manually call onVisibleDateRangeChange here
-            // because fitContent() will trigger subscribeVisibleTimeRangeChange
-            // which will update the state automatically.
-        }
-    }, []);
+            [newStart, newEnd] = constrainToBounds(newStart, newEnd, newRangeDays, dataStart, dataEnd);
 
-    // Reset view when frequency changes to prevent invalid zoom state
-    useEffect(() => {
-        handleReset();
-    }, [frequency, handleReset]);
+            setFocusDate(currentFocus);
+            onVisibleDateRangeChange(formatDate(newStart), formatDate(newEnd));
+        }, [focusDate, visibleStartDate, visibleEndDate, maxRangeDays, dataStart, dataEnd, onVisibleDateRangeChange]);
 
-    return (
-        <div className="flex flex-col h-full bg-gray-950">
-            {/* Header */}
-            <div className="relative flex items-center justify-between px-4 py-2 bg-gray-900 border-b border-gray-800">
-                <div className="flex items-center space-x-3">
-                    {/* Granularity Buttons */}
-                    <div className="flex space-x-1 bg-gray-800/50 rounded-lg p-1">
-                        {[Frequency.DAILY, Frequency.WEEKLY, Frequency.MONTHLY, Frequency.QUARTERLY, Frequency.YEARLY].map((freq) => (
-                            <button
-                                key={freq}
-                                onClick={() => onFrequencyChange(freq)}
-                                className={`px-3 py-1 text-xs font-medium rounded transition-colors ${frequency === freq
-                                    ? 'bg-blue-600 text-white'
-                                    : 'text-gray-400 hover:text-white hover:bg-gray-700'
-                                    }`}
-                            >
-                                {freq.charAt(0).toUpperCase() + freq.slice(1)}
-                            </button>
-                        ))}
+        const handleReset = useCallback(() => {
+            if (chartRef.current) {
+                chartRef.current.timeScale().fitContent();
+                setFocusDate(null);
+                setRequestedZoomPercentage(0);
+                // We don't need to manually call onVisibleDateRangeChange here
+                // because fitContent() will trigger subscribeVisibleTimeRangeChange
+                // which will update the state automatically.
+            }
+        }, []);
+
+        // Reset view when frequency changes to prevent invalid zoom state
+        useEffect(() => {
+            handleReset();
+        }, [frequency, handleReset]);
+
+        return (
+            <div className="flex flex-col h-full bg-gray-950">
+                {/* Header */}
+                <div className="relative flex items-center justify-between px-4 py-2 bg-gray-900 border-b border-gray-800">
+                    <div className="flex items-center space-x-3">
+                        {/* Granularity Buttons */}
+                        <div className="flex space-x-1 bg-gray-800/50 rounded-lg p-1">
+                            {[Frequency.DAILY, Frequency.WEEKLY, Frequency.MONTHLY, Frequency.QUARTERLY, Frequency.YEARLY].map((freq) => (
+                                <button
+                                    key={freq}
+                                    onClick={() => onFrequencyChange(freq)}
+                                    className={`px-3 py-1 text-xs font-medium rounded transition-colors ${frequency === freq
+                                        ? 'bg-blue-600 text-white'
+                                        : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                                        }`}
+                                >
+                                    {freq.charAt(0).toUpperCase() + freq.slice(1)}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Visible Range Display */}
+                        <div className="flex items-center space-x-2 bg-gray-900 px-3 py-1.5 rounded border border-gray-700 h-8 justify-center w-[290px]">
+                            <span className={`text-xs font-medium ${isZoomed ? 'text-purple-400' : 'text-gray-400'}`}>Zoomed:</span>
+                            <div className="grid grid-cols-[85px_20px_85px] items-center text-white font-mono text-xs">
+                                <span className="text-center">
+                                    {isZoomed && headerDateRange.current ? formatDateMMDDYYYY(new Date(headerDateRange.current.from)) : '-/-/-'}
+                                </span>
+                                <span className="text-center">-</span>
+                                <span className="text-center">
+                                    {isZoomed && headerDateRange.current ? formatDateMMDDYYYY(new Date(headerDateRange.current.to)) : '-/-/-'}
+                                </span>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Visible Range Display */}
-                    <div className="flex items-center space-x-2 bg-gray-900 px-3 py-1.5 rounded border border-gray-700 h-8 justify-center w-[290px]">
-                        <span className={`text-xs font-medium ${isZoomed ? 'text-purple-400' : 'text-gray-400'}`}>Zoomed:</span>
-                        <div className="grid grid-cols-[85px_20px_85px] items-center text-white font-mono text-xs">
-                            <span className="text-center">
-                                {isZoomed && headerDateRange.current ? formatDateMMDDYYYY(new Date(headerDateRange.current.from)) : '-/-/-'}
-                            </span>
-                            <span className="text-center">-</span>
-                            <span className="text-center">
-                                {isZoomed && headerDateRange.current ? formatDateMMDDYYYY(new Date(headerDateRange.current.to)) : '-/-/-'}
-                            </span>
+                    {/* Reset Zoom - Centered */}
+
+
+                    <div className="flex items-center space-x-4">
+                        {/* Zoom Slider */}
+                        <ZoomSlider percentage={requestedZoomPercentage || zoomPercentage} onChange={handleZoomChange} isZoomed={isZoomed} onReset={handleReset} />
+
+                        {/* Simulation Dates */}
+                        <div className="flex items-center space-x-2 bg-gray-900 px-3 py-1.5 rounded border border-gray-700 h-8 justify-center mr-2">
+                            <span className="text-xs text-lime-400">Sim:</span>
+                            <div className="bg-white/10 rounded px-1 flex items-center justify-center h-5 hover:bg-lime-400/20 transition-colors cursor-pointer" onClick={() => (document.getElementById('sim-start-date') as HTMLInputElement)?.showPicker()}>
+                                <input
+                                    id="sim-start-date"
+                                    type="date"
+                                    value={simulationStartDate}
+                                    onChange={(e) => onSimulationDateRangeChange(e.target.value, simulationEndDate)}
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        e.currentTarget.showPicker();
+                                    }}
+                                    className="bg-transparent text-white font-mono text-xs border-none outline-none p-0 w-[80px] text-center cursor-pointer [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:hidden selection:bg-transparent caret-transparent"
+                                />
+                            </div>
+                            <span className="text-gray-400 text-xs">-</span>
+                            <div className="bg-white/10 rounded px-1 flex items-center justify-center h-5 hover:bg-lime-400/20 transition-colors cursor-pointer" onClick={() => (document.getElementById('sim-end-date') as HTMLInputElement)?.showPicker()}>
+                                <input
+                                    id="sim-end-date"
+                                    type="date"
+                                    value={simulationEndDate}
+                                    onChange={(e) => onSimulationDateRangeChange(simulationStartDate, e.target.value)}
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        e.currentTarget.showPicker();
+                                    }}
+                                    className="bg-transparent text-white font-mono text-xs border-none outline-none p-0 w-[80px] text-center cursor-pointer [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:hidden selection:bg-transparent caret-transparent"
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Reset Zoom - Centered */}
-
-
-                <div className="flex items-center space-x-4">
-                    {/* Zoom Slider */}
-                    <ZoomSlider percentage={requestedZoomPercentage || zoomPercentage} onChange={handleZoomChange} isZoomed={isZoomed} onReset={handleReset} />
-
-                    {/* Simulation Dates */}
-                    <div className="flex items-center space-x-2 bg-gray-900 px-3 py-1.5 rounded border border-gray-700 h-8 justify-center mr-2">
-                        <span className="text-xs text-lime-400">Sim:</span>
-                        <div className="bg-white/10 rounded px-1 flex items-center justify-center h-5 hover:bg-lime-400/20 transition-colors cursor-pointer" onClick={() => (document.getElementById('sim-start-date') as HTMLInputElement)?.showPicker()}>
-                            <input
-                                id="sim-start-date"
-                                type="date"
-                                value={simulationStartDate}
-                                onChange={(e) => onSimulationDateRangeChange(e.target.value, simulationEndDate)}
-                                onMouseDown={(e) => e.preventDefault()}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    e.currentTarget.showPicker();
-                                }}
-                                className="bg-transparent text-white font-mono text-xs border-none outline-none p-0 w-[80px] text-center cursor-pointer [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:hidden selection:bg-transparent caret-transparent"
-                            />
+                {/* Chart Container */}
+                <div className="relative flex-1 overflow-hidden">
+                    {/* Focus/Range Overlay */}
+                    {isZoomed && focusDate && (
+                        <div className="absolute top-2 left-2 z-[60]">
+                            <ZoomInfoDisplay focusDate={focusDate} rangeBefore={rangeBefore} rangeAfter={rangeAfter} />
                         </div>
-                        <span className="text-gray-400 text-xs">-</span>
-                        <div className="bg-white/10 rounded px-1 flex items-center justify-center h-5 hover:bg-lime-400/20 transition-colors cursor-pointer" onClick={() => (document.getElementById('sim-end-date') as HTMLInputElement)?.showPicker()}>
-                            <input
-                                id="sim-end-date"
-                                type="date"
-                                value={simulationEndDate}
-                                onChange={(e) => onSimulationDateRangeChange(simulationStartDate, e.target.value)}
-                                onMouseDown={(e) => e.preventDefault()}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    e.currentTarget.showPicker();
-                                }}
-                                className="bg-transparent text-white font-mono text-xs border-none outline-none p-0 w-[80px] text-center cursor-pointer [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:hidden selection:bg-transparent caret-transparent"
-                            />
-                        </div>
-                    </div>
+                    )}
+
+                    <div
+                        ref={chartContainerRef}
+                        className="w-full h-full cursor-grab active:cursor-grabbing"
+                    />
+
+                    {/* Sim Start Line */}
+                    <div
+                        ref={simStartLineRef}
+                        className="absolute top-0 bottom-[30px] border-l border-lime-400 border-dashed w-px pointer-events-none z-50 hidden"
+                    />
+
+                    {/* Sim End Line */}
+                    <div
+                        ref={simEndLineRef}
+                        className="absolute top-0 bottom-[30px] border-l border-lime-400 border-dashed w-px pointer-events-none z-50 hidden"
+                    />
+
+                    {/* Focus Line (Orange) */}
+                    <div
+                        ref={focusLineRef}
+                        className="absolute top-0 bottom-[30px] border-l border-orange-400 border-dotted w-px pointer-events-none z-40 hidden opacity-60"
+                    />
+
+                    {/* Zoom Start Boundary Line (Purple) */}
+                    <div
+                        ref={zoomStartLineRef}
+                        className="absolute top-0 bottom-[30px] border-l border-purple-400 border-dotted w-px pointer-events-none z-30 hidden opacity-60"
+                    />
+
+                    {/* Zoom End Boundary Line (Purple) */}
+                    <div
+                        ref={zoomEndLineRef}
+                        className="absolute top-0 bottom-[30px] border-l border-purple-400 border-dotted w-px pointer-events-none z-30 hidden opacity-60"
+                    />
                 </div>
             </div>
-
-            {/* Chart Container */}
-            <div className="relative flex-1 overflow-hidden">
-                {/* Focus/Range Overlay */}
-                {isZoomed && focusDate && (
-                    <div className="absolute top-2 left-2 z-[60]">
-                        <ZoomInfoDisplay focusDate={focusDate} rangeBefore={rangeBefore} rangeAfter={rangeAfter} />
-                    </div>
-                )}
-
-                <div
-                    ref={chartContainerRef}
-                    className="w-full h-full cursor-grab active:cursor-grabbing"
-                />
-
-                {/* Sim Start Line */}
-                <div
-                    ref={simStartLineRef}
-                    className="absolute top-0 bottom-[30px] border-l border-lime-400 border-dashed w-px pointer-events-none z-50 hidden"
-                />
-
-                {/* Sim End Line */}
-                <div
-                    ref={simEndLineRef}
-                    className="absolute top-0 bottom-[30px] border-l border-lime-400 border-dashed w-px pointer-events-none z-50 hidden"
-                />
-
-                {/* Focus Line (Orange) */}
-                <div
-                    ref={focusLineRef}
-                    className="absolute top-0 bottom-[30px] border-l border-orange-400 border-dotted w-px pointer-events-none z-40 hidden opacity-60"
-                />
-
-                {/* Zoom Start Boundary Line (Purple) */}
-                <div
-                    ref={zoomStartLineRef}
-                    className="absolute top-0 bottom-[30px] border-l border-purple-400 border-dotted w-px pointer-events-none z-30 hidden opacity-60"
-                />
-
-                {/* Zoom End Boundary Line (Purple) */}
-                <div
-                    ref={zoomEndLineRef}
-                    className="absolute top-0 bottom-[30px] border-l border-purple-400 border-dotted w-px pointer-events-none z-30 hidden opacity-60"
-                />
-            </div>
-        </div>
-    );
-};
+        );
+    };
