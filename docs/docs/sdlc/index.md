@@ -8,9 +8,12 @@ sidebar_position: 6
 ## Unreleased
 
 **Features:**
-- Add data layer for individual event series
+- Integrate multi-series chart in app page
+- Implement multi-series rendering for individual events
+- Add foundation comments for multi-series support
 
 **Bug Fixes:**
+- Convert hsl colors to hex for multi-series rendering
 - Move tag after amending release commit to include docs
 
 ## v1.4.0 (Current)
