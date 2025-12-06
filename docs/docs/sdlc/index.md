@@ -14,6 +14,8 @@ sidebar_position: 6
 - Add settings panel with multi-series toggle (#4)
 
 **Bug Fixes:**
+- Prevent simulation rerun when only chart color changes
+- Remove items from item series data memo deps
 - Memoize color callback to prevent render loops
 - Stop infinite loop in series creation
 - Restore missing series data call

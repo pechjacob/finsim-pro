@@ -74,14 +74,20 @@ const AppPage: React.FC = () => {
   // Computed
   const activeAccount = accounts.find(a => a.id === activeAccountId) || accounts[0];
 
+  // Stable items for simulation (excluding UI-only props like chartColor)
+  // This prevents simulation from rerunning when only chartColor changes
+  const stableItemsForSimulation = useMemo(() => {
+    return items.map(({ chartColor, ...item }) => item);
+  }, [JSON.stringify(items.map(({ chartColor, ...i }) => i))]);
+
   // Run simulation for displayed items (enabled or draft)
   const simulationResult = useMemo(() => {
-    const displayedItems = items.filter((item) => {
+    const displayedItems = stableItemsForSimulation.filter((item) => {
       if (draftItem && item.id === draftItem.id) return true;
       return item.accountId === activeAccountId && item.isEnabled !== false;
     });
     return runSimulation(activeAccount, displayedItems, simulationStartDate, simulationEndDate);
-  }, [activeAccount, items, simulationStartDate, simulationEndDate, draftItem, activeAccountId]);
+  }, [activeAccount, stableItemsForSimulation, simulationStartDate, simulationEndDate, draftItem, activeAccountId]);
 
   const simulationData = simulationResult.points;
   const simulationPoints = simulationResult.points; // Full points with itemContributions
