@@ -232,13 +232,16 @@ const AppPage: React.FC = () => {
   };
 
   const handleToggleAllItems = (itemIds?: string[]) => {
-    const idsToToggle = itemIds || items.filter(i => i.accountId === activeAccountId || i.toAccountId === activeAccountId).map(i => i.id);
-    const anyDisabled = idsToToggle.some(id => {
-      const item = items.find(i => i.id === id);
-      return item && item.isEnabled === false;
-    });
-    const newState = anyDisabled ? true : false;
-    setItems(prev => prev.map(i => idsToToggle.includes(i.id) ? { ...i, isEnabled: newState } : i));
+    const idsToToggle = itemIds || (selectedItemIds.size > 0 ? Array.from(selectedItemIds) : items.map(i => i.id));
+    setItems(prev => prev.map(item =>
+      idsToToggle.includes(item.id) ? { ...item, isEnabled: !(item.isEnabled ?? true) } : item
+    ));
+  };
+
+  const handleToggleChartSeries = (itemIds: string[]) => {
+    setItems(prev => prev.map(item =>
+      itemIds.includes(item.id) ? { ...item, isChartVisible: !(item.isChartVisible ?? true) } : item
+    ));
   };
 
   // Memoize filtered items to prevent creating new array on every render
@@ -353,6 +356,7 @@ const AppPage: React.FC = () => {
             isFlipped={isFlipped}
             onFlip={() => setIsFlipped(!isFlipped)}
             showIndividualSeries={showIndividualSeries}
+            onToggleChartSeries={handleToggleChartSeries}
           />
         </div>
 

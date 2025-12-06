@@ -46,6 +46,7 @@ interface TimelineEventsProps {
     isFlipped: boolean;
     onFlip: () => void;
     showIndividualSeries?: boolean; // Controls chart icon and color indicator visibility
+    onToggleChartSeries?: (itemIds: string[]) => void; // Toggle chart series visibility for items
 }
 
 interface SortableEventItemProps {
@@ -330,7 +331,8 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
     onFlip,
     simulationStartDate,
     simulationEndDate,
-    showIndividualSeries = true // Default to true (ON)
+    showIndividualSeries = true, // Default to true (ON)
+    onToggleChartSeries
 }) => {
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -613,10 +615,29 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                     </button>
                                 </div>
 
-                                {/* Chart Icon - visible when toggle ON, invisible (but space reserved) when OFF */}
-                                <div className={`p-1 ml-2 ${showIndividualSeries ? 'text-gray-500' : 'invisible'}`}>
+                                {/* Chart Icon - Toggles chart series visibility for selected items */}
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (selectedItemIds.size === 0 || !showIndividualSeries) return;
+                                        // Toggle chart visibility for selected items
+                                        const selectedItems = filteredItems.filter(i => selectedItemIds.has(i.id));
+                                        if (onToggleChartSeries) {
+                                            onToggleChartSeries(selectedItems.map(i => i.id));
+                                        }
+                                    }}
+                                    onMouseDown={(e) => e.stopPropagation()}
+                                    className={`p-1 ml-2 transition-colors rounded ${showIndividualSeries
+                                        ? (selectedItemIds.size > 0
+                                            ? 'text-blue-400 hover:text-blue-300 hover:bg-gray-800 cursor-pointer'
+                                            : 'text-gray-600 cursor-not-allowed')
+                                        : 'invisible'
+                                        }`}
+                                    disabled={selectedItemIds.size === 0 || !showIndividualSeries}
+                                    title={selectedItemIds.size > 0 ? "Toggle chart series for selected events" : "Select events to toggle chart series"}
+                                >
                                     <LineChart size={16} />
-                                </div>
+                                </button>
 
                                 {/* Visibility Toggle (Eye Icon) - Only works on selected items */}
                                 <button
