@@ -680,7 +680,12 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
             // Ensure total balance series is visible and data is refreshed
             if (seriesRef.current && chartRef.current) {
                 console.log('[Chart] Showing total balance series');
-                seriesRef.current.applyOptions({ visible: true });
+                seriesRef.current.applyOptions({
+                    visible: true,
+                    // Restore area styling
+                    topColor: 'rgba(59, 130, 246, 0.3)',
+                    bottomColor: 'rgba(59, 130, 246, 0)',
+                });
                 // Force data refresh
                 seriesRef.current.setData(chartData);
                 console.log('[Chart] Set chart data, points:', chartData.length);
@@ -699,7 +704,12 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
         if (itemSeriesData.size === 0) {
             console.log('[Chart] No individual series data available, showing total balance as fallback');
             if (seriesRef.current) {
-                seriesRef.current.applyOptions({ visible: true });
+                seriesRef.current.applyOptions({
+                    visible: true,
+                    // Use area styling for fallback
+                    topColor: 'rgba(59, 130, 246, 0.3)',
+                    bottomColor: 'rgba(59, 130, 246, 0)',
+                });
                 seriesRef.current.setData(chartData);
                 if (chart) {
                     chart.timeScale().fitContent();
@@ -709,8 +719,14 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
         }
 
         // Ensure total balance series is ALSO visible when showing individuals
+        // But make it transparent so it doesn't occlude the individual series
         if (seriesRef.current) {
-            seriesRef.current.applyOptions({ visible: true });
+            seriesRef.current.applyOptions({
+                visible: true,
+                // Make area transparent to show individual series behind/underneath
+                topColor: 'transparent',
+                bottomColor: 'transparent',
+            });
             seriesRef.current.setData(chartData);
         }
 
