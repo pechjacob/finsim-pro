@@ -665,10 +665,15 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
             });
             itemSeriesRef.current.clear();
 
-            // Ensure total balance series is visible
-            if (seriesRef.current) {
+            // Ensure total balance series is visible and data is refreshed
+            if (seriesRef.current && chartRef.current) {
                 console.log('[Chart] Showing total balance series');
                 seriesRef.current.applyOptions({ visible: true });
+                // Force data refresh
+                seriesRef.current.setData(chartData);
+                console.log('[Chart] Set chart data, points:', chartData.length);
+                // Force chart to fit content
+                chartRef.current.timeScale().fitContent();
             }
             return;
         }

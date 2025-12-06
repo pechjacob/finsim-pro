@@ -16,6 +16,7 @@ sidebar_position: 6
 - Add settings panel with multi-series toggle (#4)
 
 **Bug Fixes:**
+- Ensure total balance series shows when toggle off
 - Restore accidentally deleted sortableeventitem component
 - Fix all broken tailwind classes causing layout issues
 - Remove spaces from tailwind classes in toggle
