@@ -169,6 +169,9 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
     }, [balanceData, frequency]);
 
     // Prepare individual item series data from simulationPoints
+    // NOTE: We intentionally use `items` from props without listing it in dependencies
+    // This prevents infinite loop when chartColor is assigned via callback
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const itemSeriesData = useMemo(() => {
         if (!showIndividualSeries || items.length === 0 || simulationPoints.length === 0) {
             return new Map<string, Array<{ time: string; value: number }>>();
