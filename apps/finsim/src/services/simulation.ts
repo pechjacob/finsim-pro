@@ -9,9 +9,13 @@ export const runSimulation = (
 ): { points: SimulationPoint[], itemTotals: Record<string, number> } => {
   const points: SimulationPoint[] = [];
   const itemTotals: Record<string, number> = {};
+  const itemContributions: Record<string, number> = {}; // Track cumulative contributions
 
-  // Initialize totals
-  items.forEach(i => itemTotals[i.id] = 0);
+  // Initialize totals and contributions
+  items.forEach(i => {
+    itemTotals[i.id] = 0;
+    itemContributions[i.id] = 0;
+  });
 
   let currentBalance = account.initialBalance;
   const startDate = parseDate(startDateStr);
@@ -69,6 +73,7 @@ export const runSimulation = (
         if (dateStr === item.startDate) {
           currentBalance += impact;
           itemTotals[item.id] += impact;
+          itemContributions[item.id] += impact; // Track cumulative contribution
         }
       } else if (item.formula === FormulaType.MONTHLY_SUM) {
         const daysInMonth = new Date(loopDate.getFullYear(), loopDate.getMonth() + 1, 0).getDate();
@@ -78,12 +83,14 @@ export const runSimulation = (
         if (dayOfMonth === effectiveDay) {
           currentBalance += impact;
           itemTotals[item.id] += impact;
+          itemContributions[item.id] += impact; // Track cumulative contribution
         }
       } else if (item.formula === FormulaType.RECURRING_SUM) {
         const diff = Math.floor((loopDate.getTime() - itemStart.getTime()) / (1000 * 60 * 60 * 24));
         if (diff >= 0 && item.recurrenceDays && diff % item.recurrenceDays === 0) {
           currentBalance += impact;
           itemTotals[item.id] += impact;
+          itemContributions[item.id] += impact; // Track cumulative contribution
         }
       }
     }); // This closing brace was missing for the forEach callback function.
@@ -219,6 +226,7 @@ export const runSimulation = (
           const interestAmount = currentBalance * ratePerApp;
           currentBalance += interestAmount;
           itemTotals[item.id] += interestAmount;
+          itemContributions[item.id] += interestAmount; // Track cumulative contribution
         }
       } else if (item.formula === FormulaType.SIMPLE_INTEREST && item.interestRate) {
         // Simple Interest: Apply once per period based on the Period setting.
@@ -277,6 +285,7 @@ export const runSimulation = (
           const interestAmount = currentBalance * ratePerApp;
           currentBalance += interestAmount;
           itemTotals[item.id] += interestAmount;
+          itemContributions[item.id] += interestAmount; // Track cumulative contribution
         }
       }
     });
@@ -285,7 +294,8 @@ export const runSimulation = (
       date: dateStr,
       balance: currentBalance,
       balanceBeforeEffects,
-      itemStartBalances
+      itemStartBalances,
+      itemContributions: { ...itemContributions } // Snapshot of cumulative contributions
     });
 
     loopDate.setTime(addDays(loopDate, 1).getTime());
