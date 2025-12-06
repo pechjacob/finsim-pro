@@ -8,6 +8,7 @@ sidebar_position: 6
 ## Unreleased
 
 **Features:**
+- Gray out color indicator when chart series is hidden
 - Honor ischartvisible property for individual series
 - Implement clickable chart icon toggle
 - Implement manual event series toggle

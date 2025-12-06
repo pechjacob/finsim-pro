@@ -730,6 +730,8 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
             seriesRef.current.setData(chartData);
         }
 
+        if (!chart) return;
+
         // Collect existing series IDs
         const existingItemIds = new Set(itemSeriesRef.current.keys());
         const currentItemIds = new Set(itemSeriesData.keys());
@@ -737,7 +739,13 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
         // Remove series for items no longer in data
         for (const [itemId, series] of itemSeriesRef.current.entries()) {
             if (!currentItemIds.has(itemId)) {
-                chart.removeSeries(series);
+                if (series) {
+                    try {
+                        chart.removeSeries(series);
+                    } catch (e) {
+                        console.warn(`[Chart] Failed to remove series for ${itemId}:`, e);
+                    }
+                }
                 itemSeriesRef.current.delete(itemId);
                 console.log(`[Chart] Removed series for deleted item: ${itemId}`);
             }
