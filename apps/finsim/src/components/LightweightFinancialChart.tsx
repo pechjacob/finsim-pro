@@ -1,7 +1,7 @@
 import React, { useRef, useState, useCallback, useMemo, useEffect } from 'react';
 import { createChart, ColorType, LineStyle, CrosshairMode, IChartApi, ISeriesApi, UTCTimestamp } from 'lightweight-charts';
 import { RotateCcw, Minus, Plus } from 'lucide-react';
-import { Frequency } from '../types'; // FinancialItem, SimulationPoint will be added in next commit
+import { FinancialItem, SimulationPoint, Frequency } from '../types';
 import {
     formatDate,
     getDaysDifference,
@@ -11,6 +11,7 @@ import {
     constrainToBounds,
     aggregateData
 } from '../utils';
+import { getDistinctColor } from '../colorUtils';
 
 export interface BalanceDataPoint {
     date: string;
@@ -28,7 +29,9 @@ interface LightweightFinancialChartProps {
     frequency: Frequency;
     onFrequencyChange: (frequency: Frequency) => void;
     onHover?: (date: string | null) => void;
-    // items, simulationPoints, showIndividualSeries will be added in follow-up commits
+    items?: FinancialItem[];
+    simulationPoints?: SimulationPoint[];
+    showIndividualSeries?: boolean;
 }
 
 // Format date as MM/DD/YYYY
@@ -129,12 +132,15 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
     onSimulationDateRangeChange,
     frequency,
     onFrequencyChange,
-    onHover
-    // items, simulationPoints, showIndividualSeries will be added in next commit when implemented
+    onHover,
+    items = [],
+    simulationPoints = [],
+    showIndividualSeries = false
 }) => {
     const chartContainerRef = useRef<HTMLDivElement>(null);
     const chartRef = useRef<IChartApi | null>(null);
     const seriesRef = useRef<ISeriesApi<'Area'> | null>(null);
+    const itemSeriesRef = useRef<Map<string, ISeriesApi<'Area'>>>(new Map());
     const isInitialized = useRef(false);
 
     const [focusDate, setFocusDate] = useState<Date | null>(null);
@@ -144,7 +150,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
     const headerDateRange = useRef<{ from: string; to: string } | null>(null);
     const [, forceUpdate] = useState({}); // Force update for header date range if needed
 
-    // Refs for Sim Lines, Focus Line, and Zoom Boundary Lines
+    // Ref for Sim Lines, Focus Line, and Zoom Boundary Lines
     const simStartLineRef = useRef<HTMLDivElement>(null);
     const simEndLineRef = useRef<HTMLDivElement>(null);
     const focusLineRef = useRef<HTMLDivElement>(null);
@@ -159,6 +165,44 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
             value: point.balance
         }));
     }, [balanceData, frequency]);
+
+    // Prepare individual item series data from simulationPoints
+    const itemSeriesData = useMemo(() => {
+        if (!showIndividualSeries || items.length === 0 || simulationPoints.length === 0) {
+            return new Map<string, Array<{ time: string; value: number }>>();
+        }
+
+        const seriesMap = new Map<string, Array<{ time: string; value: number }>>();
+
+        // Get visible items with chart enabled
+        const visibleItems = items.filter(item => item.isEnabled !== false && item.isChartVisible !== false);
+
+        // Prepare data for each visible item
+        visibleItems.forEach(item => {
+            const itemData: Array<{ time: string; value: number }> = [];
+
+            simulationPoints.forEach(point => {
+                const contribution = point.itemContributions?.[item.id] ?? 0;
+                itemData.push({
+                    time: point.date,
+                    value: contribution
+                });
+            });
+
+            // Aggregate the data based on frequency
+            const aggregated = aggregateData(
+                itemData.map(d => ({ date: d.time, balance: d.value })),
+                frequency
+            );
+
+            seriesMap.set(
+                item.id,
+                aggregated.map(p => ({ time: p.date, value: p.balance }))
+            );
+        });
+
+        return seriesMap;
+    }, [items, simulationPoints, showIndividualSeries, frequency]);
 
     const simStart = useMemo(() => new Date(simulationStartDate), [simulationStartDate]);
     const simEnd = useMemo(() => new Date(simulationEndDate), [simulationEndDate]);
@@ -588,6 +632,64 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
             }
         }
     }, [chartData]);
+
+    // Manage individual item series
+    useEffect(() => {
+        if (!chartRef.current || !showIndividualSeries) {
+            // Clean up existing item series if feature is disabled
+            itemSeriesRef.current.forEach(series => {
+                chartRef.current?.removeSeries(series);
+            });
+            itemSeriesRef.current.clear();
+            return;
+        }
+
+        const chart = chartRef.current;
+        const currentSeriesIds = new Set(itemSeriesRef.current.keys());
+        const newSeriesIds = new Set(itemSeriesData.keys());
+
+        // Remove series that no longer exist
+        currentSeriesIds.forEach(id => {
+            if (!newSeriesIds.has(id)) {
+                const series = itemSeriesRef.current.get(id);
+                if (series) {
+                    chart.removeSeries(series);
+                    itemSeriesRef.current.delete(id);
+                }
+            }
+        });
+
+        // Add or update series
+        itemSeriesData.forEach((data, itemId) => {
+            const item = items.find(i => i.id === itemId);
+            if (!item) return;
+
+            let series = itemSeriesRef.current.get(itemId);
+
+            if (!series) {
+                // Create new series
+                const existingColors = Array.from(itemSeriesRef.current.keys())
+                    .map(id => items.find(i => i.id === id)?.chartColor)
+                    .filter(Boolean) as string[];
+
+                const color = item.chartColor || getDistinctColor(existingColors, items.indexOf(item));
+
+                series = chart.addAreaSeries({
+                    lineColor: color,
+                    topColor: `${color}80`, // 50% opacity
+                    bottomColor: `${color}00`, // Transparent
+                    lineWidth: 1,
+                    priceLineVisible: false,
+                    lastValueVisible: false,
+                });
+
+                itemSeriesRef.current.set(itemId, series);
+            }
+
+            // Update data
+            series.setData(data);
+        });
+    }, [itemSeriesData, showIndividualSeries, items]);
 
     // Track previous chart data to detect changes
     const prevChartDataRef = useRef(chartData);

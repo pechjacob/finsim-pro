@@ -8,7 +8,7 @@ sidebar_position: 6
 ## Unreleased
 
 **Features:**
-- Add data layer for individual event series
+- Add foundation comments for multi-series support
 
 **Bug Fixes:**
 - Move tag after amending release commit to include docs
