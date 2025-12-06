@@ -239,16 +239,16 @@ const SortableEventItem: React.FC<SortableEventItemProps> = ({
             <div className="absolute top-0 bottom-0 pointer-events-none" style={{ width: 'calc(100% - 80px)', left: 0 }}>
                 {/* Active Bar Portion */}
                 <div className={`${barColor} transition-all duration-300`} style={activeBarStyle} />
-
-                {/* Chart Series Color Indicator */}
-                {item.chartColor && (
-                    <div
-                        className="absolute top-0 bottom-0 right-0 w-1 opacity-90"
-                        style={{ backgroundColor: item.chartColor }}
-                        title={`Chart color: ${item.chartColor}`}
-                    />
-                )}
             </div>
+
+            {/* Chart Series Color Indicator - Far Right Edge */}
+            {item.chartColor && (
+                <div
+                    className="absolute top-0 bottom-0 right-0 w-1.5 opacity-90"
+                    style={{ backgroundColor: item.chartColor }}
+                    title={`Chart color: ${item.chartColor}`}
+                />
+            )}
 
             {/* Content Layer */}
             <div className="relative z-10 flex items-center h-full px-4 w-full">

@@ -8,6 +8,7 @@ sidebar_position: 6
 ## Unreleased
 
 **Features:**
+- Complete color sync between chart and timeline
 - Sync series colors to items via callback
 - Add chart color indicators to event bars
 - Add settings panel with multi-series toggle (#4)
