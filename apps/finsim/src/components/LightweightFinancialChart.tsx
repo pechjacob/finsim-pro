@@ -639,8 +639,10 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
     // Update data separately
     useEffect(() => {
         if (seriesRef.current) {
+            const isVisible = !showIndividualSeries;
+            console.log(`[Chart] Total balance series visibility: ${isVisible}`);
             // Toggle visibility based on showIndividualSeries
-            seriesRef.current.applyOptions({ visible: !showIndividualSeries });
+            seriesRef.current.applyOptions({ visible: isVisible });
 
             seriesRef.current.setData(chartData);
             // Ensure Sim lines are updated if chart is already ready when data loads
@@ -656,11 +658,18 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
     // Manage individual item series
     useEffect(() => {
         if (!chartRef.current || !showIndividualSeries) {
+            console.log('[Chart] Individual series toggle OFF - cleaning up individual series');
             // Clean up existing item series if feature is disabled
             itemSeriesRef.current.forEach(series => {
                 chartRef.current?.removeSeries(series);
             });
             itemSeriesRef.current.clear();
+
+            // Ensure total balance series is visible
+            if (seriesRef.current) {
+                console.log('[Chart] Showing total balance series');
+                seriesRef.current.applyOptions({ visible: true });
+            }
             return;
         }
 
