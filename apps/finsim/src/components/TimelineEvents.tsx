@@ -35,6 +35,7 @@ interface TimelineEventsProps {
     itemTotals: Record<string, number>;
     onReorderItems: (itemId: string, newIndex: number) => void;
     onDeleteAllItems: () => void;
+    onDeleteItems: (itemIds: string[]) => void;
     onToggleAllItems: (itemIds?: string[]) => void;
     hoverDate?: string | null;
     isZoomed?: boolean;
@@ -307,6 +308,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
     itemTotals = {},
     onReorderItems,
     onDeleteAllItems,
+    onDeleteItems,
     onToggleAllItems,
     hoverDate,
     isZoomed,
@@ -625,11 +627,16 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        onDeleteAllItems();
+                                        if (selectedItemIds.size === 0) return;
+                                        onDeleteItems(Array.from(selectedItemIds));
                                     }}
                                     onMouseDown={(e) => e.stopPropagation()}
-                                    className="text-gray-400 hover:text-red-400 focus:outline-none ml-1"
-                                    title="Delete All Events"
+                                    disabled={selectedItemIds.size === 0}
+                                    className={`p-1.5 rounded-md transition-colors ml-1 ${selectedItemIds.size > 0
+                                        ? 'text-gray-400 hover:text-red-400 hover:bg-gray-800'
+                                        : 'text-gray-600 cursor-not-allowed'
+                                        }`}
+                                    title={selectedItemIds.size > 0 ? "Delete Selected Events" : "Select items to delete"}
                                 >
                                     <Trash2 size={16} />
                                 </button>

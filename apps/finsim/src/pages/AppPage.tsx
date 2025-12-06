@@ -191,6 +191,18 @@ const AppPage: React.FC = () => {
     setSelectedItemIds(new Set());
   };
 
+  const handleDeleteItems = (ids: string[]) => {
+    setItems(prev => prev.filter(i => !ids.includes(i.id)));
+    setSelectedItemIds(prev => {
+      const next = new Set(prev);
+      ids.forEach(id => next.delete(id));
+      return next;
+    });
+    if (draftItem && ids.includes(draftItem.id)) {
+      setDraftItem(null);
+    }
+  };
+
   const handleToggleAllItems = (itemIds?: string[]) => {
     const idsToToggle = itemIds || items.filter(i => i.accountId === activeAccountId || i.toAccountId === activeAccountId).map(i => i.id);
     const anyDisabled = idsToToggle.some(id => {
@@ -296,6 +308,7 @@ const AppPage: React.FC = () => {
             itemTotals={itemTotals}
             onReorderItems={handleReorderItems}
             onDeleteAllItems={handleDeleteAllItems}
+            onDeleteItems={handleDeleteItems}
             onToggleAllItems={handleToggleAllItems}
             hoverDate={hoverDate}
             frequency={granularity}
