@@ -8,6 +8,7 @@ sidebar_position: 6
 ## Unreleased
 
 **Features:**
+- Honor ischartvisible property for individual series
 - Implement clickable chart icon toggle
 - Implement manual event series toggle
 - Rename toggle to manual event series toggling

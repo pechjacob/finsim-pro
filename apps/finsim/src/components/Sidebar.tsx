@@ -700,7 +700,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                                                             type: 'income',
                                                                             startDate: getDefaultStartDate(),
                                                                             formula: FormulaType.MONTHLY_SUM,
-                                                                            amount: 1000
+                                                                            amount: 1000,
+                                                                            isChartVisible: true, // Default to visible
                                                                         });
                                                                     }
                                                                     setIsAddMenuOpen(false);
@@ -723,7 +724,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                                                             type: 'expense',
                                                                             startDate: getDefaultStartDate(),
                                                                             formula: FormulaType.MONTHLY_SUM,
-                                                                            amount: 500
+                                                                            amount: 500,
+                                                                            isChartVisible: true, // Default to visible
                                                                         });
                                                                     }
                                                                     setIsAddMenuOpen(false);
