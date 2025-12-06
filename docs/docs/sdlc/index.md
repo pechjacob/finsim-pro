@@ -13,6 +13,9 @@ sidebar_position: 6
 - Add chart color indicators to event bars
 - Add settings panel with multi-series toggle (#4)
 
+**Bug Fixes:**
+- Move color indicator to far right edge of bar
+
 ## v1.5.0 (Current)
 * **chart:** add individual event area series visualization ([#3](https://github.com/pechjacob/finsim-pro/issues/3)) ([ff5eed6](https://github.com/pechjacob/finsim-pro/commit/ff5eed68a49ae32e42e46c5a8c2232194918519c)), closes [#3d8bd9](https://github.com/pechjacob/finsim-pro/issues/3d8bd9)
 * individual event series data layer + testing ([#2](https://github.com/pechjacob/finsim-pro/issues/2)) ([ad31271](https://github.com/pechjacob/finsim-pro/commit/ad3127122e558284d5f93215cea99d2450ba9cdc))

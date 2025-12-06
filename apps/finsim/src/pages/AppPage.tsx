@@ -56,8 +56,8 @@ const AppPage: React.FC = () => {
   const today = new Date();
   const [simulationStartDate, setSimulationStartDate] = useState<string>(formatDate(today));
   const [simulationEndDate, setSimulationEndDate] = useState<string>(formatDate(addDays(today, 365 * 5))); // 5 years default
-  const [visibleStartDate, setVisibleStartDate] = useState<string>('');
-  const [visibleEndDate, setVisibleEndDate] = useState<string>('');
+  const [visibleStartDate, setVisibleStartDate] = useState<string>(formatDate(today));
+  const [visibleEndDate, setVisibleEndDate] = useState<string>(formatDate(addDays(today, 365 * 5)));
   const [granularity, setGranularity] = useState<Frequency>(Frequency.MONTHLY);
   const [isFlipped, setIsFlipped] = useState(false);
   // Initialize from localStorage, persist on change
