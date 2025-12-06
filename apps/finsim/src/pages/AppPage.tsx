@@ -352,6 +352,7 @@ const AppPage: React.FC = () => {
             simulationEndDate={simulationEndDate}
             isFlipped={isFlipped}
             onFlip={() => setIsFlipped(!isFlipped)}
+            showIndividualSeries={showIndividualSeries}
           />
         </div>
 

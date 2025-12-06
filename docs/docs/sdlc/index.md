@@ -8,6 +8,7 @@ sidebar_position: 6
 ## Unreleased
 
 **Features:**
+- Rename toggle to manual event series toggling
 - Complete color sync between chart and timeline
 - Sync series colors to items via callback
 - Add chart color indicators to event bars

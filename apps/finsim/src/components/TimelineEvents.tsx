@@ -45,6 +45,7 @@ interface TimelineEventsProps {
     simulationEndDate: string;
     isFlipped: boolean;
     onFlip: () => void;
+    showIndividualSeries?: boolean; // Controls chart icon and color indicator visibility
 }
 
 interface SortableEventItemProps {
@@ -54,6 +55,7 @@ interface SortableEventItemProps {
     viewStartDate: string;
     viewEndDate: string;
     itemTotals: Record<string, number>;
+    showIndividualSeries?: boolean; // Control color indicator visibility
     simulationPoints: SimulationPoint[];
 }
 
@@ -64,6 +66,7 @@ const SortableEventItem: React.FC<SortableEventItemProps> = ({
     viewStartDate,
     viewEndDate,
     itemTotals,
+    showIndividualSeries,
     simulationPoints
 }) => {
     const {
@@ -242,7 +245,8 @@ const SortableEventItem: React.FC<SortableEventItemProps> = ({
             </div>
 
             {/* Chart Series Color Indicator - Far Right Edge */}
-            {item.chartColor && (
+            {/* Chart Color Indicator - visible when toggle ON, hidden when OFF */}
+            {item.chartColor && showIndividualSeries && (
                 <div
                     className="absolute top-0 bottom-0 right-0 w-1.5 opacity-90"
                     style={{ backgroundColor: item.chartColor }}
@@ -325,7 +329,8 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
     isFlipped,
     onFlip,
     simulationStartDate,
-    simulationEndDate
+    simulationEndDate,
+    showIndividualSeries = true // Default to true (ON)
 }) => {
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -608,8 +613,8 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                     </button>
                                 </div>
 
-                                {/* Chart Icon (Placeholder) */}
-                                <div className="text-gray-500 p-1 ml-2">
+                                {/* Chart Icon - visible when toggle ON, invisible (but space reserved) when OFF */}
+                                <div className={`p-1 ml-2 ${showIndividualSeries ? 'text-gray-500' : 'invisible'}`}>
                                     <LineChart size={16} />
                                 </div>
 
@@ -680,16 +685,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                     >
                                         <div className="pb-4 pt-1">
                                             {filteredItems.map((item) => (
-                                                <SortableEventItem
-                                                    key={item.id}
-                                                    item={item}
-                                                    isActive={selectedItemIds.has(item.id)}
-                                                    onItemClick={onItemClick}
-                                                    viewStartDate={effectiveStartDate}
-                                                    viewEndDate={effectiveEndDate}
-                                                    itemTotals={itemTotals}
-                                                    simulationPoints={simulationPoints}
-                                                />
+
                                             ))}
                                         </div>
                                     </SortableContext>
