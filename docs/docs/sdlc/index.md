@@ -18,6 +18,7 @@ sidebar_position: 6
 - Add settings panel with multi-series toggle (#4)
 
 **Bug Fixes:**
+- Correct typescript errors in series data iteration
 - Show total balance when individual series data not ready
 - Add comprehensive logging for series visibility
 - Set ischartvisible true by default on all new items

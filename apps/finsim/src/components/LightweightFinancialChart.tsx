@@ -735,7 +735,11 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
 
             if (!series) {
                 // Create new series
-                const colorRaw = item.chartColor || getDistinctColor(itemSeriesRef.current.size);
+                const existingColors = Array.from(itemSeriesRef.current.keys())
+                    .map(id => items.find(i => i.id === id)?.chartColor)
+                    .filter(Boolean) as string[];
+
+                const colorRaw = item.chartColor || getDistinctColor(existingColors, itemSeriesRef.current.size);
                 // Convert HSL to hex for lightweight-charts compatibility
                 const color = hslStringToHex(colorRaw);
 
