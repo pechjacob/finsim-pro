@@ -74,6 +74,15 @@ const AppPage: React.FC = () => {
   // Computed
   const activeAccount = accounts.find(a => a.id === activeAccountId) || accounts[0];
 
+  // Create a stable key for items that excludes chartColor
+  // This prevents simulation from rerunning when only chartColor changes
+  const itemsKeyWithoutColor = useMemo(() => {
+    return items.map(item => {
+      const { chartColor, ...rest } = item;
+      return JSON.stringify(rest);
+    }).join('|');
+  }, [items]);
+
   // Run simulation for displayed items (enabled or draft)
   const simulationResult = useMemo(() => {
     const displayedItems = items.filter((item) => {
@@ -81,7 +90,7 @@ const AppPage: React.FC = () => {
       return item.accountId === activeAccountId && item.isEnabled !== false;
     });
     return runSimulation(activeAccount, displayedItems, simulationStartDate, simulationEndDate);
-  }, [activeAccount, items, simulationStartDate, simulationEndDate, draftItem, activeAccountId]);
+  }, [activeAccount, itemsKeyWithoutColor, simulationStartDate, simulationEndDate, draftItem, activeAccountId]);
 
   const simulationData = simulationResult.points;
   const simulationPoints = simulationResult.points; // Full points with itemContributions

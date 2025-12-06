@@ -14,6 +14,7 @@ sidebar_position: 6
 - Add settings panel with multi-series toggle (#4)
 
 **Bug Fixes:**
+- Remove stableitems workaround no longer needed
 - Prevent infinite loop with eslint disable
 - Prevent simulation rerun when only chart color changes
 - Remove items from item series data memo deps
