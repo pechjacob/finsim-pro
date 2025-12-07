@@ -7,13 +7,13 @@ sidebar_position: 6
 
 ## Unreleased
 
-**Features:**
-- Add settings panel with multi-series toggle (#4)
-
 **Bug Fixes:**
-- Resolve crash and toggle visibility logic
+- Enable manual series toggling by default
 
-## v1.6.0 (Current)
+## v1.6.1 (Current)
+
+
+## v1.6.0
 * **app:** add settings panel with multi-series toggle ([#4](https://github.com/pechjacob/finsim-pro/issues/4)) ([60e1e6d](https://github.com/pechjacob/finsim-pro/commit/60e1e6dcc5c0ad54191aefd19c72c7f3be3ee4bf))
 * **chart:** resolve crash and toggle visibility logic ([36afaca](https://github.com/pechjacob/finsim-pro/commit/36afaca6a1bf21ccf065197dcc589d1332b75d95))
 
