@@ -8,9 +8,16 @@ sidebar_position: 6
 ## Unreleased
 
 **Features:**
-- Add settings panel with multi-series toggle
+- Add settings panel with multi-series toggle (#4)
 
-## v1.5.0 (Current)
+**Bug Fixes:**
+- Resolve crash and toggle visibility logic
+
+## v1.6.0 (Current)
+* **app:** add settings panel with multi-series toggle ([#4](https://github.com/pechjacob/finsim-pro/issues/4)) ([60e1e6d](https://github.com/pechjacob/finsim-pro/commit/60e1e6dcc5c0ad54191aefd19c72c7f3be3ee4bf))
+* **chart:** resolve crash and toggle visibility logic ([36afaca](https://github.com/pechjacob/finsim-pro/commit/36afaca6a1bf21ccf065197dcc589d1332b75d95))
+
+## v1.5.0
 * **chart:** add individual event area series visualization ([#3](https://github.com/pechjacob/finsim-pro/issues/3)) ([ff5eed6](https://github.com/pechjacob/finsim-pro/commit/ff5eed68a49ae32e42e46c5a8c2232194918519c)), closes [#3d8bd9](https://github.com/pechjacob/finsim-pro/issues/3d8bd9)
 * individual event series data layer + testing ([#2](https://github.com/pechjacob/finsim-pro/issues/2)) ([ad31271](https://github.com/pechjacob/finsim-pro/commit/ad3127122e558284d5f93215cea99d2450ba9cdc))
 * **ci:** move tag after amending release commit to include docs ([f3b3da0](https://github.com/pechjacob/finsim-pro/commit/f3b3da0cc9a8b0c9a9642e66054bdab5a6c1ba76))
