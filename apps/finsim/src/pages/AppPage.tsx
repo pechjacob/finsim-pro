@@ -31,7 +31,9 @@ const AppPage: React.FC = () => {
       type: 'income',
       amount: 2000,
       formula: FormulaType.MONTHLY_SUM,
+      formula: FormulaType.MONTHLY_SUM,
       startDate: formatDate(new Date()), // Start today
+      isChartVisible: false,
     },
     {
       id: generateUUID(),
@@ -41,6 +43,7 @@ const AppPage: React.FC = () => {
       amount: 1500,
       formula: FormulaType.MONTHLY_SUM,
       startDate: formatDate(new Date()),
+      isChartVisible: false,
     }
   ]);
 

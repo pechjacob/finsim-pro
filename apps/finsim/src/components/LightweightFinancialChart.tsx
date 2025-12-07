@@ -174,11 +174,11 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
 
         const seriesMap = new Map<string, Array<{ time: string; value: number }>>();
 
-        // Get visible items with chart enabled
-        const visibleItems = items.filter(item => item.isEnabled !== false && item.isChartVisible !== false);
+        // Get items that are enabled (regardless of chart visibility)
+        const activeItems = items.filter(item => item.isEnabled !== false);
 
-        // Prepare data for each visible item
-        visibleItems.forEach(item => {
+        // Prepare data for each item
+        activeItems.forEach(item => {
             const itemData: Array<{ time: string; value: number }> = [];
 
             simulationPoints.forEach(point => {
@@ -649,7 +649,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
         const currentSeriesIds = new Set(itemSeriesRef.current.keys());
         const newSeriesIds = new Set(itemSeriesData.keys());
 
-        // Remove series that no longer exist
+        // Remove series that no longer exist (i.e. item was disabled or deleted)
         currentSeriesIds.forEach(id => {
             if (!newSeriesIds.has(id)) {
                 const series = itemSeriesRef.current.get(id);
@@ -668,6 +668,9 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
         itemSeriesData.forEach((data, itemId) => {
             const item = items.find(i => i.id === itemId);
             if (!item) return;
+
+            // Determine visibility: default to true if undefined
+            const isVisible = item.isChartVisible !== false;
 
             let series = itemSeriesRef.current.get(itemId);
 
@@ -688,9 +691,15 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                     lineWidth: 1,
                     priceLineVisible: false,
                     lastValueVisible: false,
+                    visible: isVisible, // Set initial visibility
                 });
 
                 itemSeriesRef.current.set(itemId, series);
+            } else {
+                // Update visibility for existing series
+                series.applyOptions({
+                    visible: isVisible
+                });
             }
 
             // Update data
