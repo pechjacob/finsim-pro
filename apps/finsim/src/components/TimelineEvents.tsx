@@ -45,6 +45,8 @@ interface TimelineEventsProps {
     simulationEndDate: string;
     isFlipped: boolean;
     onFlip: () => void;
+    showIndividualSeries?: boolean; // Controls chart icon and color indicator visibility
+    onToggleChartSeries?: (itemIds: string[]) => void; // Toggle chart series visibility for items
 }
 
 interface SortableEventItemProps {
@@ -54,6 +56,7 @@ interface SortableEventItemProps {
     viewStartDate: string;
     viewEndDate: string;
     itemTotals: Record<string, number>;
+    showIndividualSeries?: boolean; // Control color indicator visibility
     simulationPoints: SimulationPoint[];
 }
 
@@ -64,6 +67,7 @@ const SortableEventItem: React.FC<SortableEventItemProps> = ({
     viewStartDate,
     viewEndDate,
     itemTotals,
+    showIndividualSeries,
     simulationPoints
 }) => {
     const {
@@ -241,6 +245,18 @@ const SortableEventItem: React.FC<SortableEventItemProps> = ({
                 <div className={`${barColor} transition-all duration-300`} style={activeBarStyle} />
             </div>
 
+            {/* Chart Series Color Indicator - Far Right Edge */}
+            {/* Chart Color Indicator - visible when toggle ON, hidden when OFF */}
+            {item.chartColor && showIndividualSeries && (
+                <div
+                    className="absolute top-0 bottom-0 right-0 w-1.5 opacity-90 transition-colors duration-300"
+                    style={{
+                        backgroundColor: (item.isChartVisible ?? true) ? item.chartColor : '#9ca3af' // gray-400
+                    }}
+                    title={(item.isChartVisible ?? true) ? `Chart color: ${item.chartColor}` : 'Series hidden from chart'}
+                />
+            )}
+
             {/* Content Layer */}
             <div className="relative z-10 flex items-center h-full px-4 w-full">
                 <div className="mr-2 cursor-grab active:cursor-grabbing text-gray-600 group-hover:text-gray-400 transition-colors">
@@ -316,7 +332,9 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
     isFlipped,
     onFlip,
     simulationStartDate,
-    simulationEndDate
+    simulationEndDate,
+    showIndividualSeries = true, // Default to true (ON)
+    onToggleChartSeries
 }) => {
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -599,10 +617,29 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                     </button>
                                 </div>
 
-                                {/* Chart Icon (Placeholder) */}
-                                <div className="text-gray-500 p-1 ml-2">
+                                {/* Chart Icon - Toggles chart series visibility for selected items */}
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (selectedItemIds.size === 0 || !showIndividualSeries) return;
+                                        // Toggle chart visibility for selected items
+                                        const selectedItems = filteredItems.filter(i => selectedItemIds.has(i.id));
+                                        if (onToggleChartSeries) {
+                                            onToggleChartSeries(selectedItems.map(i => i.id));
+                                        }
+                                    }}
+                                    onMouseDown={(e) => e.stopPropagation()}
+                                    className={`p-1 ml-2 transition-colors rounded ${showIndividualSeries
+                                        ? (selectedItemIds.size > 0
+                                            ? 'text-blue-400 hover:text-blue-300 hover:bg-gray-800 cursor-pointer'
+                                            : 'text-gray-600 cursor-not-allowed')
+                                        : 'invisible'
+                                        }`}
+                                    disabled={selectedItemIds.size === 0 || !showIndividualSeries}
+                                    title={selectedItemIds.size > 0 ? "Toggle chart series for selected events" : "Select events to toggle chart series"}
+                                >
                                     <LineChart size={16} />
-                                </div>
+                                </button>
 
                                 {/* Visibility Toggle (Eye Icon) - Only works on selected items */}
                                 <button
@@ -680,6 +717,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                                     viewEndDate={effectiveEndDate}
                                                     itemTotals={itemTotals}
                                                     simulationPoints={simulationPoints}
+                                                    showIndividualSeries={showIndividualSeries}
                                                 />
                                             ))}
                                         </div>

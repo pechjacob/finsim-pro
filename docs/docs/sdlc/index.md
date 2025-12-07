@@ -8,7 +8,50 @@ sidebar_position: 6
 ## Unreleased
 
 **Features:**
-- Add settings panel with multi-series toggle
+- Gray out color indicator when chart series is hidden
+- Honor ischartvisible property for individual series
+- Implement clickable chart icon toggle
+- Implement manual event series toggle
+- Rename toggle to manual event series toggling
+- Complete color sync between chart and timeline
+- Sync series colors to items via callback
+- Add chart color indicators to event bars
+- Add settings panel with multi-series toggle (#4)
+
+**Bug Fixes:**
+- Restore gradient and ensure proper scaling
+- Add reactive initialization state
+- Initialize series with correct transparency
+- Prevent crash when removing series
+- Make total balance transparent when showing individual series
+- Show total balance series alongside individual series
+- Assign colors to new items created in sidebar
+- Pre-assign chart colors to fix missing color indicators
+- Pass both required arguments to getdistinctcolor
+- Correct typescript errors in series data iteration
+- Show total balance when individual series data not ready
+- Add comprehensive logging for series visibility
+- Set ischartvisible true by default on all new items
+- Force data refresh when showing total balance series
+- Ensure total balance series shows when toggle off
+- Restore accidentally deleted sortableeventitem component
+- Fix all broken tailwind classes causing layout issues
+- Remove spaces from tailwind classes in toggle
+- Add null check for crosshair series ref
+- Remove callback and memoize items to fix infinite loop
+- Remove callback prop and memoize filtered items
+- Remove auto color callback to break infinite loop
+- Use stable items key to prevent simulation loop
+- Remove stableitems workaround no longer needed
+- Prevent infinite loop with eslint disable
+- Prevent simulation rerun when only chart color changes
+- Remove items from item series data memo deps
+- Memoize color callback to prevent render loops
+- Stop infinite loop in series creation
+- Restore missing series data call
+- Hide total balance series when showing individual series
+- Initialize visible range on page load
+- Move color indicator to far right edge of bar
 
 ## v1.5.0 (Current)
 * **chart:** add individual event area series visualization ([#3](https://github.com/pechjacob/finsim-pro/issues/3)) ([ff5eed6](https://github.com/pechjacob/finsim-pro/commit/ff5eed68a49ae32e42e46c5a8c2232194918519c)), closes [#3d8bd9](https://github.com/pechjacob/finsim-pro/issues/3d8bd9)

@@ -6,6 +6,7 @@ import { LightweightFinancialChart } from '../components/LightweightFinancialCha
 import { TimelineEvents } from '../components/TimelineEvents';
 import { runSimulation } from '../services/simulation';
 import { addDays, formatDate, generateUUID } from '../utils';
+import { generateUniqueColor } from '../colorUtils';
 import { Settings, Bug } from 'lucide-react';
 import { RightPanel } from '../components/RightPanel';
 import { getFullVersionString } from '../version';
@@ -32,6 +33,8 @@ const AppPage: React.FC = () => {
       amount: 2000,
       formula: FormulaType.MONTHLY_SUM,
       startDate: formatDate(new Date()), // Start today
+      isChartVisible: true, // Default to visible
+      chartColor: generateUniqueColor(0), // Pre-assign color
     },
     {
       id: generateUUID(),
@@ -41,6 +44,8 @@ const AppPage: React.FC = () => {
       amount: 1500,
       formula: FormulaType.MONTHLY_SUM,
       startDate: formatDate(new Date()),
+      isChartVisible: true, // Default to visible
+      chartColor: generateUniqueColor(1), // Pre-assign color
     }
   ]);
 
@@ -56,14 +61,14 @@ const AppPage: React.FC = () => {
   const today = new Date();
   const [simulationStartDate, setSimulationStartDate] = useState<string>(formatDate(today));
   const [simulationEndDate, setSimulationEndDate] = useState<string>(formatDate(addDays(today, 365 * 5))); // 5 years default
-  const [visibleStartDate, setVisibleStartDate] = useState<string>('');
-  const [visibleEndDate, setVisibleEndDate] = useState<string>('');
+  const [visibleStartDate, setVisibleStartDate] = useState<string>(formatDate(today));
+  const [visibleEndDate, setVisibleEndDate] = useState<string>(formatDate(addDays(today, 365 * 5)));
   const [granularity, setGranularity] = useState<Frequency>(Frequency.MONTHLY);
   const [isFlipped, setIsFlipped] = useState(false);
   // Initialize from localStorage, persist on change
   const [showIndividualSeries, setShowIndividualSeries] = useState(() => {
     const saved = localStorage.getItem('showIndividualSeries');
-    return saved ? JSON.parse(saved) : false;
+    return saved !== null ? JSON.parse(saved) : true; // Default to ON when no saved value
   });
 
   // Persist showIndividualSeries preference
@@ -74,6 +79,15 @@ const AppPage: React.FC = () => {
   // Computed
   const activeAccount = accounts.find(a => a.id === activeAccountId) || accounts[0];
 
+  // Create a stable key for items that excludes chartColor
+  // This prevents simulation from rerunning when only chartColor changes
+  const itemsKeyWithoutColor = useMemo(() => {
+    return items.map(item => {
+      const { chartColor, ...rest } = item;
+      return JSON.stringify(rest);
+    }).join('|');
+  }, [items]);
+
   // Run simulation for displayed items (enabled or draft)
   const simulationResult = useMemo(() => {
     const displayedItems = items.filter((item) => {
@@ -81,7 +95,7 @@ const AppPage: React.FC = () => {
       return item.accountId === activeAccountId && item.isEnabled !== false;
     });
     return runSimulation(activeAccount, displayedItems, simulationStartDate, simulationEndDate);
-  }, [activeAccount, items, simulationStartDate, simulationEndDate, draftItem, activeAccountId]);
+  }, [activeAccount, itemsKeyWithoutColor, simulationStartDate, simulationEndDate, draftItem, activeAccountId]);
 
   const simulationData = simulationResult.points;
   const simulationPoints = simulationResult.points; // Full points with itemContributions
@@ -99,7 +113,11 @@ const AppPage: React.FC = () => {
       if (exists) {
         return prev.map(i => i.id === item.id ? item : i);
       }
-      return [...prev, item];
+      // New item - assign a color if it doesn't have one
+      const itemWithColor = item.chartColor
+        ? item
+        : { ...item, chartColor: generateUniqueColor(prev.length) };
+      return [...prev, itemWithColor];
     });
     setSelectedItemIds(new Set([item.id])); // Focus the new/edited item
   };
@@ -223,14 +241,22 @@ const AppPage: React.FC = () => {
   };
 
   const handleToggleAllItems = (itemIds?: string[]) => {
-    const idsToToggle = itemIds || items.filter(i => i.accountId === activeAccountId || i.toAccountId === activeAccountId).map(i => i.id);
-    const anyDisabled = idsToToggle.some(id => {
-      const item = items.find(i => i.id === id);
-      return item && item.isEnabled === false;
-    });
-    const newState = anyDisabled ? true : false;
-    setItems(prev => prev.map(i => idsToToggle.includes(i.id) ? { ...i, isEnabled: newState } : i));
+    const idsToToggle = itemIds || (selectedItemIds.size > 0 ? Array.from(selectedItemIds) : items.map(i => i.id));
+    setItems(prev => prev.map(item =>
+      idsToToggle.includes(item.id) ? { ...item, isEnabled: !(item.isEnabled ?? true) } : item
+    ));
   };
+
+  const handleToggleChartSeries = (itemIds: string[]) => {
+    setItems(prev => prev.map(item =>
+      itemIds.includes(item.id) ? { ...item, isChartVisible: !(item.isChartVisible ?? true) } : item
+    ));
+  };
+
+  // Memoize filtered items to prevent creating new array on every render
+  const displayedChartItems = useMemo(() => {
+    return items.filter(i => i.accountId === activeAccountId && i.isEnabled !== false);
+  }, [items, activeAccountId]);
 
   return (
     <div className="flex h-screen w-screen bg-gray-950 text-gray-100 font-sans overflow-hidden relative">
@@ -280,7 +306,7 @@ const AppPage: React.FC = () => {
               frequency={granularity}
               onFrequencyChange={setGranularity}
               onHover={setHoverDate}
-              items={items.filter(i => i.accountId === activeAccountId && i.isEnabled !== false)}
+              items={displayedChartItems}
               simulationPoints={simulationPoints}
               showIndividualSeries={showIndividualSeries}
             />
@@ -303,7 +329,7 @@ const AppPage: React.FC = () => {
         </div>
 
         {/* Timeline/Events Area (Lower Split) */}
-        <div className={`w-full flex flex-col transition-all duration-300 ease-in-out ${isTimelineCollapsed ? 'h-10 shrink-0' : 'h-[40%] shrink-0'} `}>
+        <div className={`w-full flex flex-col transition-all duration-300 ease-in-out ${isTimelineCollapsed ? 'h-10 shrink-0' : 'h-[40%] shrink-0'}`}>
           <TimelineEvents
             items={displayedItems.filter(i => i.accountId === activeAccountId || i.toAccountId === activeAccountId)}
             selectedItemIds={selectedItemIds}
@@ -338,6 +364,8 @@ const AppPage: React.FC = () => {
             simulationEndDate={simulationEndDate}
             isFlipped={isFlipped}
             onFlip={() => setIsFlipped(!isFlipped)}
+            showIndividualSeries={showIndividualSeries}
+            onToggleChartSeries={handleToggleChartSeries}
           />
         </div>
 
@@ -403,8 +431,8 @@ const AppPage: React.FC = () => {
               }}
               className={`p-1.5 rounded transition-colors ${isDebugOpen ? 'bg-gray-800 hover:bg-gray-700' : 'hover:bg-gray-900'
                 } ${isDebugMode ? 'text-green-400 hover:text-green-300' : 'text-red-400 hover:text-red-300'
-                }`}
-              title={`Debug Panel (${isDebugMode ? 'On' : 'Off'})`}
+                } `}
+              title={`Debug Panel(${isDebugMode ? 'On' : 'Off'})`}
             >
               <Bug size={16} />
             </button>
@@ -435,17 +463,17 @@ const AppPage: React.FC = () => {
           {/* Chart Display Section */}
           <div>
             <div className="text-sm font-medium text-gray-300 mb-3 pb-2 border-b border-gray-700">
-              Chart Display
+              Chart Controls
             </div>
 
-            {/* Multi-Series Toggle */}
+            {/* Manual Event Series Toggle */}
             <label className="flex items-center justify-between cursor-pointer group">
               <div className="flex-1">
                 <div className="text-sm text-gray-300 group-hover:text-white transition-colors">
-                  Show Individual Event Series
+                  Manual Event Series Toggling
                 </div>
                 <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-                  Display income and expenses as separate colored areas on the chart
+                  Show chart icon and color indicators to manually toggle individual event series visibility
                 </p>
               </div>
               <button
@@ -454,8 +482,8 @@ const AppPage: React.FC = () => {
                   }`}
                 aria-label={`Toggle individual series ${showIndividualSeries ? 'off' : 'on'}`}
               >
-                <div
-                  className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow-md transition-transform ${showIndividualSeries ? 'translate-x-8' : 'translate-x-1'
+                <span
+                  className={`absolute left-1 top-1 w-5 h-5 rounded-full bg-white transition-transform ${showIndividualSeries ? 'translate-x-7' : 'translate-x-0'
                     }`}
                 />
               </button>
@@ -480,15 +508,15 @@ const AppPage: React.FC = () => {
               className={`relative w-20 h-6 rounded-full transition-all ml-auto ${isDebugMode
                 ? 'bg-green-500/30'
                 : 'bg-red-500/30'
-                }`}
-              title={`Debug Mode: ${isDebugMode ? 'On' : 'Off'}`}
+                } `}
+              title={`Debug Mode: ${isDebugMode ? 'On' : 'Off'} `}
             >
               {/* Slider */}
               <div
                 className={`absolute top-0.5 h-5 w-10 rounded-full transition-all duration-200 flex items-center justify-center gap-1 font-medium text-[10px] ${isDebugMode
                   ? 'right-0.5 bg-green-500 text-white'
                   : 'left-0.5 bg-red-500 text-white'
-                  }`}
+                  } `}
               >
                 <Bug size={10} />
                 <span>{isDebugMode ? 'ON' : 'OFF'}</span>
