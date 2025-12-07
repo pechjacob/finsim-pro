@@ -490,13 +490,13 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
 
         const areaSeries = chart.addAreaSeries({
             lineColor: '#60a5fa',
-            // If individual series are shown, start transparent so we don't occlude them while they load
-            topColor: showIndividualSeries ? 'rgba(0, 0, 0, 0)' : 'rgba(59, 130, 246, 0.3)',
-            bottomColor: showIndividualSeries ? 'rgba(0, 0, 0, 0)' : 'rgba(59, 130, 246, 0)',
+            // User requested gradient to persist even when individual series are shown
+            topColor: 'rgba(59, 130, 246, 0.3)',
+            bottomColor: 'rgba(59, 130, 246, 0.05)', // Slight fadeout
             lineWidth: showIndividualSeries ? 1 : 2,
             priceLineVisible: true,
             lastValueVisible: true,
-            visible: true, // Always visible (transparent line vs area)
+            visible: true,
         });
 
         chartRef.current = chart;
@@ -723,9 +723,8 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
         if (seriesRef.current) {
             seriesRef.current.applyOptions({
                 visible: true,
-                // Make area transparent to show individual series behind/underneath
-                topColor: 'transparent',
-                bottomColor: 'transparent',
+                topColor: 'rgba(59, 130, 246, 0.3)',
+                bottomColor: 'rgba(59, 130, 246, 0.05)',
             });
             seriesRef.current.setData(chartData);
         }
@@ -797,8 +796,11 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
 
         // Fit content after all series updated
         if (chart) {
-            chart.timeScale().fitContent();
-            console.log('[Chart] Fit content to individual series');
+            // Slight delay to ensure series are processed by chart engine before fitting
+            setTimeout(() => {
+                chart.timeScale().fitContent();
+                console.log('[Chart] Fit content (delayed)');
+            }, 50);
         }
     }, [itemSeriesData, showIndividualSeries, chartData, isChartReady]);
 

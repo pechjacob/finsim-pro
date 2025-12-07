@@ -19,6 +19,7 @@ sidebar_position: 6
 - Add settings panel with multi-series toggle (#4)
 
 **Bug Fixes:**
+- Add reactive initialization state
 - Initialize series with correct transparency
 - Prevent crash when removing series
 - Make total balance transparent when showing individual series
