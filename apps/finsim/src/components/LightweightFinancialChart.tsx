@@ -169,9 +169,6 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
     }, [balanceData, frequency]);
 
     // Prepare individual item series data from simulationPoints
-    // NOTE: We intentionally use `items` from props without listing it in dependencies
-    // This prevents infinite loop when chartColor is assigned via callback
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     const itemSeriesData = useMemo(() => {
         if (!showIndividualSeries || items.length === 0 || simulationPoints.length === 0) {
             return new Map<string, Array<{ time: string; value: number }>>();
@@ -218,7 +215,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
             itemNames: visibleItems.map(i => i.name)
         });
         return seriesMap;
-    }, [simulationPoints, showIndividualSeries, frequency]);
+    }, [items, simulationPoints, showIndividualSeries, frequency]);
 
     const simStart = useMemo(() => new Date(simulationStartDate), [simulationStartDate]);
     const simEnd = useMemo(() => new Date(simulationEndDate), [simulationEndDate]);
@@ -492,12 +489,13 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
 
         const areaSeries = chart.addAreaSeries({
             lineColor: '#60a5fa',
-            topColor: 'rgba(59, 130, 246, 0.3)',
-            bottomColor: 'rgba(59, 130, 246, 0)',
-            lineWidth: 2,
+            // If individual series are shown, start transparent so we don't occlude them while they load
+            topColor: showIndividualSeries ? 'rgba(0, 0, 0, 0)' : 'rgba(59, 130, 246, 0.3)',
+            bottomColor: showIndividualSeries ? 'rgba(0, 0, 0, 0)' : 'rgba(59, 130, 246, 0)',
+            lineWidth: showIndividualSeries ? 1 : 2,
             priceLineVisible: true,
             lastValueVisible: true,
-            visible: !showIndividualSeries, // Hide when individual series shown
+            visible: true, // Always visible (transparent line vs area)
         });
 
         chartRef.current = chart;

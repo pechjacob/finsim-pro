@@ -19,6 +19,7 @@ sidebar_position: 6
 - Add settings panel with multi-series toggle (#4)
 
 **Bug Fixes:**
+- Prevent crash when removing series
 - Make total balance transparent when showing individual series
 - Show total balance series alongside individual series
 - Assign colors to new items created in sidebar
