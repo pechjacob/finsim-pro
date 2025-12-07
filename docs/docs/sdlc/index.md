@@ -7,7 +7,8 @@ sidebar_position: 6
 
 ## Unreleased
 
-
+**Features:**
+- Hide individual series by default and refactor chart toggling
 
 ## v1.6.1
 * **app:** enable manual series toggling by default ([87e9c70](https://github.com/pechjacob/finsim-pro/commit/87e9c70))

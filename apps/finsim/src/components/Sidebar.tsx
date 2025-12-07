@@ -829,9 +829,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                         Documentation
                                     </a>
 
-                                    <a href="#" className="hover:text-blue-400 flex items-center gap-1">
-                                        Github
-                                    </a>
+                                    {import.meta.env.DEV && (
+                                        <a
+                                            href="https://pechjacob.github.io/finsim-pro/app"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="hover:text-blue-400 flex items-center gap-1"
+                                        >
+                                            Github
+                                        </a>
+                                    )}
                                 </div>
                             </div>
                             <div
