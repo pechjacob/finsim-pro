@@ -7,7 +7,7 @@ sidebar_position: 6
 
 
 ## v1.6.1
-
+* **app:** enable manual series toggling by default ([87e9c70](https://github.com/pechjacob/finsim-pro/commit/87e9c70))
 
 ## v1.6.0
 * **app:** add settings panel with multi-series toggle ([#4](https://github.com/pechjacob/finsim-pro/issues/4)) ([60e1e6d](https://github.com/pechjacob/finsim-pro/commit/60e1e6dcc5c0ad54191aefd19c72c7f3be3ee4bf))

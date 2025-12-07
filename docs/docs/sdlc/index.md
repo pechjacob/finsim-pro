@@ -7,8 +7,7 @@ sidebar_position: 6
 
 ## Unreleased
 
-**Bug Fixes:**
-- Enable manual series toggling by default
+
 
 ## v1.6.1
 * **app:** enable manual series toggling by default ([87e9c70](https://github.com/pechjacob/finsim-pro/commit/87e9c70))
