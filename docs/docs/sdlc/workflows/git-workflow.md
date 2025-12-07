@@ -67,8 +67,8 @@ feat(Chart): Add Feature   # Capitalized (should be lowercase)
 ### Main Branch
 
 - `main` - Production-ready code
-- Direct commits only for hotfixes
-- All features merged via pull requests
+- **No direct commits** (even for hotfixes)
+- All changes merged via pull requests
 
 ### Feature Branches
 

@@ -327,6 +327,20 @@ sequenceDiagram
 | `git commit -m "feat: ..."` | Conventional commit |
 | `npm run changelog:preview` | View unreleased changes (CLI) |
 | `git push -u origin feat/name` | Push feature branch |
+## Exception: Hotfixes
+
+For critical production bugs ONLY:
+1. Create `fix/critical-description` branch
+2. Make minimal fix
+3. **Create Pull Request** (Required for automation)
+   - Ensure title follows `fix: description`
+   - Merge via PR (Squash or Rebase)
+4. `npm run release:patch`
+    - Creates release commit, tag, and updates changelog
+5. Push with tags
+   ```bash
+   git push --follow-tags origin main
+   ```
 | `npm run release:preview` | Preview release (dry-run) |
 | `npm run release` | Create version + tag |
 | `npm run release:patch` | Force patch bump |

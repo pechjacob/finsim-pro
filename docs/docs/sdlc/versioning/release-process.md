@@ -57,9 +57,9 @@ git checkout -b fix/critical-bug
 # ... make fixes ...
 git commit -m "fix(app): resolve critical bug"
 
-# 2. Merge to main
-git checkout main
-git merge fix/critical-bug
+# 2. Open Pull Request
+# Ensure title matches conventional commits (e.g. "fix: ...")
+# Merge to main via PR
 
 # 3. Release patch
 npm run release:patch

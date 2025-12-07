@@ -51,6 +51,17 @@
    git push origin feat/your-feature-name
    ```
 
+## Exception: Hotfixes
+
+For critical production bugs ONLY:
+1. Create `fix/critical-description` branch
+2. Make minimal fix
+3. **Create Pull Request** (Required for automation)
+   - Title: `fix: description`
+   - Merge via PR to ensure correct commit hooks fire
+4. `npm run release:patch`
+5. Push with tags
+
 5. **After merge**, preview and create release:
    ```bash
    git checkout main
