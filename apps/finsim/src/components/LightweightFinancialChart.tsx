@@ -632,6 +632,8 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
             chart.remove();
             chartRef.current = null;
             seriesRef.current = null;
+            itemSeriesRef.current.clear();
+            setIsChartReady(false);
             isInitialized.current = false;
         };
     }, []); // Run once on mount
