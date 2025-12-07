@@ -66,7 +66,7 @@ const AppPage: React.FC = () => {
   // Initialize from localStorage, persist on change
   const [showIndividualSeries, setShowIndividualSeries] = useState<boolean>(() => {
     const saved = localStorage.getItem('showIndividualSeries');
-    return saved ? JSON.parse(saved) : false;
+    return saved ? JSON.parse(saved) : true;
   });
 
   // Persist showIndividualSeries preference
