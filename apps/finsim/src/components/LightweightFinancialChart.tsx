@@ -144,6 +144,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
     const seriesRef = useRef<ISeriesApi<'Area'> | null>(null);
     const itemSeriesRef = useRef<Map<string, ISeriesApi<'Area'>>>(new Map());
     const isInitialized = useRef(false);
+    const [isChartReady, setIsChartReady] = useState(false);
 
     const [focusDate, setFocusDate] = useState<Date | null>(null);
     const [zoomPercentage, setZoomPercentage] = useState(0);
@@ -500,6 +501,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
 
         chartRef.current = chart;
         seriesRef.current = areaSeries;
+        setIsChartReady(true); // Trigger re-render to run management effect
 
         // Subscribe to crosshair move
         chart.subscribeCrosshairMove((param) => {
@@ -798,7 +800,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
             chart.timeScale().fitContent();
             console.log('[Chart] Fit content to individual series');
         }
-    }, [itemSeriesData, showIndividualSeries, chartData]);
+    }, [itemSeriesData, showIndividualSeries, chartData, isChartReady]);
 
     // Track previous chart data to detect changes
     const prevChartDataRef = useRef(chartData);
