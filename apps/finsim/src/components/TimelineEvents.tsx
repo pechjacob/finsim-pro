@@ -22,6 +22,7 @@ import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { TimelineSyncChart } from './TimelineSyncChart';
 import { motion } from 'framer-motion';
 import { FormulaDisplay } from './FormulaDisplay';
+import { TotalEventBar } from './TotalEventBar';
 
 interface TimelineEventsProps {
     items: FinancialItem[];
@@ -45,6 +46,9 @@ interface TimelineEventsProps {
     simulationEndDate: string;
     isFlipped: boolean;
     onFlip: () => void;
+    showIndividualSeries: boolean;
+    onToggleIndividualSeries: () => void;
+    onToggleItemSeries: (itemIds: string[]) => void;
 }
 
 interface SortableEventItemProps {
@@ -55,6 +59,7 @@ interface SortableEventItemProps {
     viewEndDate: string;
     itemTotals: Record<string, number>;
     simulationPoints: SimulationPoint[];
+    isChartSeriesVisible: boolean; // Derived from item.isChartVisible
 }
 
 const SortableEventItem: React.FC<SortableEventItemProps> = ({
@@ -64,7 +69,8 @@ const SortableEventItem: React.FC<SortableEventItemProps> = ({
     viewStartDate,
     viewEndDate,
     itemTotals,
-    simulationPoints
+    simulationPoints,
+    isChartSeriesVisible
 }) => {
     const {
         attributes,
@@ -93,18 +99,18 @@ const SortableEventItem: React.FC<SortableEventItemProps> = ({
     let sign = '+';
 
     if (item.type === 'income') {
-        barColor = isActive ? 'bg-green-700' : 'bg-green-800/60';
-        borderClass = isActive ? 'border-green-400' : 'border-green-900';
+        barColor = isActive ? 'bg-green-600' : 'bg-green-600';
+        borderClass = isActive ? 'border-green-400' : 'border-green-800';
         textColor = 'text-green-100';
         sign = '+';
     } else if (item.type === 'expense') {
-        barColor = isActive ? 'bg-red-700' : 'bg-red-800/60';
-        borderClass = isActive ? 'border-red-400' : 'border-red-900';
+        barColor = isActive ? 'bg-red-600' : 'bg-red-600';
+        borderClass = isActive ? 'border-red-400' : 'border-red-800';
         textColor = 'text-red-100';
         sign = '-';
     } else if (item.type === 'effect') {
-        barColor = isActive ? 'bg-purple-700' : 'bg-purple-800/60';
-        borderClass = isActive ? 'border-purple-400' : 'border-purple-900';
+        barColor = isActive ? 'bg-purple-600' : 'bg-purple-600';
+        borderClass = isActive ? 'border-purple-400' : 'border-purple-800';
         textColor = 'text-purple-100';
         sign = '+';
     }
@@ -150,6 +156,7 @@ const SortableEventItem: React.FC<SortableEventItemProps> = ({
         top: 0,
         zIndex: 0, // Behind text
         borderRadius: 'inherit',
+        opacity: isActive ? 0.9 : 0.75,
     };
 
     // Styling for the inactive track (grayed out) - spans full width now
@@ -292,6 +299,16 @@ const SortableEventItem: React.FC<SortableEventItemProps> = ({
                     )}
                 </div>
             </div>
+
+            {/* Chart Color Indicator - Full Height, Far Right */}
+            <div
+                className="absolute right-0 top-0 bottom-0 w-1.5 shadow-sm z-20"
+                style={{
+                    backgroundColor: isChartSeriesVisible
+                        ? (item.chartColor || (item.type === 'income' ? '#22c55e' : item.type === 'expense' ? '#ef4444' : item.type === 'effect' ? '#a855f7' : '#4b5563'))
+                        : '#374151' // Gray-700 for hidden series
+                }}
+            />
         </div>
     );
 };
@@ -316,7 +333,9 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
     isFlipped,
     onFlip,
     simulationStartDate,
-    simulationEndDate
+    simulationEndDate,
+    showIndividualSeries,
+    onToggleItemSeries
 }) => {
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -599,10 +618,24 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                     </button>
                                 </div>
 
-                                {/* Chart Icon (Placeholder) */}
-                                <div className="text-gray-500 p-1 ml-2">
-                                    <LineChart size={16} />
-                                </div>
+                                {showIndividualSeries && (
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (selectedItemIds.size > 0) {
+                                                onToggleItemSeries(Array.from(selectedItemIds));
+                                            }
+                                        }}
+                                        disabled={selectedItemIds.size === 0}
+                                        className={`p-1.5 rounded-md transition-colors ml-2 ${selectedItemIds.size > 0
+                                            ? 'text-gray-400 hover:text-blue-400 hover:bg-gray-800'
+                                            : 'text-gray-700 cursor-not-allowed'
+                                            } ${selectedItemIds.size > 0 && Array.from(selectedItemIds).every(id => items.find(i => i.id === id)?.isChartVisible) ? 'bg-blue-900/30 text-blue-400' : ''}`}
+                                        title={selectedItemIds.size > 0 ? "Toggle Chart Series for Selected" : "Select items to toggle chart series"}
+                                    >
+                                        <LineChart size={16} />
+                                    </button>
+                                )}
 
                                 {/* Visibility Toggle (Eye Icon) - Only works on selected items */}
                                 <button
@@ -680,6 +713,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                                     viewEndDate={effectiveEndDate}
                                                     itemTotals={itemTotals}
                                                     simulationPoints={simulationPoints}
+                                                    isChartSeriesVisible={showIndividualSeries && (item.isChartVisible !== false)}
                                                 />
                                             ))}
                                         </div>
@@ -687,6 +721,13 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                 </DndContext>
                             </div>
                         </div>
+                        {/* Total Event Bar - Locked to bottom */}
+                        {filteredItems.length >= 2 && (
+                            <TotalEventBar
+                                delta={Object.values(itemTotals).reduce((a, b) => a + b, 0)}
+                                endDate={new Date(simulationEndDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }).replace(/\//g, '-')}
+                            />
+                        )}
                     </div>
 
                     {/* Back Face: Formula View */}

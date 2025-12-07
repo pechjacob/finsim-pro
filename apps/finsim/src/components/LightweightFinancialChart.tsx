@@ -207,16 +207,12 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
     const simStart = useMemo(() => new Date(simulationStartDate), [simulationStartDate]);
     const simEnd = useMemo(() => new Date(simulationEndDate), [simulationEndDate]);
 
-    // Calculate data bounds from aggregated data
-    const { dataStart, dataEnd } = useMemo(() => {
-        if (chartData.length === 0) return { dataStart: simStart, dataEnd: simEnd };
-        // Parse dates from chartData which are YYYY-MM-DD strings
-        const start = new Date(chartData[0].time as string);
-        const end = new Date(chartData[chartData.length - 1].time as string);
-        return { dataStart: start, dataEnd: end };
-    }, [chartData, simStart, simEnd]);
-
-    const maxRangeDays = useMemo(() => getDaysDifference(dataStart, dataEnd), [dataStart, dataEnd]);
+    // Calculate max range from simulation dates directly to ensure stability
+    const maxRangeDays = useMemo(() => {
+        const start = new Date(simulationStartDate);
+        const end = new Date(simulationEndDate);
+        return getDaysDifference(start, end);
+    }, [simulationStartDate, simulationEndDate]);
 
     const isZoomed = useMemo(() => {
         const currentRange = getDaysDifference(new Date(visibleStartDate), new Date(visibleEndDate));
@@ -615,6 +611,7 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
             chart.remove();
             chartRef.current = null;
             seriesRef.current = null;
+            itemSeriesRef.current.clear(); // Clear references to destroyed series
             isInitialized.current = false;
         };
     }, []); // Run once on mount
@@ -638,7 +635,11 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
         if (!chartRef.current || !showIndividualSeries) {
             // Clean up existing item series if feature is disabled
             itemSeriesRef.current.forEach(series => {
-                chartRef.current?.removeSeries(series);
+                try {
+                    chartRef.current?.removeSeries(series);
+                } catch (e) {
+                    console.warn('Failed to remove series on cleanup', e);
+                }
             });
             itemSeriesRef.current.clear();
             return;
@@ -653,7 +654,11 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
             if (!newSeriesIds.has(id)) {
                 const series = itemSeriesRef.current.get(id);
                 if (series) {
-                    chart.removeSeries(series);
+                    try {
+                        chart.removeSeries(series);
+                    } catch (e) {
+                        console.warn(`Failed to remove series ${id}`, e);
+                    }
                     itemSeriesRef.current.delete(id);
                 }
             }
@@ -777,11 +782,11 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
         let newStart = new Date(currentFocus.getTime() - halfRangeMs);
         let newEnd = new Date(currentFocus.getTime() + halfRangeMs);
 
-        [newStart, newEnd] = constrainToBounds(newStart, newEnd, newRangeDays, dataStart, dataEnd);
+        [newStart, newEnd] = constrainToBounds(newStart, newEnd, newRangeDays, simStart, simEnd);
 
         setFocusDate(currentFocus);
         onVisibleDateRangeChange(formatDate(newStart), formatDate(newEnd));
-    }, [focusDate, visibleStartDate, visibleEndDate, maxRangeDays, dataStart, dataEnd, onVisibleDateRangeChange]);
+    }, [focusDate, visibleStartDate, visibleEndDate, maxRangeDays, simStart, simEnd, onVisibleDateRangeChange]);
 
     const handleReset = useCallback(() => {
         if (chartRef.current) {

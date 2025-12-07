@@ -54,14 +54,17 @@ const AppPage: React.FC = () => {
 
   // View Settings
   const today = new Date();
-  const [simulationStartDate, setSimulationStartDate] = useState<string>(formatDate(today));
-  const [simulationEndDate, setSimulationEndDate] = useState<string>(formatDate(addDays(today, 365 * 5))); // 5 years default
-  const [visibleStartDate, setVisibleStartDate] = useState<string>('');
-  const [visibleEndDate, setVisibleEndDate] = useState<string>('');
+  const initialSimStart = formatDate(today);
+  const initialSimEnd = formatDate(addDays(today, 365 * 5)); // 5 years default
+
+  const [simulationStartDate, setSimulationStartDate] = useState<string>(initialSimStart);
+  const [simulationEndDate, setSimulationEndDate] = useState<string>(initialSimEnd);
+  const [visibleStartDate, setVisibleStartDate] = useState<string>(initialSimStart);
+  const [visibleEndDate, setVisibleEndDate] = useState<string>(initialSimEnd);
   const [granularity, setGranularity] = useState<Frequency>(Frequency.MONTHLY);
   const [isFlipped, setIsFlipped] = useState(false);
   // Initialize from localStorage, persist on change
-  const [showIndividualSeries, setShowIndividualSeries] = useState(() => {
+  const [showIndividualSeries, setShowIndividualSeries] = useState<boolean>(() => {
     const saved = localStorage.getItem('showIndividualSeries');
     return saved ? JSON.parse(saved) : false;
   });
@@ -232,6 +235,19 @@ const AppPage: React.FC = () => {
     setItems(prev => prev.map(i => idsToToggle.includes(i.id) ? { ...i, isEnabled: newState } : i));
   };
 
+  const handleToggleItemSeries = (itemIds: string[]) => {
+    // Logic: If ANY selected item is explicitly hidden (false), set ALL to visible.
+    // Otherwise (if all are visible or undefined/implicit), set ALL to hidden.
+    // Treat undefined as 'true' (visible) by default to match Chart behavior.
+    const targetItems = items.filter(i => itemIds.includes(i.id));
+    const anyHidden = targetItems.some(i => i.isChartVisible === false);
+
+    // Toggle state: true (show) if mixed or hidden, false (hide) if all visible
+    const newState = anyHidden;
+
+    setItems(prev => prev.map(i => itemIds.includes(i.id) ? { ...i, isChartVisible: newState } : i));
+  };
+
   return (
     <div className="flex h-screen w-screen bg-gray-950 text-gray-100 font-sans overflow-hidden relative">
 
@@ -338,6 +354,10 @@ const AppPage: React.FC = () => {
             simulationEndDate={simulationEndDate}
             isFlipped={isFlipped}
             onFlip={() => setIsFlipped(!isFlipped)}
+            showIndividualSeries={showIndividualSeries}
+            onToggleItemSeries={handleToggleItemSeries}
+            // onToggleIndividualSeries deprecated in favor of per-item toggling via chart icon selection
+            onToggleIndividualSeries={() => { }}
           />
         </div>
 
@@ -435,17 +455,17 @@ const AppPage: React.FC = () => {
           {/* Chart Display Section */}
           <div>
             <div className="text-sm font-medium text-gray-300 mb-3 pb-2 border-b border-gray-700">
-              Chart Display
+              Chart Controls
             </div>
 
             {/* Multi-Series Toggle */}
             <label className="flex items-center justify-between cursor-pointer group">
               <div className="flex-1">
                 <div className="text-sm text-gray-300 group-hover:text-white transition-colors">
-                  Show Individual Event Series
+                  Manual Event Series Toggling
                 </div>
                 <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-                  Display income and expenses as separate colored areas on the chart
+                  Show chart icon and color indicators to manually toggle individual event series visibility
                 </p>
               </div>
               <button
