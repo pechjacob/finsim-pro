@@ -182,6 +182,12 @@ npm run dev:all           # Run both app and docs
 - Use alerts for important info (`> [!IMPORTANT]`)
 - Add screenshots for UI features
 
+### AI Assistant Guidelines
+
+- ✅ **ALWAYS** check `docs/build/llms.txt` before planning documentation changes to understand the structure.
+- ✅ **ALWAYS** run `npm run docs:build` after editing docs to verify `llms.txt` generation.
+- 💡 Use the `/docs` workflow for step-by-step guidance.
+
 ## Dependencies
 
 ### Installing

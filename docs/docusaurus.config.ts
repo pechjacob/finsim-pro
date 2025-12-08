@@ -47,6 +47,7 @@ const config: Config = {
       onBrokenMarkdownLinks: 'warn',
     },
   },
+  plugins: ['docusaurus-plugin-llms'],
   themes: [
     '@docusaurus/theme-mermaid',
     [

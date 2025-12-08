@@ -104,4 +104,16 @@ When you run `npm run release`:
 - Auto-syncs to release notes docs
 - Creates commit and git tag
 
-For details, see [Changelog Automation](./changelog-automation.md)
+
+## AI-Driven Development
+
+This project uses `llms.txt` to enable efficient AI interaction.
+
+### Using AI Agents
+When working with AI coding assistants (like Cursor, Windsurf, or Antigravity):
+
+1.  **Reference `llms.txt`**: Instruct the agent to read `docs/build/llms.txt` to understand the project structure and key components without parsing the entire site.
+2.  **Validation**: Always run `npm run docs:build` after making documentation changes to ensure the AI context files are updated.
+
+### Workflow
+See the [SDLC Release Notes](/sdlc/) for integration details.
