@@ -324,7 +324,6 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
     simulationPoints,
     itemTotals = {},
     onReorderItems,
-    onDeleteAllItems,
     onDeleteItems,
     onToggleAllItems,
     hoverDate,
@@ -748,30 +747,21 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                 <div className="text-gray-500 group-hover:text-white transition-colors shrink-0">
                                     <ChevronDown size={16} />
                                 </div>
-                                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider shrink-0">
+                                <span className="text-xs font-semibold uppercase tracking-wider shrink-0 bg-gradient-to-r from-lime-400 via-purple-400 to-pink-500 bg-clip-text text-transparent">
                                     Event Timeline
                                 </span>
 
-                                {/* Moved Zoom and Flip here */}
-                                <div className="flex items-center space-x-2 mx-2">
-                                    {zoomToggle}
-                                    <button
-                                        onClick={(e) => { e.stopPropagation(); onFlip(); }}
-                                        className={`p-1.5 rounded-md transition-colors ${isFlipped ? 'bg-blue-900/50 text-blue-400 hover:bg-blue-900/80 hover:text-blue-300' : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800'}`}
-                                        title={isFlipped ? "Switch to Timeline" : "Switch to Formula View"}
-                                    >
-                                        <FlipIcon size={16} />
-                                    </button>
-                                </div>
+
 
                                 {/* Search Bar */}
-                                <div className="relative ml-2 flex-1 max-w-md group/search" onClick={(e) => e.stopPropagation()}>
+                                <div className="relative ml-2 w-64 group/search" onClick={(e) => e.stopPropagation()}>
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <Search size={14} className="text-gray-500 group-focus-within/search:text-blue-400 transition-colors" />
+                                        <Search size={14} className={`transition-colors ${searchQuery ? 'text-blue-500' : 'text-gray-500 group-hover/search:text-white group-focus-within/search:!text-blue-500'}`} />
                                     </div>
                                     <input
+                                        ref={searchInputRef}
                                         type="text"
-                                        className="block w-full pl-10 pr-12 py-1 bg-gray-800 border border-gray-700 rounded-md text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                        className={`block w-full pl-10 pr-12 py-1 bg-gray-800 border rounded-md text-xs text-gray-200 placeholder-gray-500 group-hover/search:placeholder-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all ${searchQuery ? 'border-blue-500 ring-1 ring-blue-500' : 'border-gray-700 hover:border-white'}`}
                                         placeholder="Select Event/Effect to Edit"
                                         value={searchQuery}
                                         onChange={(e) => {
@@ -780,13 +770,24 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                     />
                                     <div className="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none">
                                         <div className="flex items-center space-x-0.5">
-                                            <kbd className="inline-flex items-center justify-center h-5 min-w-[20px] px-1 text-[10px] font-medium text-gray-400 bg-gray-700 border border-gray-600 rounded">⌘</kbd>
-                                            <kbd className="inline-flex items-center justify-center h-5 min-w-[20px] px-1 text-[10px] font-medium text-gray-400 bg-gray-700 border border-gray-600 rounded">K</kbd>
+                                            <kbd className="inline-flex items-center justify-center h-5 min-w-[20px] px-1 text-[10px] font-medium text-gray-400 bg-gray-700 border border-gray-600 rounded group-hover/search:text-white group-hover/search:border-gray-500 transition-colors">⌘</kbd>
+                                            <kbd className="inline-flex items-center justify-center h-5 min-w-[20px] px-1 text-[10px] font-medium text-gray-400 bg-gray-700 border border-gray-600 rounded group-hover/search:text-white group-hover/search:border-gray-500 transition-colors">K</kbd>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div className="flex items-center space-x-0 shrink-0">
+                                {/* Zoom and Flip Icons */}
+                                <div className="flex items-center space-x-1 mr-2">
+                                    {zoomToggle}
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); onFlip(); }}
+                                        className={`p-1.5 rounded-md transition-colors ${isFlipped ? 'bg-blue-900/50 text-blue-400' : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800'}`}
+                                        title={isFlipped ? "Switch to Timeline" : "Switch to Formula View"}
+                                    >
+                                        <FlipIcon size={16} />
+                                    </button>
+                                </div>
                                 {/* Select All Toggle */}
                                 <button
                                     onClick={(e) => {
@@ -838,21 +839,27 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                             e.stopPropagation();
                                             setIsFilterOpen(!isFilterOpen);
                                         }}
-                                        className={`flex items-center justify-between space-x-1 text-xs px-2 h-[26px] rounded border transition-colors w-28 ${isFilterOpen || filterType
+                                        onMouseDown={(e) => e.stopPropagation()}
+                                        className={`flex items-center justify-between space-x-1 text-xs px-2 h-[26px] rounded border transition-colors w-28 ${(isFilterOpen || searchQuery || filterType)
                                             ? 'bg-blue-900/30 border-blue-500/50 text-blue-200 hover:bg-blue-900/50 hover:text-white'
                                             : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white'
                                             }`}
                                     >
                                         <div className="flex items-center space-x-1 overflow-hidden">
                                             <Filter size={12} className="shrink-0" />
-                                            <span className="truncate">{filterType ? filterType.charAt(0).toUpperCase() + filterType.slice(1) : 'All Events'}</span>
+                                            <span className="truncate">
+                                                {searchQuery ? 'Search' : (filterType ? (filterType.charAt(0).toUpperCase() + filterType.slice(1)) : 'All Events')}
+                                            </span>
                                         </div>
                                         {isFilterOpen ? <ChevronUp size={12} className="shrink-0" /> : <ChevronDown size={12} className="shrink-0" />}
                                     </button>
 
                                     {isFilterOpen && (
                                         <>
-                                            <div className="fixed inset-0 z-50" onClick={(e) => { e.stopPropagation(); setIsFilterOpen(false); }} />
+                                            <div className="fixed inset-0 z-50" onClick={(e) => {
+                                                e.stopPropagation();
+                                                setIsFilterOpen(false);
+                                            }} />
                                             <div className="absolute right-0 top-full mt-1 w-32 bg-gray-900 border border-gray-700 rounded shadow-xl z-[60] py-1 flex flex-col">
                                                 {[
                                                     { label: 'All Events', value: null },
@@ -892,10 +899,24 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                     </button>
                                 </div>
 
-                                {/* Chart Icon (Placeholder) */}
-                                <div className="text-gray-500 p-1 ml-2">
-                                    <LineChart size={16} />
-                                </div>
+                                {showIndividualSeries && (
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (selectedItemIds.size > 0) {
+                                                onToggleItemSeries(Array.from(selectedItemIds));
+                                            }
+                                        }}
+                                        disabled={selectedItemIds.size === 0}
+                                        className={`p-1.5 rounded-md transition-colors ml-2 ${selectedItemIds.size > 0
+                                            ? 'text-gray-400 hover:text-blue-400 hover:bg-gray-800'
+                                            : 'text-gray-700 cursor-not-allowed'
+                                            } ${selectedItemIds.size > 0 && Array.from(selectedItemIds).every(id => items.find(i => i.id === id)?.isChartVisible) ? 'bg-blue-900/30 text-blue-400' : ''}`}
+                                        title={selectedItemIds.size > 0 ? "Toggle Chart Series for Selected" : "Select items to toggle chart series"}
+                                    >
+                                        <LineChart size={16} />
+                                    </button>
+                                )}
 
                                 {/* Visibility Toggle (Eye Icon) - Only works on selected items */}
                                 <button
@@ -920,11 +941,16 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        onDeleteAllItems();
+                                        if (selectedItemIds.size === 0) return;
+                                        onDeleteItems(Array.from(selectedItemIds));
                                     }}
                                     onMouseDown={(e) => e.stopPropagation()}
-                                    className="text-gray-400 hover:text-red-400 focus:outline-none ml-1"
-                                    title="Delete All Events"
+                                    disabled={selectedItemIds.size === 0}
+                                    className={`p-1.5 rounded-md transition-colors ml-1 ${selectedItemIds.size > 0
+                                        ? 'text-gray-400 hover:text-red-400 hover:bg-gray-800'
+                                        : 'text-gray-600 cursor-not-allowed'
+                                        }`}
+                                    title={selectedItemIds.size > 0 ? "Delete Selected Events" : "Select items to delete"}
                                 >
                                     <Trash2 size={16} />
                                 </button>
@@ -956,8 +982,17 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                 viewEndDate={effectiveEndDate}
                                 simulationPoints={simulationPoints}
                                 itemTotals={itemTotals}
+                                showIndividualSeries={showIndividualSeries}
                             />
                         </div>
+
+                        {/* Total Event Bar - Locked to bottom (Formula View) */}
+                        {filteredItems.length >= 2 && (
+                            <TotalEventBar
+                                delta={Object.values(itemTotals).reduce((a, b) => a + b, 0)}
+                                endDate={new Date(simulationEndDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }).replace(/\//g, '-')}
+                            />
+                        )}
                     </div>
                 </motion.div>
             </motion.div>

@@ -8,6 +8,7 @@ sidebar_position: 6
 ## Unreleased
 
 **Features:**
+- Add llms.txt plugin and update agent rules
 - Restrict github link to dev environment
 - Hide individual series by default and refactor chart toggling
 

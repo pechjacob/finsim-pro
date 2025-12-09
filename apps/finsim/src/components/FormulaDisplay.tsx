@@ -14,6 +14,7 @@ interface FormulaDisplayProps {
     viewEndDate?: string;
     simulationPoints?: { date: string; balance: number; itemStartBalances?: Record<string, number>; }[];
     itemTotals?: Record<string, number>;
+    showIndividualSeries?: boolean;
 }
 
 export const FormulaDisplay: React.FC<FormulaDisplayProps> = ({
@@ -23,7 +24,8 @@ export const FormulaDisplay: React.FC<FormulaDisplayProps> = ({
     viewStartDate,
     viewEndDate,
     simulationPoints = [],
-    itemTotals = {}
+    itemTotals = {},
+    showIndividualSeries = true, // Default to true if not provided
 }) => {
     // Helper to get variable name
     const getVarName = (item: FinancialItem) => {
@@ -39,7 +41,7 @@ export const FormulaDisplay: React.FC<FormulaDisplayProps> = ({
     };
 
     return (
-        <div className="h-full overflow-y-auto custom-scrollbar px-2 pt-1">
+        <div className="px-2 pt-1 pb-2">
             <div className="space-y-2">
                 {items.map(item => {
                     const isIncome = item.type === 'income';
@@ -52,30 +54,20 @@ export const FormulaDisplay: React.FC<FormulaDisplayProps> = ({
                     let textColor = 'text-gray-200';
 
                     if (isIncome) {
-                        bgColor = isActive ? 'bg-green-700' : 'bg-green-800/60';
-                        borderColor = isActive ? 'border-green-400' : 'border-green-700/50';
+                        bgColor = isActive ? 'bg-green-600' : 'bg-green-600/60';
+                        borderColor = isActive ? 'border-green-400' : 'border-green-800';
                         textColor = 'text-green-100';
                     } else if (isExpense) {
-                        bgColor = isActive ? 'bg-red-700' : 'bg-red-800/60';
-                        borderColor = isActive ? 'border-red-400' : 'border-red-700/50';
+                        bgColor = isActive ? 'bg-red-600' : 'bg-red-600/60';
+                        borderColor = isActive ? 'border-red-400' : 'border-red-800';
                         textColor = 'text-red-100';
                     } else if (isEffect) {
-                        bgColor = isActive ? 'bg-purple-700' : 'bg-purple-800/60';
-                        borderColor = isActive ? 'border-purple-400' : 'border-purple-700/50';
+                        bgColor = isActive ? 'bg-purple-600' : 'bg-purple-600/60';
+                        borderColor = isActive ? 'border-purple-400' : 'border-purple-800';
                         textColor = 'text-purple-100';
                     }
 
                     const varName = getVarName(item);
-                    // const amount = item.amount || 0; // Unused
-                    // const amountStr = isExpense ? `-\\$${amount} ` : `\\$${amount} `; // Unused
-                    // const nameStr = `\\text{${item.name} } `; // Unused
-
-                    // Left side equation: I_j = Job
-                    // const leftEq = `${varName} = ${nameStr} `; // Unused
-
-                    // Center equation: I_j = $2000
-                    // const centerEq = `${varName} = ${amountStr} `; // Unused
-
                     const isEnabled = item.isEnabled !== false;
 
                     // Calculate the account balance at the event's start date (matches unflipped view)
@@ -218,6 +210,16 @@ export const FormulaDisplay: React.FC<FormulaDisplayProps> = ({
                                     {item.endDate ? `Ends ${item.endDate.split('-')[1]}-${item.endDate.split('-')[2]}-${item.endDate.split('-')[0]}` : 'Ongoing'}
                                 </span>
                             </div>
+
+                            {/* Chart Color Indicator - Full Height, Far Right */}
+                            <div
+                                className="absolute right-0 top-0 bottom-0 w-1.5 shadow-sm z-20"
+                                style={{
+                                    backgroundColor: (showIndividualSeries && item.isChartVisible !== false)
+                                        ? (item.chartColor || (item.type === 'income' ? '#22c55e' : item.type === 'expense' ? '#ef4444' : item.type === 'effect' ? '#a855f7' : '#4b5563'))
+                                        : '#374151' // Gray-700 for hidden series
+                                }}
+                            />
                         </div>
                     );
                 })}
