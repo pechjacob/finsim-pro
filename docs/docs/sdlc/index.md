@@ -8,6 +8,8 @@ sidebar_position: 6
 ## Unreleased
 
 **Features:**
+- Add llms.txt plugin and update agent rules
+- Restrict github link to dev environment
 - Hide individual series by default and refactor chart toggling
 
 ## v1.6.1
@@ -96,4 +98,19 @@ sidebar_position: 6
 ## v0.9.0 (Beta)
 *   Beta testing release
 *   Basic chart functionality
-*   Simple income/expense tracking
+
+## AI Integration (New)
+
+The project includes `docusaurus-plugin-llms` to generate AI-friendly documentation.
+
+### Build Output
+When you run `npm run docs:build`, two files are generated in `docs/build/`:
+- **`/llms.txt`**: A concise map of the documentation.
+- **`/llms-full.txt`**: The full content of all documentation, optimized for LLM context windows.
+
+### Usage
+AI Agents (like Cursor, Windsurf, or custom scripts) can use these files to rapidly ingest the entire project documentation without crawling or parsing HTML.
+
+**URLs:**
+- `https://pechjacob.github.io/finsim-pro/docs/llms.txt`
+- `https://pechjacob.github.io/finsim-pro/docs/llms-full.txt`
