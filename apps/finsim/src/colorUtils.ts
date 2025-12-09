@@ -43,6 +43,7 @@ export function hslToHex(h: number, s: number, l: number): string {
  * Parse HSL string to hex
  */
 export function hslStringToHex(hsl: string): string {
+    if (hsl.startsWith('#')) return hsl;
     const match = hsl.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
     if (!match) return '#3B82F6'; // Default blue
 

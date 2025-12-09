@@ -11,7 +11,7 @@ import {
     constrainToBounds,
     aggregateData
 } from '../utils';
-import { getDistinctColor, hslStringToHex } from '../colorUtils';
+import { hslStringToHex } from '../colorUtils';
 
 export interface BalanceDataPoint {
     date: string;
@@ -32,6 +32,7 @@ interface LightweightFinancialChartProps {
     items?: FinancialItem[];
     simulationPoints?: SimulationPoint[];
     showIndividualSeries?: boolean;
+    totalSeriesColor?: string;
 }
 
 // Format date as MM/DD/YYYY
@@ -135,7 +136,8 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
     onHover,
     items = [],
     simulationPoints = [],
-    showIndividualSeries = false
+    showIndividualSeries = false,
+    totalSeriesColor = '#60a5fa'
 }) => {
     const chartContainerRef = useRef<HTMLDivElement>(null);
     const chartRef = useRef<IChartApi | null>(null);
@@ -471,9 +473,9 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
         });
 
         const areaSeries = chart.addAreaSeries({
-            lineColor: '#60a5fa',
-            topColor: 'rgba(59, 130, 246, 0.3)',
-            bottomColor: 'rgba(59, 130, 246, 0)',
+            lineColor: totalSeriesColor,
+            topColor: `${totalSeriesColor}4D`, // ~30% opacity
+            bottomColor: `${totalSeriesColor}00`, // Transparent
             lineWidth: 2,
             priceLineVisible: true,
             lastValueVisible: true,
@@ -630,6 +632,17 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
         }
     }, [chartData]);
 
+    // Update main series color when prop changes
+    useEffect(() => {
+        if (seriesRef.current) {
+            seriesRef.current.applyOptions({
+                lineColor: totalSeriesColor,
+                topColor: `${totalSeriesColor}4D`,
+                bottomColor: `${totalSeriesColor}00`,
+            });
+        }
+    }, [totalSeriesColor]);
+
     // Manage individual item series
     useEffect(() => {
         if (!chartRef.current || !showIndividualSeries) {
@@ -674,13 +687,12 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
 
             let series = itemSeriesRef.current.get(itemId);
 
+
+
             if (!series) {
                 // Create new series
-                const existingColors = Array.from(itemSeriesRef.current.keys())
-                    .map(id => items.find(i => i.id === id)?.chartColor)
-                    .filter(Boolean) as string[];
 
-                const colorRaw = item.chartColor || getDistinctColor(existingColors, items.indexOf(item));
+                const colorRaw = item.chartColor || (item.type === 'income' ? '#22c55e' : item.type === 'expense' ? '#ef4444' : item.type === 'effect' ? '#a855f7' : '#4b5563');
                 // Convert HSL to hex for lightweight-charts compatibility
                 const color = hslStringToHex(colorRaw);
 
@@ -696,9 +708,15 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
 
                 itemSeriesRef.current.set(itemId, series);
             } else {
-                // Update visibility for existing series
+                // Update visibility AND color for existing series
+                const colorRaw = item.chartColor || (item.type === 'income' ? '#22c55e' : item.type === 'expense' ? '#ef4444' : item.type === 'effect' ? '#a855f7' : '#4b5563');
+                const color = hslStringToHex(colorRaw);
+
                 series.applyOptions({
-                    visible: isVisible
+                    visible: isVisible,
+                    lineColor: color,
+                    topColor: `${color}80`,
+                    bottomColor: `${color}00`,
                 });
             }
 

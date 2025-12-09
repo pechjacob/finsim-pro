@@ -76,6 +76,8 @@ const AppPage: React.FC = () => {
     localStorage.setItem('showIndividualSeries', JSON.stringify(showIndividualSeries));
   }, [showIndividualSeries]);
 
+  const [totalSeriesColor, setTotalSeriesColor] = useState<string>('#60a5fa');
+
   // Computed
   const activeAccount = accounts.find(a => a.id === activeAccountId) || accounts[0];
 
@@ -107,6 +109,15 @@ const AppPage: React.FC = () => {
       return [...prev, item];
     });
     setSelectedItemIds(new Set([item.id])); // Focus the new/edited item
+  };
+
+  const handleItemColorChange = (itemId: string, color: string) => {
+    setItems(prev => prev.map(item => {
+      if (item.id === itemId) {
+        return { ...item, chartColor: color };
+      }
+      return item;
+    }));
   };
 
   const handleDeleteItem = (id: string) => {
@@ -301,6 +312,7 @@ const AppPage: React.FC = () => {
               items={items.filter(i => i.accountId === activeAccountId && i.isEnabled !== false)}
               simulationPoints={simulationPoints}
               showIndividualSeries={showIndividualSeries}
+              totalSeriesColor={totalSeriesColor}
             />
           ) : (
             <FinancialChart
@@ -360,6 +372,9 @@ const AppPage: React.FC = () => {
             onToggleItemSeries={handleToggleItemSeries}
             // onToggleIndividualSeries deprecated in favor of per-item toggling via chart icon selection
             onToggleIndividualSeries={() => { }}
+            onItemColorChange={handleItemColorChange}
+            totalSeriesColor={totalSeriesColor}
+            onTotalSeriesColorChange={setTotalSeriesColor}
           />
         </div>
 

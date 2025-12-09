@@ -1,13 +1,24 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { formatCurrency } from '../utils';
 import { GripVertical } from 'lucide-react';
 
 interface TotalEventBarProps {
     delta: number;
     endDate: string; // "MM-DD-YYYY" or similar
+    color?: string;
+    onColorChange?: (color: string) => void;
+    isChartSeriesVisible?: boolean;
 }
 
-export const TotalEventBar: React.FC<TotalEventBarProps> = ({ delta, endDate }) => {
+export const TotalEventBar: React.FC<TotalEventBarProps> = ({
+    delta,
+    endDate,
+    color = '#60a5fa', // Default blue if not provided
+    onColorChange,
+    isChartSeriesVisible = true
+}) => {
+    const colorInputRef = useRef<HTMLInputElement>(null);
+
     // The "Total" active bar should conceptually span the entire timeline as it summarizes everything.
     // We use the same 'calc(100% - 80px)' width logic to align with the chart's time scale area,
     // assuming the other bars use this to offset the Y-axis space.
@@ -21,8 +32,12 @@ export const TotalEventBar: React.FC<TotalEventBarProps> = ({ delta, endDate }) 
             <div className="absolute top-0 bottom-0 pointer-events-none" style={{ width: 'calc(100% - 80px)', left: 0 }}>
                 {/* Active Gradient Bar - Full width of the plotting area */}
                 <div
-                    className="absolute top-0 h-full bg-gradient-to-r from-lime-400/80 via-emerald-400/80 to-purple-500/80 transition-all duration-300 opacity-90"
-                    style={{ width: '100%', left: 0 }}
+                    className="absolute top-0 h-full transition-all duration-300 opacity-90"
+                    style={{
+                        width: '100%',
+                        left: 0,
+                        background: `linear-gradient(90deg, ${color}20, ${color}80, ${color})`
+                    }}
                 />
             </div>
 
@@ -45,7 +60,7 @@ export const TotalEventBar: React.FC<TotalEventBarProps> = ({ delta, endDate }) 
                 </div>
 
                 {/* Right Side: End Date + Badge */}
-                <div className="flex items-center space-x-2 text-xs font-mono z-10 ml-auto text-white">
+                <div className="flex items-center space-x-2 text-xs font-mono z-10 ml-auto text-white mr-2">
                     <span className="opacity-80 uppercase text-[10px] tracking-wider font-semibold drop-shadow-sm">Ends {endDate}</span>
                     <span className="px-1.5 py-0.5 bg-gray-900/80 border border-gray-600 rounded uppercase text-[10px] tracking-wider text-gray-300 font-bold shadow-sm">
                         TOTAL
@@ -54,7 +69,29 @@ export const TotalEventBar: React.FC<TotalEventBarProps> = ({ delta, endDate }) 
             </div>
 
             {/* Color Indicator Strip - Full Height, Far Right */}
-            <div className="absolute right-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-lime-400 to-purple-500 shadow-sm z-20" />
+            {/* Clickable to trigger hidden color input */}
+            <div
+                className={`absolute right-0 top-0 bottom-0 w-3 transition-all z-20 shadow-[-2px_0_10px_rgba(0,0,0,0.5)] ${isChartSeriesVisible ? 'cursor-pointer hover:brightness-110' : 'cursor-not-allowed grayscale opacity-50'}`}
+                style={{ backgroundColor: color }}
+                onClick={() => {
+                    if (isChartSeriesVisible && onColorChange && colorInputRef.current) {
+                        colorInputRef.current.click();
+                    }
+                }}
+                title={isChartSeriesVisible ? "Click to change total series color" : "Enable chart series to change color"}
+            />
+
+            {/* Hidden Color Input */}
+            {isChartSeriesVisible && onColorChange && (
+                <input
+                    ref={colorInputRef}
+                    type="color"
+                    value={color}
+                    onChange={(e) => onColorChange(e.target.value)}
+                    className="absolute opacity-0 pointer-events-none"
+                    aria-label="Total series color picker"
+                />
+            )}
         </div>
     );
 };
