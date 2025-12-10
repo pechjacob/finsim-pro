@@ -1043,9 +1043,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                 Event Timeline
                             </span>
                         </div>
-                        <div className="text-xs text-gray-500 font-mono">
-                            Delta in View
-                        </div>
+
                     </div>
                 )
             }

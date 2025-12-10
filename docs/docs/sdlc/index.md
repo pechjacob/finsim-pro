@@ -8,9 +8,14 @@ sidebar_position: 6
 ## Unreleased
 
 **Features:**
+- Implement individual and total event bar color pickers
 - Add llms.txt plugin and update agent rules
 - Restrict github link to dev environment
 - Hide individual series by default and refactor chart toggling
+
+**Bug Fixes:**
+- Repair timeline header styling and polish event bar aesthetics
+- Unify formula view layout and styles with event timeline
 
 ## v1.6.1
 * **app:** enable manual series toggling by default ([87e9c70](https://github.com/pechjacob/finsim-pro/commit/87e9c70))
