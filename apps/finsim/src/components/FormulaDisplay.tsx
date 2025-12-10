@@ -213,11 +213,11 @@ export const FormulaDisplay: React.FC<FormulaDisplayProps> = ({
 
                             {/* Chart Color Indicator - Full Height, Far Right */}
                             <div
-                                className="absolute right-0 top-0 bottom-0 w-1.5 shadow-sm z-20"
+                                className={`absolute right-0 top-0 bottom-0 w-3 shadow-sm z-20 transition-all ${showIndividualSeries && item.isChartVisible !== false ? 'cursor-pointer hover:brightness-110' : 'cursor-not-allowed grayscale opacity-50'}`}
                                 style={{
                                     backgroundColor: (showIndividualSeries && item.isChartVisible !== false)
                                         ? (item.chartColor || (item.type === 'income' ? '#22c55e' : item.type === 'expense' ? '#ef4444' : item.type === 'effect' ? '#a855f7' : '#4b5563'))
-                                        : '#374151' // Gray-700 for hidden series
+                                        : '#374151'
                                 }}
                             />
                         </div>

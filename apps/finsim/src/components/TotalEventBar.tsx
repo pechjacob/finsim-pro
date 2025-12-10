@@ -61,7 +61,7 @@ export const TotalEventBar: React.FC<TotalEventBarProps> = ({
 
                 {/* Right Side: End Date + Badge */}
                 <div className="flex items-center space-x-2 text-xs font-mono z-10 ml-auto text-white mr-2">
-                    <span className="opacity-80 uppercase text-[10px] tracking-wider font-semibold drop-shadow-sm">Ends {endDate}</span>
+                    <span className="opacity-80 drop-shadow-sm mr-6">Ends {endDate}</span>
                     <span className="px-1.5 py-0.5 bg-gray-900/80 border border-gray-600 rounded uppercase text-[10px] tracking-wider text-gray-300 font-bold shadow-sm">
                         TOTAL
                     </span>

@@ -98,26 +98,24 @@ const SortableEventItem: React.FC<SortableEventItemProps> = ({
     const isLumpSum = item.formula === FormulaType.LUMP_SUM;
 
     // Visual styling
-    let barColor = 'bg-gray-700';
     let textColor = 'text-gray-200';
     let borderClass = 'border-gray-700';
     let sign = '+';
+    let bgColor = 'bg-gray-800'; // Default for the item container
 
     if (item.type === 'income') {
-        barColor = isActive ? 'bg-green-600' : 'bg-green-600';
+        bgColor = isActive ? 'bg-green-600' : 'bg-green-600/60';
         borderClass = isActive ? 'border-green-400' : 'border-green-800';
         textColor = 'text-green-100';
-        sign = '+';
     } else if (item.type === 'expense') {
-        barColor = isActive ? 'bg-red-600' : 'bg-red-600';
+        bgColor = isActive ? 'bg-red-600' : 'bg-red-600/60';
         borderClass = isActive ? 'border-red-400' : 'border-red-800';
         textColor = 'text-red-100';
         sign = '-';
     } else if (item.type === 'effect') {
-        barColor = isActive ? 'bg-purple-600' : 'bg-purple-600';
+        bgColor = isActive ? 'bg-purple-600' : 'bg-purple-600/60';
         borderClass = isActive ? 'border-purple-400' : 'border-purple-800';
         textColor = 'text-purple-100';
-        sign = '+';
     }
 
     // Calculate bar width and position based on view range
@@ -161,7 +159,6 @@ const SortableEventItem: React.FC<SortableEventItemProps> = ({
         top: 0,
         zIndex: 0, // Behind text
         borderRadius: 'inherit',
-        opacity: isActive ? 0.9 : 0.75,
     };
 
     // Styling for the inactive track (grayed out) - spans full width now
@@ -250,7 +247,7 @@ const SortableEventItem: React.FC<SortableEventItemProps> = ({
             {/* Width calc: 100% - 80px (YAxis width) */}
             <div className="absolute top-0 bottom-0 pointer-events-none" style={{ width: 'calc(100% - 80px)', left: 0 }}>
                 {/* Active Bar Portion */}
-                <div className={`${barColor} transition-all duration-300`} style={activeBarStyle} />
+                <div className={`${bgColor} transition-all duration-300`} style={activeBarStyle} />
             </div>
 
             {/* Content Layer */}
@@ -307,7 +304,7 @@ const SortableEventItem: React.FC<SortableEventItemProps> = ({
 
             {/* Chart Color Indicator - Full Height, Far Right */}
             <div
-                className={`absolute right-0 top-0 bottom-0 w-1.5 shadow-sm z-20 transition-all ${isChartSeriesVisible ? 'cursor-pointer hover:brightness-110' : 'cursor-not-allowed grayscale opacity-50'}`}
+                className={`absolute right-0 top-0 bottom-0 w-3 shadow-sm z-20 transition-all ${isChartSeriesVisible ? 'cursor-pointer hover:brightness-110' : 'cursor-not-allowed grayscale opacity-50'}`}
                 style={{
                     backgroundColor: isChartSeriesVisible
                         ? (item.chartColor || (item.type === 'income' ? '#22c55e' : item.type === 'expense' ? '#ef4444' : item.type === 'effect' ? '#a855f7' : '#4b5563'))
@@ -464,7 +461,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
 
 
     return (
-        <div className={`flex flex - col transition - all duration - 300 ease -in -out ${isCollapsed ? 'h-10' : 'h-full'} `} style={{ perspective: 1000 }}>
+        <div className={`flex flex-col transition-all duration-300 ease-in-out ${isCollapsed ? 'h-10' : 'h-full'} `} style={{ perspective: 1000 }}>
             <motion.div
                 className="flex-1 relative overflow-hidden"
                 initial={false}
@@ -503,12 +500,12 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                 {/* Search Bar */}
                                 <div className="relative ml-2 w-64 group/search" onClick={(e) => e.stopPropagation()}>
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <Search size={14} className={`transition - colors ${searchQuery ? 'text-blue-500' : 'text-gray-500 group-hover/search:text-white group-focus-within/search:!text-blue-500'} `} />
+                                        <Search size={14} className={`transition-colors ${searchQuery ? 'text-blue-500' : 'text-gray-500 group-hover/search:text-white group-focus-within/search:!text-blue-500'} `} />
                                     </div>
                                     <input
                                         ref={searchInputRef}
                                         type="text"
-                                        className={`block w - full pl - 10 pr - 12 py - 1 bg - gray - 800 border rounded - md text - xs text - gray - 200 placeholder - gray - 500 group - hover / search: placeholder - white focus: outline - none focus: ring - 1 focus: ring - blue - 500 focus: border - blue - 500 transition - all ${searchQuery ? 'border-blue-500 ring-1 ring-blue-500' : 'border-gray-700 hover:border-white'} `}
+                                        className={`block w-full pl-10 pr-12 py-1 bg-gray-800 border rounded-md text-xs text-gray-200 placeholder-gray-500 group-hover/search:placeholder-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all ${searchQuery ? 'border-blue-500 ring-1 ring-blue-500' : 'border-gray-700 hover:border-white'} `}
                                         placeholder="Select Event/Effect to Edit"
                                         value={searchQuery}
                                         onChange={(e) => {
@@ -529,7 +526,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                     {zoomToggle}
                                     <button
                                         onClick={(e) => { e.stopPropagation(); onFlip(); }}
-                                        className={`p - 1.5 rounded - md transition - colors ${isFlipped ? 'bg-blue-900/50 text-blue-400' : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800'} `}
+                                        className={`p-1.5 rounded-md transition-colors ${isFlipped ? 'bg-blue-900/50 text-blue-400' : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800'} `}
                                         title={isFlipped ? "Switch to Timeline" : "Switch to Formula View"}
                                     >
                                         <FlipIcon size={16} />
@@ -587,7 +584,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                             setIsFilterOpen(!isFilterOpen);
                                         }}
                                         onMouseDown={(e) => e.stopPropagation()}
-                                        className={`flex items - center justify - between space - x - 1 text - xs px - 2 h - [26px] rounded border transition - colors w - 28 ${(isFilterOpen || searchQuery || filterType)
+                                        className={`flex items-center justify-between space-x-1 text-xs px-2 h-[26px] rounded border transition-colors w-28 ${(isFilterOpen || searchQuery || filterType)
                                             ? 'bg-blue-900/30 border-blue-500/50 text-blue-200 hover:bg-blue-900/50 hover:text-white'
                                             : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white'
                                             } `}
@@ -621,7 +618,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                                             setFilterType(option.value as any);
                                                             setIsFilterOpen(false);
                                                         }}
-                                                        className={`text - left px - 3 py - 1.5 text - xs hover: bg - gray - 700 ${filterType === option.value ? 'text-blue-400 font-medium' : 'text-gray-300'} `}
+                                                        className={`text-left px-3 py-1.5 text-xs hover:bg-gray-700 ${filterType === option.value ? 'text-blue-400 font-medium' : 'text-gray-300'} `}
                                                     >
                                                         {option.label}
                                                     </button>
@@ -632,7 +629,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                 </div>
 
                                 {/* Reset Icon */}
-                                <div className={`flex items - center justify - center w - [26px] h - [26px] ${(searchQuery || filterType) ? 'visible' : 'invisible'} `}>
+                                <div className={`flex items-center justify-center w-[26px] h-[26px] ${(searchQuery || filterType) ? 'visible' : 'invisible'} `}>
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
@@ -655,7 +652,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                             }
                                         }}
                                         disabled={selectedItemIds.size === 0}
-                                        className={`p - 1.5 rounded - md transition - colors ml - 2 ${selectedItemIds.size > 0
+                                        className={`p-1.5 rounded-md transition-colors ml-2 ${selectedItemIds.size > 0
                                             ? 'text-gray-400 hover:text-blue-400 hover:bg-gray-800'
                                             : 'text-gray-700 cursor-not-allowed'
                                             } ${selectedItemIds.size > 0 && Array.from(selectedItemIds).every(id => items.find(i => i.id === id)?.isChartVisible) ? 'bg-blue-900/30 text-blue-400' : ''} `}
@@ -676,7 +673,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                     }}
                                     onMouseDown={(e) => e.stopPropagation()}
                                     disabled={selectedItemIds.size === 0}
-                                    className={`p - 1.5 rounded - md transition - colors ml - 1 ${selectedItemIds.size > 0
+                                    className={`p-1.5 rounded-md transition-colors ml-1 ${selectedItemIds.size > 0
                                         ? 'hover:bg-gray-800 text-gray-400 hover:text-white'
                                         : 'text-gray-600 cursor-not-allowed'
                                         } `}
@@ -693,7 +690,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                     }}
                                     onMouseDown={(e) => e.stopPropagation()}
                                     disabled={selectedItemIds.size === 0}
-                                    className={`p - 1.5 rounded - md transition - colors ml - 1 ${selectedItemIds.size > 0
+                                    className={`p-1.5 rounded-md transition-colors ml-1 ${selectedItemIds.size > 0
                                         ? 'text-gray-400 hover:text-red-400 hover:bg-gray-800'
                                         : 'text-gray-600 cursor-not-allowed'
                                         } `}
@@ -788,12 +785,12 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                 {/* Search Bar */}
                                 <div className="relative ml-2 w-64 group/search" onClick={(e) => e.stopPropagation()}>
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <Search size={14} className={`transition - colors ${searchQuery ? 'text-blue-500' : 'text-gray-500 group-hover/search:text-white group-focus-within/search:!text-blue-500'} `} />
+                                        <Search size={14} className={`transition-colors ${searchQuery ? 'text-blue-500' : 'text-gray-500 group-hover/search:text-white group-focus-within/search:!text-blue-500'} `} />
                                     </div>
                                     <input
                                         ref={searchInputRef}
                                         type="text"
-                                        className={`block w - full pl - 10 pr - 12 py - 1 bg - gray - 800 border rounded - md text - xs text - gray - 200 placeholder - gray - 500 group - hover / search: placeholder - white focus: outline - none focus: ring - 1 focus: ring - blue - 500 focus: border - blue - 500 transition - all ${searchQuery ? 'border-blue-500 ring-1 ring-blue-500' : 'border-gray-700 hover:border-white'} `}
+                                        className={`block w-full pl-10 pr-12 py-1 bg-gray-800 border rounded-md text-xs text-gray-200 placeholder-gray-500 group-hover/search:placeholder-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all ${searchQuery ? 'border-blue-500 ring-1 ring-blue-500' : 'border-gray-700 hover:border-white'} `}
                                         placeholder="Select Event/Effect to Edit"
                                         value={searchQuery}
                                         onChange={(e) => {
@@ -814,7 +811,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                     {zoomToggle}
                                     <button
                                         onClick={(e) => { e.stopPropagation(); onFlip(); }}
-                                        className={`p - 1.5 rounded - md transition - colors ${isFlipped ? 'bg-blue-900/50 text-blue-400' : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800'} `}
+                                        className={`p-1.5 rounded-md transition-colors ${isFlipped ? 'bg-blue-900/50 text-blue-400' : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800'} `}
                                         title={isFlipped ? "Switch to Timeline" : "Switch to Formula View"}
                                     >
                                         <FlipIcon size={16} />
@@ -872,7 +869,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                             setIsFilterOpen(!isFilterOpen);
                                         }}
                                         onMouseDown={(e) => e.stopPropagation()}
-                                        className={`flex items - center justify - between space - x - 1 text - xs px - 2 h - [26px] rounded border transition - colors w - 28 ${(isFilterOpen || searchQuery || filterType)
+                                        className={`flex items-center justify-between space-x-1 text-xs px-2 h-[26px] rounded border transition-colors w-28 ${(isFilterOpen || searchQuery || filterType)
                                             ? 'bg-blue-900/30 border-blue-500/50 text-blue-200 hover:bg-blue-900/50 hover:text-white'
                                             : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white'
                                             } `}
@@ -906,7 +903,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                                             setFilterType(option.value as any);
                                                             setIsFilterOpen(false);
                                                         }}
-                                                        className={`text - left px - 3 py - 1.5 text - xs hover: bg - gray - 700 ${filterType === option.value ? 'text-blue-400 font-medium' : 'text-gray-300'} `}
+                                                        className={`text-left px-3 py-1.5 text-xs hover:bg-gray-700 ${filterType === option.value ? 'text-blue-400 font-medium' : 'text-gray-300'} `}
                                                     >
                                                         {option.label}
                                                     </button>
@@ -917,7 +914,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                 </div>
 
                                 {/* Reset Icon */}
-                                <div className={`flex items - center justify - center w - [26px] h - [26px] ${(searchQuery || filterType) ? 'visible' : 'invisible'} `}>
+                                <div className={`flex items-center justify-center w-[26px] h-[26px] ${(searchQuery || filterType) ? 'visible' : 'invisible'} `}>
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
@@ -940,7 +937,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                             }
                                         }}
                                         disabled={selectedItemIds.size === 0}
-                                        className={`p - 1.5 rounded - md transition - colors ml - 2 ${selectedItemIds.size > 0
+                                        className={`p-1.5 rounded-md transition-colors ml-2 ${selectedItemIds.size > 0
                                             ? 'text-gray-400 hover:text-blue-400 hover:bg-gray-800'
                                             : 'text-gray-700 cursor-not-allowed'
                                             } ${selectedItemIds.size > 0 && Array.from(selectedItemIds).every(id => items.find(i => i.id === id)?.isChartVisible) ? 'bg-blue-900/30 text-blue-400' : ''} `}
@@ -961,7 +958,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                     }}
                                     onMouseDown={(e) => e.stopPropagation()}
                                     disabled={selectedItemIds.size === 0}
-                                    className={`p - 1.5 rounded - md transition - colors ml - 1 ${selectedItemIds.size > 0
+                                    className={`p-1.5 rounded-md transition-colors ml-1 ${selectedItemIds.size > 0
                                         ? 'hover:bg-gray-800 text-gray-400 hover:text-white'
                                         : 'text-gray-600 cursor-not-allowed'
                                         } `}
@@ -978,7 +975,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                     }}
                                     onMouseDown={(e) => e.stopPropagation()}
                                     disabled={selectedItemIds.size === 0}
-                                    className={`p - 1.5 rounded - md transition - colors ml - 1 ${selectedItemIds.size > 0
+                                    className={`p-1.5 rounded-md transition-colors ml-1 ${selectedItemIds.size > 0
                                         ? 'text-gray-400 hover:text-red-400 hover:bg-gray-800'
                                         : 'text-gray-600 cursor-not-allowed'
                                         } `}
