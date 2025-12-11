@@ -252,6 +252,36 @@ const SortableEventItem: React.FC<SortableEventItemProps> = ({
 
             {/* Content Layer */}
             <div className="relative z-10 flex items-center h-full px-4 w-full">
+                {/* Checkbox */}
+                <div
+                    className="mr-3 flex items-center justify-center cursor-pointer"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onItemClick(item.id);
+                    }}
+                >
+                    <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all duration-200 ${isActive
+                        ? (item.type === 'income' ? 'border-green-400 bg-green-500/20' : item.type === 'expense' ? 'border-red-400 bg-red-500/20' : 'border-purple-400 bg-purple-500/20')
+                        : 'border-gray-500 group-hover:border-white group-hover:shadow-[0_0_8px_rgba(255,255,255,0.3)] bg-transparent'
+                        }`}>
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="3"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className={`w-3 h-3 ${isActive
+                                ? (item.type === 'income' ? 'text-green-400' : item.type === 'expense' ? 'text-red-400' : 'text-purple-400')
+                                : 'text-transparent'
+                                }`}
+                        >
+                            <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                    </div>
+                </div>
+
                 <div className="mr-2 cursor-grab active:cursor-grabbing text-gray-600 group-hover:text-gray-400 transition-colors">
                     <GripVertical size={14} />
                 </div>
@@ -375,6 +405,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
     const [filterType, setFilterType] = useState<'income' | 'expense' | 'effect' | null>(null);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [isZoomTrackingEnabled, setIsZoomTrackingEnabled] = useState(true);
+    const [isTotalSelected, setIsTotalSelected] = useState(false); // Local state for total bar selection
 
     // Keyboard shortcut for search
     React.useEffect(() => {
@@ -754,6 +785,10 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                 endDate={new Date(simulationEndDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }).replace(/\//g, '-')}
                                 color={totalSeriesColor}
                                 onColorChange={onTotalSeriesColorChange}
+                                isSelected={isTotalSelected}
+                                onToggleSelect={() => setIsTotalSelected(!isTotalSelected)}
+                                selectedCount={filteredItems.filter(i => selectedItemIds.has(i.id)).length}
+                                totalCount={filteredItems.length}
                             />
                         )}
                     </div>
@@ -1022,6 +1057,10 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                 endDate={new Date(simulationEndDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }).replace(/\//g, '-')}
                                 color={totalSeriesColor}
                                 onColorChange={onTotalSeriesColorChange}
+                                isSelected={isTotalSelected}
+                                onToggleSelect={() => setIsTotalSelected(!isTotalSelected)}
+                                selectedCount={filteredItems.filter(i => selectedItemIds.has(i.id)).length}
+                                totalCount={filteredItems.length}
                             />
                         )}
                     </div>
