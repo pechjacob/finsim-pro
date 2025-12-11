@@ -10,6 +10,7 @@ import {
     Search,
     Trash2,
     Eye,
+    EyeOff,
     CheckSquare,
     FlipHorizontal as FlipIcon,
     RotateCcw,
@@ -297,6 +298,33 @@ const SortableEventItem: React.FC<SortableEventItemProps> = ({
                             : `${sign}${formatCurrency(item.amount || 0)} ${frequencyText}`
                         }
                     </span>
+                </div>
+
+                {/* Status Icons - Absolutely positioned for vertical alignment across bars */}
+                <div className="absolute left-1/2 -translate-x-[200px] flex items-center space-x-1 z-10">
+                    {/* Chart Visibility Icon */}
+                    <div
+                        className={`relative flex items-center justify-center w-7 h-6 rounded bg-black/40 transition-colors ${isChartSeriesVisible ? 'text-blue-400' : 'text-gray-500'}`}
+                        title={isChartSeriesVisible ? "Chart series visible" : "Chart series hidden"}
+                    >
+                        <LineChart size={14} className={!isChartSeriesVisible ? 'opacity-60' : ''} />
+                        {!isChartSeriesVisible && (
+                            <div className="absolute inset-0 pointer-events-none overflow-hidden rounded">
+                                <div className="absolute top-0 left-0 w-[150%] h-[1px] bg-gray-500 origin-top-left rotate-[40deg] translate-x-[-2px] translate-y-[1px]" />
+                            </div>
+                        )}
+                    </div>
+                    {/* Simulation Visibility Icon */}
+                    <div
+                        className={`relative flex items-center justify-center w-7 h-6 rounded bg-black/40 transition-colors ${item.isEnabled !== false ? 'text-blue-400' : 'text-gray-500'}`}
+                        title={item.isEnabled !== false ? "Event included in simulation" : "Event hidden from simulation"}
+                    >
+                        {item.isEnabled !== false ? (
+                            <Eye size={14} />
+                        ) : (
+                            <EyeOff size={14} className="opacity-50" />
+                        )}
+                    </div>
                 </div>
 
                 {/* Center delta */}
@@ -686,7 +714,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                         className={`p-1.5 rounded-md transition-colors ml-2 ${selectedItemIds.size > 0
                                             ? 'text-gray-400 hover:text-blue-400 hover:bg-gray-800'
                                             : 'text-gray-700 cursor-not-allowed'
-                                            } ${selectedItemIds.size > 0 && Array.from(selectedItemIds).every(id => items.find(i => i.id === id)?.isChartVisible) ? 'bg-blue-900/30 text-blue-400' : ''} `}
+                                            }`}
                                         title={selectedItemIds.size > 0 ? "Toggle Chart Series for Selected" : "Select items to toggle chart series"}
                                     >
                                         <LineChart size={16} />
@@ -975,7 +1003,7 @@ export const TimelineEvents: React.FC<TimelineEventsProps> = ({
                                         className={`p-1.5 rounded-md transition-colors ml-2 ${selectedItemIds.size > 0
                                             ? 'text-gray-400 hover:text-blue-400 hover:bg-gray-800'
                                             : 'text-gray-700 cursor-not-allowed'
-                                            } ${selectedItemIds.size > 0 && Array.from(selectedItemIds).every(id => items.find(i => i.id === id)?.isChartVisible) ? 'bg-blue-900/30 text-blue-400' : ''} `}
+                                            }`}
                                         title={selectedItemIds.size > 0 ? "Toggle Chart Series for Selected" : "Select items to toggle chart series"}
                                     >
                                         <LineChart size={16} />

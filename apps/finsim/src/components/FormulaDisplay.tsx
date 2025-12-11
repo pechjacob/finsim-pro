@@ -4,7 +4,7 @@ import { formatCurrency } from '../utils';
 import { calculateTotalDelta } from '../services/simulation';
 import 'katex/dist/katex.min.css';
 import { InlineMath } from 'react-katex';
-import { GripVertical } from 'lucide-react';
+import { GripVertical, LineChart, Eye, EyeOff } from 'lucide-react';
 
 interface FormulaDisplayProps {
     items: FinancialItem[];
@@ -177,8 +177,37 @@ export const FormulaDisplay: React.FC<FormulaDisplayProps> = ({
                                 <div className={`absolute inset-0 ${bgColor}`} style={{ zIndex: 0 }} />
                             )}
 
-                            {/* Left: Variable Definition + Amount */}
+                            {/* Left: Checkbox + Grip + Variable Definition + Amount */}
                             <div className={`relative flex items-center space-x-2 z-10 ${textColor}`}>
+                                {/* Checkbox */}
+                                <div
+                                    className="mr-1 flex items-center justify-center cursor-pointer"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onItemClick?.(item.id);
+                                    }}
+                                >
+                                    <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all duration-200 ${isActive
+                                        ? (item.type === 'income' ? 'border-green-400 bg-green-500/20' : item.type === 'expense' ? 'border-red-400 bg-red-500/20' : 'border-purple-400 bg-purple-500/20')
+                                        : 'border-gray-500 group-hover:border-white group-hover:shadow-[0_0_8px_rgba(255,255,255,0.3)] bg-transparent'
+                                        }`}>
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="3"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            className={`w-3 h-3 ${isActive
+                                                ? (item.type === 'income' ? 'text-green-400' : item.type === 'expense' ? 'text-red-400' : 'text-purple-400')
+                                                : 'text-transparent'
+                                                }`}
+                                        >
+                                            <polyline points="20 6 9 17 4 12" />
+                                        </svg>
+                                    </div>
+                                </div>
                                 <div className="mr-2 text-gray-600 group-hover:text-gray-400 transition-colors">
                                     <GripVertical size={14} />
                                 </div>
@@ -190,6 +219,29 @@ export const FormulaDisplay: React.FC<FormulaDisplayProps> = ({
                                 <span className="text-xs opacity-70 italic">
                                     {frequencyText}
                                 </span>
+                            </div>
+
+                            {/* Status Icons - Absolutely positioned for vertical alignment across bars */}
+                            <div className="absolute left-1/2 -translate-x-[200px] flex items-center space-x-1 z-10">
+                                {/* Chart Visibility Icon */}
+                                <div
+                                    className={`relative flex items-center justify-center w-7 h-6 rounded bg-black/40 transition-colors ${showIndividualSeries && item.isChartVisible !== false ? 'text-blue-400' : 'text-gray-500'}`}
+                                    title={showIndividualSeries && item.isChartVisible !== false ? "Chart series visible" : "Chart series hidden"}
+                                >
+                                    <LineChart size={14} className={!(showIndividualSeries && item.isChartVisible !== false) ? 'opacity-60' : ''} />
+                                    {!(showIndividualSeries && item.isChartVisible !== false) && (
+                                        <div className="absolute inset-0 pointer-events-none overflow-hidden rounded">
+                                            <div className="absolute top-0 left-0 w-[150%] h-[1px] bg-gray-500 origin-top-left rotate-[40deg] translate-x-[-2px] translate-y-[1px]" />
+                                        </div>
+                                    )}
+                                </div>
+                                {/* Simulation Visibility Icon */}
+                                <div
+                                    className={`relative flex items-center justify-center w-7 h-6 rounded bg-black/40 transition-colors ${isEnabled ? 'text-blue-400' : 'text-gray-500'}`}
+                                    title={isEnabled ? "Event included in simulation" : "Event hidden from simulation"}
+                                >
+                                    {isEnabled ? <Eye size={14} /> : <EyeOff size={14} />}
+                                </div>
                             </div>
 
                             {/* Center: Delta */}

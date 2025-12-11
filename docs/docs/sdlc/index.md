@@ -8,13 +8,16 @@ sidebar_position: 6
 ## Unreleased
 
 **Features:**
+- Add checkboxes to event bars and total bar (#9)
 - Implement individual and total event bar color pickers
 - Add llms.txt plugin and update agent rules
 - Restrict github link to dev environment
 - Hide individual series by default and refactor chart toggling
 
 **Bug Fixes:**
-- Repair timeline header styling and polish event bar aesthetics
+- Resolve visibility toggle rendering bug
+- Remove delta text when collapsed (#8)
+- Repair timeline header styling and polish event bar aesthetics (#7)
 - Unify formula view layout and styles with event timeline
 
 ## v1.6.1
