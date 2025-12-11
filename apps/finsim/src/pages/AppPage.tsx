@@ -99,6 +99,11 @@ const AppPage: React.FC = () => {
     return draftItem ? [...items, draftItem] : items;
   }, [items, draftItem]);
 
+  // Memoize filtered items for chart to prevent unnecessary re-renders during zoom gestures
+  const filteredChartItems = useMemo(() => {
+    return items.filter(i => i.accountId === activeAccountId && i.isEnabled !== false);
+  }, [items, activeAccountId]);
+
   // Handlers
   const handleUpsertItem = (item: FinancialItem) => {
     setItems(prev => {
@@ -316,7 +321,7 @@ const AppPage: React.FC = () => {
                 frequency={granularity}
                 onFrequencyChange={setGranularity}
                 onHover={setHoverDate}
-                items={items.filter(i => i.accountId === activeAccountId && i.isEnabled !== false)}
+                items={filteredChartItems}
                 simulationPoints={simulationPoints}
                 showIndividualSeries={showIndividualSeries}
                 totalSeriesColor={totalSeriesColor}

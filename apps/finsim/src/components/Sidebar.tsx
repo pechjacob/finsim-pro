@@ -95,7 +95,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         if (draftItem) {
             // If we have a draft item, we are in creation mode.
             // We don't set editingItem here because we use draftItem directly.
-            setIsCollapsed(false);
+            setIsCollapsed(false); // Expand sidebar for new item creation
             setEditingItem(null);
             setOriginalItem(null);
         } else if (activeItem) {
@@ -103,8 +103,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             if (!editingItem || editingItem.id !== activeItem.id) {
                 setEditingItem({ ...activeItem });
                 setOriginalItem({ ...activeItem }); // Store original for revert
-                // Automatically expand if an item is selected for editing
-                setIsCollapsed(false);
+                // Don't auto-expand when selecting items - user may want sidebar collapsed
             }
         } else {
             setEditingItem(null);

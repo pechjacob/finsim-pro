@@ -236,6 +236,10 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
     const latestOnVisibleDateRangeChange = useRef(onVisibleDateRangeChange);
     const latestMaxRangeDays = useRef(maxRangeDays);
 
+    // Debounce timer for parent state updates during rapid zoom gestures
+    const parentUpdateTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const pendingRange = useRef<{ from: string; to: string } | null>(null);
+
     useEffect(() => {
         latestOnHover.current = onHover;
         latestOnVisibleDateRangeChange.current = onVisibleDateRangeChange;
@@ -527,9 +531,17 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
                 const fromStr = timeRange.from as string;
                 const toStr = timeRange.to as string;
 
-                if (latestOnVisibleDateRangeChange.current) {
-                    latestOnVisibleDateRangeChange.current(fromStr, toStr);
+                // Debounce parent state update to prevent feedback loop during rapid zoom gestures
+                pendingRange.current = { from: fromStr, to: toStr };
+                if (parentUpdateTimer.current) {
+                    clearTimeout(parentUpdateTimer.current);
                 }
+                parentUpdateTimer.current = setTimeout(() => {
+                    if (pendingRange.current && latestOnVisibleDateRangeChange.current) {
+                        latestOnVisibleDateRangeChange.current(pendingRange.current.from, pendingRange.current.to);
+                    }
+                    parentUpdateTimer.current = null;
+                }, 50); // 50ms debounce
 
                 const start = new Date(fromStr);
                 const end = new Date(toStr);
