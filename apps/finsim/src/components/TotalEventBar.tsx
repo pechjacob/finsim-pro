@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { formatCurrency } from '../utils';
-import { GripVertical } from 'lucide-react';
+import { GripVertical, Eye, LineChart } from 'lucide-react';
 
 interface TotalEventBarProps {
     delta: number;
@@ -32,13 +32,13 @@ export const TotalEventBar: React.FC<TotalEventBarProps> = ({
     // assuming the other bars use this to offset the Y-axis space.
 
     // Calculate background and border based on selection
-    const isSelectedBg = isSelected ? 'bg-gray-800' : 'bg-transparent';
+    const isSelectedBg = isSelected ? 'bg-gray-800' : 'hover:bg-gray-800/50';
     const checkboxBorder = isSelected ? 'border-blue-400 bg-blue-500/20' : 'border-gray-500 group-hover:border-white group-hover:shadow-[0_0_8px_rgba(255,255,255,0.3)] bg-transparent';
     const checkboxText = isSelected ? 'text-blue-400' : 'text-transparent';
 
     return (
         <div
-            className={`relative h-10 mx-2 mb-1 rounded-md border border-gray-700 overflow-hidden select-none shrink-0 group transition-colors ${isSelectedBg}`}
+            className={`relative h-10 mx-2 mb-1 rounded-md border ${isSelected ? 'border-white' : 'border-gray-700'} overflow-hidden select-none shrink-0 group transition-colors ${isSelectedBg}`}
             onClick={() => onToggleSelect && onToggleSelect()}
         >
             {/* Full Width Track (Inactive background - dark to contrast with gradient) */}
@@ -78,7 +78,7 @@ export const TotalEventBar: React.FC<TotalEventBarProps> = ({
                 </div>
 
                 {/* Icon (9 dots / Grip) */}
-                <div className="mr-2 text-gray-500">
+                <div className="mr-2 text-gray-600 group-hover:text-gray-400 transition-colors">
                     <GripVertical size={14} />
                 </div>
 
@@ -89,6 +89,29 @@ export const TotalEventBar: React.FC<TotalEventBarProps> = ({
                 <span className="text-xs text-gray-400 font-mono hidden md:inline-block">
                     {selectedCount} of {totalCount} events selected
                 </span>
+
+                {/* Status Icons - Absolutely positioned for vertical alignment across bars */}
+                <div className="absolute left-1/2 -translate-x-[200px] flex items-center space-x-1 z-10">
+                    {/* Chart Visibility Icon */}
+                    <div
+                        className={`relative flex items-center justify-center w-7 h-6 rounded bg-black/40 transition-colors ${isChartSeriesVisible ? 'text-blue-400' : 'text-gray-500'}`}
+                        title={isChartSeriesVisible ? "Total chart series visible" : "Total chart series hidden"}
+                    >
+                        <LineChart size={14} className={!isChartSeriesVisible ? 'opacity-60' : ''} />
+                        {!isChartSeriesVisible && (
+                            <div className="absolute inset-0 pointer-events-none overflow-hidden rounded">
+                                <div className="absolute top-0 left-0 w-[150%] h-[1px] bg-gray-500 origin-top-left rotate-[40deg] translate-x-[-2px] translate-y-[1px]" />
+                            </div>
+                        )}
+                    </div>
+                    {/* Simulation Visibility Icon - Always enabled for Total */}
+                    <div
+                        className="relative flex items-center justify-center w-7 h-6 rounded bg-black/40 transition-colors text-blue-400"
+                        title="Total is always included in simulation"
+                    >
+                        <Eye size={14} />
+                    </div>
+                </div>
 
                 {/* Center Delta */}
                 <div className="flex-1 flex justify-center items-center absolute inset-0 pointer-events-none">
@@ -110,7 +133,7 @@ export const TotalEventBar: React.FC<TotalEventBarProps> = ({
             {/* Color Indicator Strip - Full Height, Far Right */}
             {/* Clickable to trigger hidden color input */}
             <div
-                className={`absolute right-0 top-0 bottom-0 w-3 transition-all z-20 shadow-[-2px_0_10px_rgba(0,0,0,0.5)] ${isChartSeriesVisible ? 'cursor-pointer hover:brightness-110' : 'cursor-not-allowed grayscale opacity-50'}`}
+                className={`absolute right-0 top-0 bottom-0 w-3 transition-all z-20 shadow-[-2px_0_10px_rgba(0,0,0,0.5)] ${isChartSeriesVisible ? `cursor-pointer hover:brightness-110 ${isSelected ? 'brightness-125' : ''}` : 'cursor-not-allowed grayscale opacity-50'}`}
                 style={{ backgroundColor: color }}
                 onClick={(e) => {
                     e.stopPropagation();
@@ -128,6 +151,7 @@ export const TotalEventBar: React.FC<TotalEventBarProps> = ({
                     type="color"
                     value={color}
                     onChange={(e) => onColorChange(e.target.value)}
+                    onClick={(e) => e.stopPropagation()}
                     className="absolute opacity-0 pointer-events-none"
                     aria-label="Total series color picker"
                 />
