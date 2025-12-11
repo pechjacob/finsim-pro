@@ -297,24 +297,32 @@ const AppPage: React.FC = () => {
 
         {/* Chart Area (Upper Split) */}
         <div className="flex-1 w-full border-b border-gray-800 min-h-0">
-          {USE_LIGHTWEIGHT_CHARTS ? (
-            <LightweightFinancialChart
-              balanceData={React.useMemo(() => simulationData.map(p => ({ date: p.date, balance: p.balance })), [simulationData])}
-              visibleStartDate={visibleStartDate}
-              visibleEndDate={visibleEndDate}
-              simulationStartDate={simulationStartDate}
-              simulationEndDate={simulationEndDate}
-              onVisibleDateRangeChange={handleVisibleDateRangeChange}
-              onSimulationDateRangeChange={handleSimulationDateRangeChange}
-              frequency={granularity}
-              onFrequencyChange={setGranularity}
-              onHover={setHoverDate}
-              items={items.filter(i => i.accountId === activeAccountId && i.isEnabled !== false)}
-              simulationPoints={simulationPoints}
-              showIndividualSeries={showIndividualSeries}
-              totalSeriesColor={totalSeriesColor}
-            />
-          ) : (
+          {USE_LIGHTWEIGHT_CHARTS ? (() => {
+            // Calculate a key that changes when we transition between "all items disabled" and "some items enabled"
+            // This forces React to remount the chart component, working around a lightweight-charts rendering bug
+            const enabledItemsCount = items.filter(i => i.accountId === activeAccountId && i.isEnabled !== false).length;
+            const chartKey = enabledItemsCount === 0 ? 'no-items' : 'has-items';
+
+            return (
+              <LightweightFinancialChart
+                key={chartKey}
+                balanceData={React.useMemo(() => simulationData.map(p => ({ date: p.date, balance: p.balance })), [simulationData])}
+                visibleStartDate={visibleStartDate}
+                visibleEndDate={visibleEndDate}
+                simulationStartDate={simulationStartDate}
+                simulationEndDate={simulationEndDate}
+                onVisibleDateRangeChange={handleVisibleDateRangeChange}
+                onSimulationDateRangeChange={handleSimulationDateRangeChange}
+                frequency={granularity}
+                onFrequencyChange={setGranularity}
+                onHover={setHoverDate}
+                items={items.filter(i => i.accountId === activeAccountId && i.isEnabled !== false)}
+                simulationPoints={simulationPoints}
+                showIndividualSeries={showIndividualSeries}
+                totalSeriesColor={totalSeriesColor}
+              />
+            );
+          })() : (
             <FinancialChart
               data={simulationData}
               granularity={granularity}

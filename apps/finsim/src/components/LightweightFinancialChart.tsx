@@ -618,19 +618,54 @@ export const LightweightFinancialChart: React.FC<LightweightFinancialChartProps>
         };
     }, []); // Run once on mount
 
-    // Update data separately
+    // Update data separately - CRITICAL FIX: Remove and recreate series to prevent rendering corruption
+    // when data transitions between all-zeros and real values
     useEffect(() => {
+        if (!chartRef.current) return;
+
+        const chart = chartRef.current;
+
+        // Remove old series if it exists
         if (seriesRef.current) {
-            seriesRef.current.setData(chartData);
-            // Ensure Sim lines are updated if chart is already ready when data loads
-            if (chartRef.current) {
-                // Use setTimeout to allow chart to process new data before calculating coordinates
-                setTimeout(() => {
-                    latestUpdateSimLines.current?.();
-                }, 50);
+            try {
+                chart.removeSeries(seriesRef.current);
+            } catch (e) {
+                // Ignore if already removed
             }
         }
-    }, [chartData]);
+
+        // Create new series with current color
+        const newSeries = chart.addAreaSeries({
+            lineColor: totalSeriesColor,
+            topColor: `${totalSeriesColor}4D`,
+            bottomColor: `${totalSeriesColor}00`,
+            lineWidth: 2,
+            lastValueVisible: true,
+            priceLineVisible: true,
+        });
+
+        // Set the data
+        newSeries.setData(chartData);
+
+        // Update ref
+        seriesRef.current = newSeries;
+
+        // Apply visible range after data is set
+        setTimeout(() => {
+            try {
+                const startTime = new Date(visibleStartDate).getTime() / 1000;
+                const endTime = new Date(visibleEndDate).getTime() / 1000;
+                chart.timeScale().setVisibleRange({
+                    from: startTime as UTCTimestamp,
+                    to: endTime as UTCTimestamp
+                });
+            } catch (e) {
+                // Ignore if range is invalid
+            }
+
+            latestUpdateSimLines.current?.();
+        }, 50);
+    }, [chartData, visibleStartDate, visibleEndDate, totalSeriesColor]);
 
     // Update main series color when prop changes
     useEffect(() => {
